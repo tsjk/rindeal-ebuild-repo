@@ -1,0 +1,10 @@
+--- metadata.xml	2015-02-28 01:32:01.288849637 +0100
++++ files/metadata.xml	2015-02-28 01:33:39.377848743 +0100
+@@ -8,5 +8,6 @@
+ 	</maintainer>
+ 	<use>
+ 		<flag name="html">Add support for HTML files</flag>
++		<flag name="uncrustify">Add support for Uncrustify indenter and beautifier</flag>
+ 	</use>
+ </pkgmetadata>
+\ No newline at end of file

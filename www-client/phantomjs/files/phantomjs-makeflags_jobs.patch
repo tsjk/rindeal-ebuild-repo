@@ -1,0 +1,11 @@
+--- a/build.sh	2015-11-08 17:06:36.536319200 +0100
++++ b/build.sh	2015-11-09 22:56:26.967434169 +0100
+@@ -8,7 +8,7 @@
+ MAKEFLAGS_JOBS=''
+ 
+ if [[ "$MAKEFLAGS" != "" ]]; then
+-  MAKEFLAGS_JOBS=$(echo $MAKEFLAGS | egrep -o '\-j[0-9]+' | egrep -o '[0-9]+')
++  MAKEFLAGS_JOBS=$(echo $MAKEFLAGS | egrep -o '\-j *[0-9]+' | egrep -o '[0-9]+')
+ fi
+ 
+ if [[ "$MAKEFLAGS_JOBS" != "" ]]; then

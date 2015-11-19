@@ -1,0 +1,108 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+</head>
+<body>
+<script>
+
+var pages = [
+    "https://github.com/",
+    "https://www.flickr.com/explore",
+    "https://www.google.com/maps",
+    "https://github.com/torvalds/linux/blob/v4.3/drivers/net/wireless/brcm80211/brcmsmac/phy/phy_n.c",
+    "https://www.youtube.com/watch?v=o7auqhgjgig",
+    "https://en.wikipedia.org/wiki/Wikipedia",
+    "https://twitter.com/barackobama",
+    "http://www.ebay.com/",
+    "https://www.facebook.com/",
+    "http://buzz.blogger.com/",
+    "https://en.blog.wordpress.com/",
+    "https://www.reddit.com/",
+    "https://www.paypal.com",
+    "https://imgur.com/",
+    "http://www.imdb.com/",
+    "https://vimeo.com/channels/staffpicks",
+    "https://mail.google.com",
+    "http://drive.google.com/",
+    "http://bitbucket.org/",
+    "https://gitlab.com/gitlab-org/gitlab-ce/issues",
+    "https://gitlab.com/gitlab-org/gitlab-ce/tree/master",
+    "https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/1749/diffs",
+    "https://github.com/torvalds/linux/commit/4ef7ea9195ea73262cd9730fb54e1eb726da157b",
+    "https://gitlab.com/gitlab-org/gitlab-design/commit/e70f653726c812b3f4473f2a4bb4b4b48fd246c3?force_show_diff=true",
+];
+
+// benchmarks
+var benchmarks = [
+    "http://krakenbenchmark.mozilla.org/kraken-1.1/driver.html",
+    "http://peacekeeper.futuremark.com/run.action",
+];
+
+var openPageInterval = 5*1000;
+var openPageKeepCount = 20;
+var runBenchmarksAfterTime = 60*1000;
+
+var closeAllAfterTime = 20*60*1000;
+
+var openPages = [];
+var openBenchmarks = [];
+var pagesIdx = 0;
+
+function getRandomInt(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+
+function openPage(){
+    if(pagesIdx >= pages.length)
+        pagesIdx = 0;
+    openPages.push(window.open(pages[pagesIdx++]));
+}
+
+
+function closePage() {
+    if(openPages.length > 0) {
+        var idx = getRandomInt(0, openPages.length);
+        openPages[idx].close();
+        openPages.splice(idx, 1);
+    }
+}
+
+function runBenchmarks() {
+    var i;
+    for(i=0; i<benchmarks.length; i++)
+        openBenchmarks.push(window.open(benchmarks[i]));
+}
+
+
+window.onload = function () {
+    var intervals = [];
+    intervals.push(window.setInterval(openPage, openPageInterval));
+    window.setTimeout(function(){
+            intervals.push(window.setInterval(closePage, openPageInterval));
+        },
+        openPageKeepCount*openPageInterval
+    );
+
+    window.setTimeout(runBenchmarks, runBenchmarksAfterTime);
+
+    window.setTimeout(function(){
+            var i;
+            for(i=0;i<intervals.length; i++)
+                window.clearInterval(intervals[i]);
+
+            for(i=0;i<openPages.length; i++)
+                openPages[i].close();
+
+            for(i=0;i<openBenchmarks.length; i++)
+                openBenchmarks[i].close();
+
+            window.close();
+        },
+        closeAllAfterTime
+    );
+};
+
+</script>
+</body>
