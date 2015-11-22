@@ -13,8 +13,14 @@ SLOT="0"
 KEYWORDS="-* ~amd64 ~x86"
 IUSE=""
 
-DEPEND=""
-RDEPEND="${DEPEND}"
+RDEPEND="
+    >=sys-apps/dbus-1.0.2
+    >=dev-libs/dbus-glib-0.78
+    >=dev-libs/glib-2.16.0:2
+    >=x11-libs/gtk+-2.16.0:2
+    >=x11-libs/pango-1.14.0
+    >=sys-libs/zlib-1.1.4
+"
 
 RESTRICT="mirror strip"
 
