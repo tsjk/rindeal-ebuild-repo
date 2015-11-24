@@ -59,13 +59,16 @@ plugins_src_dir="$WORKDIR/Plugins"
 disable_modules (){
     local file="$1"
     shift
-    echo "X=$#"
     if [ $# -gt 0 ]; then
         edos2unix "$file"
+
+        local regex=""
         for m in "$@"; do
-            echo sed -i -r "/\b$m\b( \\\\|\$)/d" "$file"
-            sed -i -r "/\b$m\b( \\\\|\$)/d" "$file"
+            regex+="\b$m\b( \\\\|\$)|"
         done
+        regex="${regex:0:-1}" # last pipe
+
+        sed -i -r "/$regex/d" "$file"
     fi
 }
 
