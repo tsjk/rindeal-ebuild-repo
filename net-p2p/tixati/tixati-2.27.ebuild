@@ -4,15 +4,14 @@
 
 EAPI=5
 
-inherit eutils
+inherit eutils fdo-mime
 
 DESCRIPTION="Tixati is a New and Powerful P2P System"
 HOMEPAGE="http://www.tixati.com"
-
 LICENSE="$PN"
+
 SLOT="0"
 KEYWORDS="-* ~amd64 ~x86"
-IUSE=""
 
 RDEPEND="
     >=sys-apps/dbus-1.0.2
@@ -25,24 +24,14 @@ RDEPEND="
 
 RESTRICT="mirror strip"
 
-pkg_name_muster="$PN-$PV-1.<ARCH>.manualinstall"
-pkg_name_x86="${pkg_name_muster/<ARCH>/i686}"
-pkg_name_amd64="${pkg_name_muster/<ARCH>/x86_64}"
-
-if has amd64 $USE; then
-    pkg_name="$pkg_name_amd64"
-elif has x86 $USE; then
-    pkg_name="$pkg_name_x86"
-fi
-
 src_uri_base="$HOMEPAGE/download"
+pkg_name_muster="$PN-$PV-1.<ARCH>.manualinstall"
 SRC_URI="
-    x86?    ( $src_uri_base/$pkg_name_x86.tar.gz )
-    amd64?  ( $src_uri_base/$pkg_name_amd64.tar.gz )
+    x86?    ( $src_uri_base/${pkg_name_muster/<ARCH>/i686}.tar.gz )
+    amd64?  ( $src_uri_base/${pkg_name_muster/<ARCH>/x86_64}.tar.gz )
 "
 
-S="$WORKDIR/$pkg_name"
-
+S="$WORKDIR/${A/.tar.gz}"
 
 src_install() {
     dobin   "$PN"
