@@ -35,11 +35,6 @@ DEPEND="
 
     >=dev-qt/designer-$min_qt_ver
     cups? ( >=dev-qt/qtprintsupport-$min_qt_ver )
-    $(
-        for m in $qtmodules; do
-            echo ">=dev-qt/qt$m-$min_qt_ver"
-        done
-    )
 
     dev-db/sqlite:3
     sqlite2? ( dev-db/sqlite:0 )
@@ -47,6 +42,10 @@ DEPEND="
     cli? ( sys-libs/readline )
     tcl? ( dev-lang/tcl )
 "
+for m in $qtmodules; do
+    DEPEND+="
+    >=dev-qt/qt$m-$min_qt_ver"
+done
 
 RDEPEND="${DEPEND}"
 
@@ -57,31 +56,35 @@ sqlitestudio_src_dir="$WORKDIR/$PN_PRETTY"
 plugins_build_dir="$sqlitestudio_build_dir/Plugins"
 plugins_src_dir="$WORKDIR/Plugins"
 
-src_prepare () {
-    local file
-
-    ## Core
-    if ! use cli; then
-        file="$sqlitestudio_src_dir/$PN_PRETTY.pro"
+disable_modules (){
+    local file="$1"
+    shift
+    echo "X=$#"
+    if [ $# -gt 0 ]; then
         edos2unix "$file"
-        sed -i -r '/\bcli\b( \\|$)/d' "$file"
-    fi
-
-    ## Plugins
-    local disabled_plugins=(
-        "$( use tcl      || echo "ScriptingTcl" )"
-        "$( use sqlite2  || echo "DbSqlite2" )"
-        "$( use cups     || echo "Printing" )"
-    )
-
-    if [ ${#disabled_plugins[@]} -gt 0 ]; then
-        file="$plugins_src_dir/Plugins.pro"
-        edos2unix "$file"
-        for p in "${disabled_plugins[@]}"; do
-            sed -i -r "/\b$p\b( \\\\|\$)/d" "$file"
+        for m in "$@"; do
+            echo sed -i -r "/\b$m\b( \\\\|\$)/d" "$file"
+            sed -i -r "/\b$m\b( \\\\|\$)/d" "$file"
         done
     fi
+}
 
+src_prepare () {
+    ## Core
+    disabled_modules=()
+
+    use cli || disabled_modules+=( "cli" )
+
+    disable_modules "$sqlitestudio_src_dir/$PN_PRETTY.pro" "${disabled_modules[@]}"
+
+    ## Plugins
+    disabled_plugins=()
+
+    use tcl     || disabled_plugins+=( "ScriptingTcl" )
+    use sqlite2 || disabled_plugins+=( "DbSqlite2" )
+    use cups    || disabled_plugins+=( "Printing" )
+
+    disable_modules "$plugins_src_dir/Plugins.pro" "${disabled_plugins[@]}"
 }
 
 src_compile () {
@@ -101,7 +104,7 @@ src_compile () {
         "DEFINES += NO_AUTO_UPDATES"
     )
 
-    use test && qmake_args+="DEFINES += tests"
+    use test && qmake_args+=( "DEFINES += tests" )
 
     eqmake5 "${qmake_args[@]}" "$sqlitestudio_src_dir"
     emake
