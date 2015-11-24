@@ -4,6 +4,7 @@
 
 EAPI=5
 
+inherit eutils
 
 DESCRIPTION="Tixati is a New and Powerful P2P System"
 HOMEPAGE="http://www.tixati.com"
@@ -51,5 +52,4 @@ src_install() {
 
 pkg_postinst() {
     fdo-mime_desktop_database_update
-    gnome2_icon_cache_update
 }
