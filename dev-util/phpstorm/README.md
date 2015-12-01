@@ -1,4 +1,4 @@
 Features:
  - slotted
- - stripps bundled JRE
+ - strips bundled JRE
  - ensures `IS_EAP` is disabled
