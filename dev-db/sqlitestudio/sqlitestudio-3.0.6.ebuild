@@ -129,15 +129,19 @@ src_install () {
 
     dodoc "$sqlitestudio_src_dir/docs/sqlitestudio3_docs.cfg"
     doicon "${FILESDIR}/$PN.svg"
-    make_desktop_entry \
-        "$EPREFIX/usr/bin/$PN %F" \
-        "$PN_PRETTY" \
-        "$PN.svg" \
-        "Development;Utility" \
-        "$(
-            echo 'Terminal=false'
-            echo "MimeType=application/x-sqlite3;$(use sqlite2 && echo 'application/x-sqlite2;')"
-         )"
+
+    make_desktop_entry_args=(
+        "$EPREFIX/usr/bin/$PN %F"   # exec
+        "$PN_PRETTY"                # name
+        "$PN.svg"                   # icon
+        "Development;Utility"       # categories
+    )
+    make_desktop_entry_extras=(
+        'Terminal=false'
+        "MimeType=application/x-sqlite3;$(use sqlite2 && echo 'application/x-sqlite2;')"
+    )
+
+    make_desktop_entry "${make_desktop_entry_args[@]}" "$( printf '%s\n' "${make_desktop_entry_extras[@]}" )"
 }
 
 pkg_postinst() {
