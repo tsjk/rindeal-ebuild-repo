@@ -1,6 +1,6 @@
 #!/bin/bash
 
-URL_PREFIX="./tree/master"
+URL_PREFIX="."
 
 cd "$( dirname "${BASH_SOURCE[0]}" )"
 
