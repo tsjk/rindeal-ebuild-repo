@@ -63,7 +63,7 @@ src_install() {
         "Development"                           # categories
     )
     make_desktop_entry_extras=(
-        "MimeType=text/x-php;text/html"
+        "MimeType=text/x-php;text/html;"        # MUST end with semicolon
     )
 
     make_desktop_entry "${make_desktop_entry_args[@]}" "$( printf '%s\n' "${make_desktop_entry_extras[@]}" )"
