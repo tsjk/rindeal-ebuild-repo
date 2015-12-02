@@ -8,10 +8,11 @@ inherit eutils fdo-mime
 
 DESCRIPTION="Tixati is a New and Powerful P2P System"
 HOMEPAGE="http://www.tixati.com"
-LICENSE="$PN"
+LICENSE="$PN" # bundled in the binary, available in menu "About -> License Agreement"
 
 SLOT="0"
 KEYWORDS="-* ~amd64 ~x86"
+RESTRICT="mirror strip"
 
 RDEPEND="
     >=sys-apps/dbus-1.0.2
@@ -21,8 +22,6 @@ RDEPEND="
     >=x11-libs/pango-1.14.0
     >=sys-libs/zlib-1.1.4
 "
-
-RESTRICT="mirror strip"
 
 src_uri_base="$HOMEPAGE/download"
 pkg_name_muster="$PN-$PV-1.<ARCH>.manualinstall"
