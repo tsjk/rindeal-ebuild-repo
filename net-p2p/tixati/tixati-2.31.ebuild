@@ -11,7 +11,7 @@ HOMEPAGE="http://www.tixati.com"
 LICENSE="$PN" # bundled in the binary, available in menu "About -> License Agreement"
 
 SLOT="0"
-KEYWORDS="-* amd64 ~x86"
+KEYWORDS="-* ~amd64 ~x86"
 RESTRICT="mirror strip"
 
 RDEPEND="
