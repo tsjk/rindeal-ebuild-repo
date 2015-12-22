@@ -6,7 +6,7 @@ EAPI=5
 AUTOTOOLS_AUTORECONF=1
 AUTOTOOLS_PRUNE_LIBTOOL_FILES=all
 
-inherit autotools-multilib
+inherit flag-o-matic autotools-multilib
 
 DESCRIPTION="free lossless audio encoder and decoder"
 HOMEPAGE="http://flac.sourceforge.net"
@@ -34,13 +34,13 @@ src_prepare() {
 		"${FILESDIR}"/${PN}-1.3.0-asneeded.patch
 		"${FILESDIR}"/${PN}-1.3.0-dontbuild-tests.patch
 		"${FILESDIR}"/${PN}-1.3.0-dontbuild-examples.patch
+		"${FILESDIR}/flac-gcc5-lto-avx2.patch"
 	)
 
 	AT_M4DIR="m4" autotools-multilib_src_prepare
 }
 
 src_configure() {
-	append-flags -UFLAC__AVX2_SUPPORTED
 	local myeconfargs=(
 		$(use_enable debug)
 		$(use_enable cpu_flags_x86_sse sse)
