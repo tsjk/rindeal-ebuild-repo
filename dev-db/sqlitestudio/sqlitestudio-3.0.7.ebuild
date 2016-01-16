@@ -16,7 +16,7 @@ SRC_URI="$HOMEPAGE/files/sqlitestudio3/complete/tar/$P.tar.gz"
 inherit qmake-utils fdo-mime
 
 SLOT="0"
-KEYWORDS="amd64 ~x86"
+KEYWORDS="~amd64 ~x86"
 
 IUSE="
     sqlite2
