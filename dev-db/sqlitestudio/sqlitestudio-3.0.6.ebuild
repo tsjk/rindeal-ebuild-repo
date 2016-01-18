@@ -1,6 +1,5 @@
 # Copyright (C) 2015; Jan Chren <dev.rindeal@outlook.com>
 # Distributed under the terms of the GNU General Public License v2
-# $Id$
 
 # http://wiki.sqlitestudio.pl/index.php/Compiling_application_from_sources
 
@@ -67,7 +66,8 @@ disable_modules (){
             regex+="\b$m\b( \\\\|\$)|"
         done
         regex="${regex:0:-1}" # last pipe
-
+		
+		elog "Disabling modules: '$@' in '$file'"
         sed -i -r "/$regex/d" "$file"
     fi
 }
@@ -99,16 +99,17 @@ src_compile () {
         "LIBDIR=$EPREFIX/usr/$(get_libdir)"
         "BINDIR=$EPREFIX/usr/bin"
 
-        "DEFINES += PLUGINS_DIR=$EPREFIX/usr/$(get_libdir)/$PN"
-        "DEFINES += ICONS_DIR=$EPREFIX/usr/share/$PN/icons"
-        "DEFINES += FORMS_DIR=$EPREFIX/usr/share/$PN/forms"
+        "DEFINES+=PLUGINS_DIR=$EPREFIX/usr/$(get_libdir)/$PN"
+        "DEFINES+=ICONS_DIR=$EPREFIX/usr/share/$PN/icons"
+        "DEFINES+=FORMS_DIR=$EPREFIX/usr/share/$PN/forms"
 
         # not strictly needed since version 3.0.6, but nevermind
-        "DEFINES += NO_AUTO_UPDATES"
+        "DEFINES+=NO_AUTO_UPDATES"
     )
 
-    use test && qmake_args+=( "DEFINES += tests" )
+    use test && qmake_args+=( "DEFINES+=tests" )
 
+	elog eqmake5 "${qmake_args[@]}" "$sqlitestudio_src_dir"
     eqmake5 "${qmake_args[@]}" "$sqlitestudio_src_dir"
     emake
 
