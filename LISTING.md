@@ -8,6 +8,7 @@
 - [dev-db](./dev-db)
  - [sqlitestudio](./dev-db/sqlitestudio)
 - [dev-ruby](./dev-ruby)
+ - [github_cli](./dev-ruby/github_cli)
  - [travis](./dev-ruby/travis)
 - [dev-util](./dev-util)
  - [phpstorm](./dev-util/phpstorm)
