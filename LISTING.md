@@ -17,6 +17,7 @@
  - [flac](./media-libs/flac)
 - [media-video](./media-video)
  - [fswebcam](./media-video/fswebcam)
+ - [xt7-player-mpv](./media-video/xt7-player-mpv)
 - [net-im](./net-im)
  - [telegram](./net-im/telegram)
  - [telegram-cli](./net-im/telegram-cli)
