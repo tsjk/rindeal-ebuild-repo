@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "http://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+  <use>
+    <flag name="taglib">taglib to tag audio files and speed-up library syncronization</flag>
+    <flag name="global-hotkeys">xbindkeys: to use global hotkeys</flag>
+    <flag name="dvb">scan and femon from LinuxTV dvb-apps to use dvbt features</flag>
+    <flag name="youtube">youtube-dl to watch and download youtube videos</flag>
+  </use>
+</pkgmetadata>

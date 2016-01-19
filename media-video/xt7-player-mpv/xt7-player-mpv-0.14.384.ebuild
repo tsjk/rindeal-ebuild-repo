@@ -15,7 +15,7 @@ RESTRICT="mirror"
 SLOT="0"
 KEYWORDS="~amd64"
 
-IUSE=""
+IUSE="taglib global-hotkeys dvb youtube"
 
 DEPEND="
 	dev-lang/gambas:3[libxml,qt4,dbus,x11,net,curl]
