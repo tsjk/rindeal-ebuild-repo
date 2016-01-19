@@ -1,6 +1,5 @@
-# Copyright 1999-2016 Gentoo Foundation
+# Copyright (C) 2015; Jan Chren <dev.rindeal@outlook.com>
 # Distributed under the terms of the GNU General Public License v2
-# $Id$
 
 EAPI=6
 
@@ -36,5 +35,4 @@ src_install (){
 	
 	domenu "${PN}.desktop"
 	doicon -s 48 "${PN}.png"
-	
 }
