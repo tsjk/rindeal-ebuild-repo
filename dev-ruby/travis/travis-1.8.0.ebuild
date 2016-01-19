@@ -8,8 +8,8 @@ inherit ruby-fakegem
 
 DESCRIPTION="Travis CI Client (CLI and Ruby library)"
 HOMEPAGE="https://github.com/travis-ci/travis.rb"
-
 LICENSE="MIT"
+
 SLOT="0"
 KEYWORDS="amd64 ~x86"
 IUSE=""
