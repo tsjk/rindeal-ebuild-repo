@@ -6,6 +6,7 @@
 - [app-text](./app-text)
  - [cppman](./app-text/cppman)
 - [dev-db](./dev-db)
+ - [dbeaver-bin](./dev-db/dbeaver-bin)
  - [sqlitestudio](./dev-db/sqlitestudio)
 - [dev-ruby](./dev-ruby)
  - [github_cli](./dev-ruby/github_cli)
