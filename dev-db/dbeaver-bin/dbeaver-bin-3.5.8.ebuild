@@ -21,30 +21,29 @@ RDEPEND="|| ( >=virtual/jdk-1.7 >=virtual/jre-1.7 )"
 S="$WORKDIR/$PN_BASE"
 
 src_install (){
-    local install_dir="/opt/${PN_PRETTY}"
-    local bin="/usr/bin/${PN_BASE}"
+	local install_dir="/opt/${PN_PRETTY}"
+	local bin="/usr/bin/${PN_BASE}"
 
-    insinto "$install_dir"
-    doins -r .
+	insinto "$install_dir"
+	doins -r .
 
-    fperms a+x "${install_dir}/${PN_BASE}"
-    dosym "${install_dir}/${PN_BASE}" "$bin"
+	fperms a+x "${install_dir}/${PN_BASE}"
+	dosym "${install_dir}/${PN_BASE}" "$bin"
 
-    doicon -s 256 "icon.xpm"
+	doicon -s 256 "icon.xpm"
 
-    make_desktop_entry_args=(
-        "${bin} %U"                         # exec
-        "$PN_PRETTY"                        # name
-        "$PN_BASE"                          # icon
-        "Development"                       # categories
-    )
-    make_desktop_entry_extras=(
-        "MimeType=application/x-sqlite3;"   # MUST end with semicolon
-    )
-    make_desktop_entry "${make_desktop_entry_args[@]}" "$( printf '%s\n' "${make_desktop_entry_extras[@]}" )"
+	make_desktop_entry_args=(
+		"${bin} %U"							# exec
+		"$PN_PRETTY"						# name
+		"$PN_BASE"							# icon
+		"Development"						# categories
+	)
+	make_desktop_entry_extras=(
+		"MimeType=application/x-sqlite3;"	# MUST end with semicolon
+	)
+	make_desktop_entry "${make_desktop_entry_args[@]}" "$( printf '%s\n' "${make_desktop_entry_extras[@]}" )"
 }
 
 pkg_postinst() {
-    fdo-mime_desktop_database_update
+	fdo-mime_desktop_database_update
 }
-

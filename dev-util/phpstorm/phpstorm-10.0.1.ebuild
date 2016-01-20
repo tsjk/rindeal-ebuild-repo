@@ -14,11 +14,11 @@ DESCRIPTION="PhpStorm is a commercial, cross-platform IDE for PHP"
 HOMEPAGE="https://www.jetbrains.com/${PN}/"
 SRC_URI="https://download.jetbrains.com/webide/${PN_PRETTY}-${PV}.tar.gz"
 LICENSE="
-    PhpStorm_personal_license
-    PhpStorm_OpenSource_license
-    PhpStorm_Academic_license
-    PhpStorm_Classroom_license
-    PhpStorm_license
+	PhpStorm_personal_license
+	PhpStorm_OpenSource_license
+	PhpStorm_Academic_license
+	PhpStorm_Classroom_license
+	PhpStorm_license
 "
 
 KEYWORDS="amd64 ~x86 ~arm"
@@ -33,43 +33,43 @@ S="$WORKDIR"
 # src_unpack() { }
 
 src_prepare() {
-    cd ${PN_PRETTY}-*/
-    S="$PWD"
+	cd ${PN_PRETTY}-*/
+	S="$PWD"
 
-    default
+	default
 
-    sed -i 's/IS_EAP="true"/IS_EAP="false"/' "bin/${PN}.sh"
+	sed -i 's/IS_EAP="true"/IS_EAP="false"/' "bin/${PN}.sh"
 
-    # use system JDK
-    rm -rf jre/
+	# use system JDK
+	rm -rf jre/
 
-    mv "bin/webide.png" "bin/${bin_name}.png"
+	mv "bin/webide.png" "bin/${bin_name}.png"
 }
 
 src_install() {
-    local install_dir="/opt/${pn_pretty_uniq}"
+	local install_dir="/opt/${pn_pretty_uniq}"
 
-    insinto "$install_dir"
-    doins -r .
+	insinto "$install_dir"
+	doins -r .
 
-    fperms a+x "$install_dir/bin/"{${PN}.sh,fsnotifier{,64,-arm}}
-    dosym "$install_dir/bin/${PN}.sh" /usr/bin/${bin_name}
+	fperms a+x "$install_dir/bin/"{${PN}.sh,fsnotifier{,64,-arm}}
+	dosym "$install_dir/bin/${PN}.sh" /usr/bin/${bin_name}
 
-    doicon -s 256 "bin/${bin_name}.png"
+	doicon -s 256 "bin/${bin_name}.png"
 
-    make_desktop_entry_args=(
-        "${bin_name} %U"                        # exec
-        "$pn_pretty_uniq"                       # name
-        "${bin_name}"                           # icon
-        "Development"                           # categories
-    )
-    make_desktop_entry_extras=(
-        "MimeType=text/x-php;text/html;"        # MUST end with semicolon
-    )
+	make_desktop_entry_args=(
+		"${bin_name} %U"						# exec
+		"$pn_pretty_uniq"						# name
+		"${bin_name}"							# icon
+		"Development"							# categories
+	)
+	make_desktop_entry_extras=(
+		"MimeType=text/x-php;text/html;"		# MUST end with semicolon
+	)
 
-    make_desktop_entry "${make_desktop_entry_args[@]}" "$( printf '%s\n' "${make_desktop_entry_extras[@]}" )"
+	make_desktop_entry "${make_desktop_entry_args[@]}" "$( printf '%s\n' "${make_desktop_entry_extras[@]}" )"
 }
 
 pkg_postinst() {
-    fdo-mime_desktop_database_update
+	fdo-mime_desktop_database_update
 }

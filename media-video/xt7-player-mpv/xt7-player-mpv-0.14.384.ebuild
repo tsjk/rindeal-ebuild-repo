@@ -17,22 +17,22 @@ KEYWORDS="~amd64"
 IUSE="taglib global-hotkeys dvb youtube"
 
 DEPEND="
-    dev-lang/gambas:3[libxml,qt4,dbus,x11,net,curl]
-    dev-qt/qtcore:4
-    media-video/mpv:0
+	dev-lang/gambas:3[libxml,qt4,dbus,x11,net,curl]
+	dev-qt/qtcore:4
+	media-video/mpv:0
 "
 RDEPEND="${DEPEND}"
 
 src_compile (){
-    gbc3 --translate-errors --all --translate --public-control --public-module .
-    gba3
+	gbc3 --translate-errors --all --translate --public-control --public-module .
+	gba3
 }
 
 src_install (){
-    mv ${PN}*.gambas "${PN}.gambas" || true
-    newbin "${PN}.gambas" "$PN"
-    sed -r -i "s/${PN}.gambas/${PN}/" "${PN}.desktop"
+	mv ${PN}*.gambas "${PN}.gambas" || true
+	newbin "${PN}.gambas" "$PN"
+	sed -r -i "s/${PN}.gambas/${PN}/" "${PN}.desktop"
 
-    domenu "${PN}.desktop"
-    doicon -s 48 "${PN}.png"
+	domenu "${PN}.desktop"
+	doicon -s 48 "${PN}.png"
 }

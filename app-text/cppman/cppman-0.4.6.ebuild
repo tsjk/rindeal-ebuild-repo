@@ -19,6 +19,6 @@ KEYWORDS="~amd64"
 IUSE=""
 
 RDEPEND="
-    sys-apps/groff
-    >=dev-python/beautifulsoup-4.0.0
+	sys-apps/groff
+	>=dev-python/beautifulsoup-4.0.0
 "
