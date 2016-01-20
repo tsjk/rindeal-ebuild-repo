@@ -6,7 +6,7 @@ EAPI=6
 inherit eutils fdo-mime
 
 PN_PRETTY="PhpStorm"
-DESCRIPTION="PhpStorm is a commercial, cross-platform IDE for PHP built on JetBrains' IntelliJ IDEA platform."
+DESCRIPTION="PhpStorm is a commercial, cross-platform IDE for PHP"
 HOMEPAGE="https://www.jetbrains.com/${PN}/"
 SRC_URI="https://download.jetbrains.com/webide/${PN_PRETTY}-${PV}.tar.gz"
 LICENSE="
