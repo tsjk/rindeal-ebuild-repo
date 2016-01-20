@@ -10,7 +10,7 @@ PN_BASE="dbeaver"
 DESCRIPTION="Free universal database manager and SQL client"
 HOMEPAGE="http://dbeaver.jkiss.org/"
 SRC_URI="https://github.com/serge-rider/dbeaver/releases/download/${PV}/dbeaver-ce-${PV}-linux.gtk.x86_64.tar.gz"
-LICENSE="~amd64"
+LICENSE="GPL-2"
 
 RESTRICT="mirror strip"
 SLOT="0"
