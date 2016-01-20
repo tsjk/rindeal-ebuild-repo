@@ -1,112 +1,103 @@
 # Copyright (C) 2015; Jan Chren <dev.rindeal@outlook.com>
 # Distributed under the terms of the GNU General Public License v2
-# $Header: $
 
 EAPI=5
 
 _qtver=5.5.0
 _qtver_short=5.5
 
-REPO_URI="git://github.com/telegramdesktop/tdesktop.git"
-
-inherit eutils gnome2-utils fdo-mime
+inherit eutils fdo-mime
 
 DESCRIPTION="Desktop client of Telegram, the messaging app."
 HOMEPAGE="https://telegram.org"
+LICENSE="GPL-3"
 SRC_URI="(
-	http://download.qt-project.org/official_releases/qt/${_qtver_short}/$_qtver/single/qt-everywhere-opensource-src-${_qtver}.tar.xz
+	https://github.com/telegramdesktop/tdesktop/archive/v${PV}.tar.gz -> ${P}.tar.gz
+    http://download.qt-project.org/official_releases/qt/${_qtver_short}/$_qtver/single/qt-everywhere-opensource-src-${_qtver}.tar.xz
 )"
 
-LICENSE="GPL-3"
 SLOT="0"
 KEYWORDS="~amd64"
+RESTRICT="mirror"
+
 IUSE="gtkstyle"
 
 RDEPEND="
-	dev-libs/icu
-	virtual/ffmpeg
-	media-libs/jasper
-	media-libs/libexif
-	media-libs/libmng
-	media-libs/libwebp
-	x11-libs/libxkbcommon
-	x11-libs/gtk+:2
-	sys-libs/mtdev
-	=media-libs/openal-9999
-	media-libs/opus
-	dev-libs/glib:2
-	dev-libs/libappindicator:3
+    dev-libs/icu
+    virtual/ffmpeg
+    media-libs/jasper
+    media-libs/libexif
+    media-libs/libmng
+    media-libs/libwebp
+    x11-libs/libxkbcommon
+    x11-libs/gtk+:2
+    sys-libs/mtdev
+    =media-libs/openal-9999
+    media-libs/opus
+    dev-libs/glib:2
+    dev-libs/libappindicator:3
 "
 DEPEND="
-	${RDEPEND}
-	dev-libs/libunity
-	dev-vcs/git
-	x11-base/xorg-server[xvfb]
+    ${RDEPEND}
+    dev-libs/libunity
+    x11-base/xorg-server[xvfb]
 "
+
+S="${WORKDIR}/tdesktop-${PV}"
+
 QSTATIC="${WORKDIR}/Libraries/QtStatic"
 _QTDIR="${WORKDIR}/qt"
 
 
 src_unpack(){
-	default
+    default
 
-	mkdir -p "${WORKDIR}/Libraries"
-
-	mv qt-everywhere-opensource-src-${_qtver} "${QSTATIC}"
-
-	git clone -q ${REPO_URI} "${S}"
-	cd "${S}"
-	git checkout -q v${PVR}
+    mkdir -p "$( dirname "$QSTATIC" )"
+    mv "qt-everywhere-opensource-src-${_qtver}" "${QSTATIC}"
 }
 
 src_prepare(){
-	cd "${QSTATIC}"
-	# Telegram does 'slightly' patches Qt
-	epatch "${S}/Telegram/_qt_${_qtver//./_}_patch.diff"
+    cd "${QSTATIC}"
+    # Telegram does 'slightly' patches Qt
+    epatch "${S}/Telegram/_qt_${_qtver//./_}_patch.diff"
 
-	cd "${S}"
+    cd "${S}"
 
-	# Patches from AOSC
-	# epatch ${FILESDIR}/disable-custom-scheme-linux.patch
-	# epatch ${FILESDIR}/disable-updater.patch
+    # Patches from AOSC
+    # epatch ${FILESDIR}/disable-custom-scheme-linux.patch
+    # epatch ${FILESDIR}/disable-updater.patch
 
-	pushd Telegram
+    pushd Telegram
 
-	# Switch to libappindicator3 (dev-libs/libappindicator::gentoo-zh)
-	sed -i 's/libappindicator/libappindicator3/g' Telegram.pro
+    # Switch to libappindicator3 (dev-libs/libappindicator::gentoo-zh)
+    sed -i 's/libappindicator/libappindicator3/g' Telegram.pro
 
-	# Telegram, hey, tell me what the hell is this?
+    # Telegram, hey, tell me what the hell is this?
     sed -i 's/\/usr\/local\/lib\/libxkbcommon.a/-lxkbcommon/g' Telegram.pro
 
     # We don't have a custom id
     sed -i 's/CUSTOM_API_ID//g' Telegram.pro
 
-	# Upstream likes broken things
-	(
-	    echo 'DEFINES += "TDESKTOP_DISABLE_AUTOUPDATE"'
-	    echo 'DEFINES += TDESKTOP_DISABLE_REGISTER_CUSTOM_SCHEME'
-	) >> Telegram.pro
+    # Upstream likes broken things
+    (
+        echo 'DEFINES += TDESKTOP_DISABLE_AUTOUPDATE'
+        echo 'DEFINES += TDESKTOP_DISABLE_REGISTER_CUSTOM_SCHEME'
+    ) >> Telegram.pro
 
-	(
-		echo 'INCLUDEPATH += "/usr/lib/glib-2.0/include"'
-		echo 'INCLUDEPATH += "/usr/lib/gtk-2.0/include"'
-		echo 'INCLUDEPATH += "/usr/include/opus"'
-	) >> Telegram.pro
+    (
+        echo 'INCLUDEPATH += "/usr/lib/glib-2.0/include"'
+        echo 'INCLUDEPATH += "/usr/lib/gtk-2.0/include"'
+        echo 'INCLUDEPATH += "/usr/include/opus"'
+    ) >> Telegram.pro
 
-	popd
+    popd
 }
 
 src_configure(){
-	cd "${QSTATIC}"
+    cd "${QSTATIC}"
 
-	optional=''
-	
-	if use gtkstyle; then
-		optional='-gtkstyle'
-	fi
-
-	local conf=(
-		-prefix "${_QTDIR}"
+    local conf=(
+        -prefix "${_QTDIR}"
 
         -static
 
@@ -150,60 +141,58 @@ src_configure(){
 
         # do not build with -Werror
         -no-warnings-are-errors
+    )
+	use gtkstyle && conf+=( '-gtkstyle' )
 
-        ${optional}
-	)
-
-	./configure "${conf[@]}"
+	# econf fails with `invalid command-line switch`es
+    ./configure "${conf[@]}"
 }
 
 src_compile(){
-	cd "${QSTATIC}"
+    cd "${QSTATIC}"
 
-	emake module-qtbase module-qtimageformats
-	emake module-qtbase-install_subtargets module-qtimageformats-install_subtargets
+    emake module-qtbase module-qtimageformats
+    emake module-qtbase-install_subtargets module-qtimageformats-install_subtargets
 
-	export PATH="${FILESDIR}:${_QTDIR}/bin:$PATH"
+    export PATH="${FILESDIR}:${_QTDIR}/bin:$PATH"
 
-	mkdir -p "${S}"/Linux/{Debug,Release}Intermediate{Style,Emoji,Lang,Updater}
+    mkdir -p "${S}"/Linux/{Debug,Release}Intermediate{Style,Emoji,Lang,Updater}
 
-	# Begin the hacky build
-	# Adapted from AUR package
-	# It needs a fake Xorg server, in ${FILESDIR}
-	for _type in debug release; do
-		for x in Style Lang; do
-			cd "${S}"/Linux/${_type^}Intermediate${x}
-			echo qmake CONFIG+="${_type}" ../../Telegram/Meta${x}.pro
-			qmake CONFIG+="${_type}" ../../Telegram/Meta${x}.pro
-			make || die 'Make failed'
-		done
+    # Begin the hacky build
+    # Adapted from AUR package
+    # It needs a fake Xorg server, in ${FILESDIR}
+    for _type in debug release; do
+        for x in Style Lang; do
+            cd "${S}/Linux/${_type^}Intermediate${x}"
+            echo qmake CONFIG+="${_type}" "../../Telegram/Meta${x}.pro"
+            qmake CONFIG+="${_type}" "../../Telegram/Meta${x}.pro"
+            make || die 'Make failed'
+        done
 
-		cd "${S}"/Linux/${_type^}Intermediate
+        cd "${S}/Linux/${_type^}Intermediate"
 
-		if ! [ -d "${S}"/Telegram/GeneratedFiles ]; then
-			qmake CONFIG+="${_type}" ../../Telegram/Telegram.pro
-			awk '$1 == "PRE_TARGETDEPS" { $1=$2="" ; print }' "${S}"/Telegram/Telegram.pro | xargs xvfb-run -a make || die 'Make failed'
-		fi
+        if ! [ -d "${S}/Telegram/GeneratedFiles" ]; then
+            qmake CONFIG+="${_type}" "../../Telegram/Telegram.pro"
+            awk '$1 == "PRE_TARGETDEPS" { $1=$2="" ; print }' "${S}/Telegram/Telegram.pro" | xargs xvfb-run -a make || die 'Make failed'
+        fi
 
-		qmake CONFIG+=${_type} ../../Telegram/Telegram.pro
-		xvfb-run -a make || die 'Make failed'
-	done
+        qmake CONFIG+=${_type} "../../Telegram/Telegram.pro"
+        xvfb-run -a make || die 'Make failed'
+    done
 }
 
 src_install(){
-	newbin "${S}"/Linux/Release/Telegram telegram
+    newbin "${S}/Linux/Release/Telegram" telegram
 
-	# From AOSC
-	insopts -m644
-	for icon_size in 16 32 48 64 128 256 512; do
-		newicon -s ${icon_size} "${S}"/Telegram/SourceFiles/art/icon${icon_size}.png telegram.png
-	done
+    # From AOSC
+    insopts -m644
+    for icon_size in 16 32 48 64 128 256 512; do
+        newicon -s ${icon_size} "${S}/Telegram/SourceFiles/art/icon${icon_size}.png" telegram.png
+    done
 
-	insinto /usr/share/applications
-	doins "${FILESDIR}"/telegram.desktop
+    domenu "${FILESDIR}/telegram.desktop"
 }
 
 pkg_postinst(){
-	fdo-mime_desktop_database_update
-	gnome2_icon_cache_update
+    fdo-mime_desktop_database_update
 }
