@@ -1,3 +1,3 @@
 Features:
 
-- `append-flags -UFLAC__AVX2_SUPPORTED` in `src_configure` which fixes build for me
+- contains a patch which nukes AVX2 to fix LTO builds
