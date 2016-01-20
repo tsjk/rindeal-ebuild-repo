@@ -5,7 +5,11 @@ EAPI=6
 
 inherit eutils fdo-mime
 
+SLOT="10"
 PN_PRETTY="PhpStorm"
+pn_pretty_uniq="${PN_PRETTY}${SLOT}"
+bin_name="${PN}${SLOT}"
+
 DESCRIPTION="PhpStorm is a commercial, cross-platform IDE for PHP"
 HOMEPAGE="https://www.jetbrains.com/${PN}/"
 SRC_URI="https://download.jetbrains.com/webide/${PN_PRETTY}-${PV}.tar.gz"
@@ -17,7 +21,6 @@ LICENSE="
     PhpStorm_license
 "
 
-SLOT="10"
 KEYWORDS="~amd64 ~x86 ~arm"
 RESTRICT="strip mirror"
 
@@ -30,15 +33,12 @@ S="$WORKDIR"
 # src_unpack() { }
 
 src_prepare() {
-    default
-
-    pn_pretty_uniq="${PN_PRETTY}${SLOT}"
-    bin_name="${PN}${SLOT}"
-
     cd ${PN_PRETTY}-*/
     S="$PWD"
 
-    sed -i 's/IS_EAP="true"/IS_EAP="false"/' bin/${PN}.sh
+    default
+
+    sed -i 's/IS_EAP="true"/IS_EAP="false"/' "bin/${PN}.sh"
 
     # use system JDK
     rm -rf jre/
