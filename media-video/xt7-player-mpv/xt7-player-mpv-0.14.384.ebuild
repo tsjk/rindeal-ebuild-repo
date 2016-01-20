@@ -5,7 +5,7 @@ EAPI=6
 
 inherit eutils
 
-DESCRIPTION="Xt7-Player-mpv aims to be an (in)complete graphical interface to mpv, focused on usability"
+DESCRIPTION="Xt7-Player-mpv is a graphical interface to mpv, focused on usability"
 HOMEPAGE="http://xt7-player.sourceforge.net/xt7forum/"
 SRC_URI="https://github.com/kokoko3k/${PN}/archive/${PV}.tar.gz -> ${P}.tar.gz"
 LICENSE=""
