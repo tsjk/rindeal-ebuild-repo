@@ -1,8 +1,7 @@
 # Copyright (C) 2015; Jan Chren <dev.rindeal@outlook.com>
 # Distributed under the terms of the GNU General Public License v2
-# $Id$
 
-EAPI=5
+EAPI=6
 
 inherit eutils fdo-mime
 
@@ -22,7 +21,7 @@ SLOT="10"
 KEYWORDS="~amd64 ~x86 ~arm"
 RESTRICT="strip mirror"
 
-RDEPEND="|| ( >=virtual/jdk-1.7 >=virtual/jre-1.6 ) "
+RDEPEND="|| ( >=virtual/jdk-1.7 >=virtual/jre-1.6 )"
 
 S="$WORKDIR"
 
@@ -31,6 +30,8 @@ S="$WORKDIR"
 # src_unpack() { }
 
 src_prepare() {
+    default
+
     pn_pretty_uniq="${PN_PRETTY}${SLOT}"
     bin_name="${PN}${SLOT}"
 
