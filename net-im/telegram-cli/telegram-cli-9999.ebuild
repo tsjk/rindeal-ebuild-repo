@@ -18,29 +18,29 @@ SLOT="0"
 KEYWORDS="~amd64 ~x86"
 
 DEPEND="sys-libs/zlib
-	sys-libs/readline
-	dev-libs/libconfig
-	dev-libs/openssl
-	dev-libs/libevent
-	lua? ( dev-lang/lua )
-	json? ( dev-libs/jansson )
-	python? ( dev-lang/python )"
+    sys-libs/readline
+    dev-libs/libconfig
+    dev-libs/openssl
+    dev-libs/libevent
+    lua? ( dev-lang/lua )
+    json? ( dev-libs/jansson )
+    python? ( dev-lang/python )"
 
 src_unpack() {
-	git-2_src_unpack
-	cd $EGIT_SOURCEDIR
-	git submodule update --init --recursive
+    git-2_src_unpack
+    cd $EGIT_SOURCEDIR
+    git submodule update --init --recursive
 }
 
 src_configure() {
-	econf $(use_enable lua liblua )
-	econf $(use_enable python python )
-	econf $(use_enable json json )
+    econf $(use_enable lua liblua )
+    econf $(use_enable python python )
+    econf $(use_enable json json )
 }
 
 src_install() {
-	newbin bin/telegram-cli telegram-cli
+    newbin bin/telegram-cli telegram-cli
 
-	insinto /etc/telegram-cli/
-	newins tg-server.pub server.pub
+    insinto /etc/telegram-cli/
+    newins tg-server.pub server.pub
 }
