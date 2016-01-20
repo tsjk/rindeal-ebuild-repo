@@ -13,7 +13,7 @@ _qtver=5.5.1
 _qtver_short=$( get_version_component_range 1-2 $_qtver )
 
 SRC_URI="(
-	https://github.com/telegramdesktop/tdesktop/archive/v${PV}.tar.gz -> ${P}.tar.gz
+    https://github.com/telegramdesktop/tdesktop/archive/v${PV}.tar.gz -> ${P}.tar.gz
     http://download.qt-project.org/official_releases/qt/${_qtver_short}/$_qtver/single/qt-everywhere-opensource-src-${_qtver}.tar.xz
 )"
 
@@ -45,30 +45,20 @@ DEPEND="
 "
 
 S="${WORKDIR}/tdesktop-${PV}"
+telegram_dir="${S}/Telegram"
 
 QSTATIC="${WORKDIR}/Libraries/QtStatic"
 _QTDIR="${WORKDIR}/qt"
 
-
-src_unpack(){
-    default
-
+src_prepare(){
     mkdir -p "$( dirname "$QSTATIC" )"
     mv "qt-everywhere-opensource-src-${_qtver}" "${QSTATIC}"
-}
 
-src_prepare(){
     cd "${QSTATIC}/qtbase"
     # Telegram does 'slightly' patches Qt
-    epatch "${S}/Telegram/_qtbase_${_qtver//./_}_patch.diff"
+    epatch "${telegram_dir}/_qtbase_${_qtver//./_}_patch.diff"
 
-    cd "${S}"
-
-    # Patches from AOSC
-    # epatch ${FILESDIR}/disable-custom-scheme-linux.patch
-    # epatch ${FILESDIR}/disable-updater.patch
-
-    pushd Telegram
+    cd "${telegram_dir}"
 
     # Switch to libappindicator3 (dev-libs/libappindicator::gentoo-zh)
     sed -i 's/libappindicator/libappindicator3/g' Telegram.pro
@@ -90,8 +80,6 @@ src_prepare(){
         echo 'INCLUDEPATH += "/usr/lib/gtk-2.0/include"'
         echo 'INCLUDEPATH += "/usr/include/opus"'
     ) >> Telegram.pro
-
-    popd
 }
 
 src_configure(){
@@ -143,9 +131,9 @@ src_configure(){
         # do not build with -Werror
         -no-warnings-are-errors
     )
-	use gtkstyle && conf+=( '-gtkstyle' )
+    use gtkstyle && conf+=( '-gtkstyle' )
 
-	# econf fails with `invalid command-line switch`es
+    # econf fails with `invalid command-line switch`es
     ./configure "${conf[@]}"
 }
 
@@ -155,9 +143,10 @@ src_compile(){
     emake module-qtbase module-qtimageformats
     emake module-qtbase-install_subtargets module-qtimageformats-install_subtargets
 
+    # ??
     export PATH="${FILESDIR}:${_QTDIR}/bin:$PATH"
 
-    mkdir -p "${S}"/Linux/{Debug,Release}Intermediate{Style,Emoji,Lang,Updater}
+    mkdir -p "${S}/Linux/"{Debug,Release}Intermediate{Style,Emoji,Lang,Updater}
 
     # Begin the hacky build
     # Adapted from AUR package
@@ -165,19 +154,20 @@ src_compile(){
     for _type in debug release; do
         for x in Style Lang; do
             cd "${S}/Linux/${_type^}Intermediate${x}"
-            echo qmake CONFIG+="${_type}" "../../Telegram/Meta${x}.pro"
-            qmake CONFIG+="${_type}" "../../Telegram/Meta${x}.pro"
+            echo qmake CONFIG+="${_type}" "${telegram_dir}/Meta${x}.pro"
+            qmake CONFIG+="${_type}" "${telegram_dir}/Meta${x}.pro"
             make || die 'Make failed'
         done
 
         cd "${S}/Linux/${_type^}Intermediate"
 
-        if ! [ -d "${S}/Telegram/GeneratedFiles" ]; then
-            qmake CONFIG+="${_type}" "../../Telegram/Telegram.pro"
-            awk '$1 == "PRE_TARGETDEPS" { $1=$2="" ; print }' "${S}/Telegram/Telegram.pro" | xargs xvfb-run -a make || die 'Make failed'
+        if ! [ -d "${telegram_dir}/GeneratedFiles" ]; then
+            qmake CONFIG+="${_type}" "${telegram_dir}/Telegram.pro"
+            awk '$1 == "PRE_TARGETDEPS" { $1=$2="" ; print }' "${telegram_dir}/Telegram.pro" | \
+                xargs xvfb-run -a make || die 'Make failed'
         fi
 
-        qmake CONFIG+=${_type} "../../Telegram/Telegram.pro"
+        qmake CONFIG+=${_type} "${telegram_dir}/Telegram.pro"
         xvfb-run -a make || die 'Make failed'
     done
 }
@@ -188,7 +178,7 @@ src_install(){
     # From AOSC
     insopts -m644
     for icon_size in 16 32 48 64 128 256 512; do
-        newicon -s ${icon_size} "${S}/Telegram/SourceFiles/art/icon${icon_size}.png" telegram.png
+        newicon -s ${icon_size} "${telegram_dir}/SourceFiles/art/icon${icon_size}.png" telegram.png
     done
 
     domenu "${FILESDIR}/telegram.desktop"
