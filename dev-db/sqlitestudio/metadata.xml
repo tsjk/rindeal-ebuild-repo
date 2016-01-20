@@ -3,6 +3,5 @@
 <pkgmetadata>
   <use>
     <flag name="cli">Build CLI interface</flag>
-    <flag name="sqlite2">Add support for SQLite2</flag>
   </use>
 </pkgmetadata>

@@ -19,7 +19,6 @@ SLOT="0"
 KEYWORDS="amd64 ~x86"
 
 IUSE="
-    sqlite2
     cli
     tcl
     cups
@@ -35,7 +34,6 @@ DEPEND="
     cups? ( >=dev-qt/qtprintsupport-${min_qt_ver} )
 
     dev-db/sqlite:3
-    sqlite2? ( dev-db/sqlite:0 )
 
     cli? ( sys-libs/readline )
     tcl? ( dev-lang/tcl )
@@ -86,10 +84,9 @@ src_prepare () {
     disable_modules "${core_src_dir}/${PN_PRETTY}.pro" "${disabled_modules[@]}"
 
     ## Plugins
-    disabled_plugins=()
+    disabled_plugins=( 'DbSqlite2' )
 
     use tcl     || disabled_plugins+=( "ScriptingTcl" )
-    use sqlite2 || disabled_plugins+=( "DbSqlite2" )
     use cups    || disabled_plugins+=( "Printing" )
 
     disable_modules "${plugins_src_dir}/Plugins.pro" "${disabled_plugins[@]}"
@@ -139,7 +136,7 @@ src_install () {
     )
     make_desktop_entry_extras=(
         'Terminal=false'
-        "MimeType=application/x-sqlite3;$(use sqlite2 && echo 'application/x-sqlite2;')"
+        "MimeType=application/x-sqlite3;"
     )
     make_desktop_entry "${make_desktop_entry_args[@]}" "$( printf '%s\n' "${make_desktop_entry_extras[@]}" )"
 }
