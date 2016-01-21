@@ -35,8 +35,8 @@ DEPEND="
 
 	dev-db/sqlite:3
 
-	cli? ( sys-libs/readline )
-	tcl? ( dev-lang/tcl )
+	cli? ( sys-libs/readline:= )
+	tcl? ( dev-lang/tcl:= )
 "
 
 qtmodules="core gui widgets script network xml svg"
