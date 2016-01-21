@@ -2,7 +2,7 @@
 # Distributed under the terms of the GNU General Public License v2
 # $Id$
 
-EAPI=5
+EAPI=6
 
 inherit eutils fdo-mime
 
@@ -23,11 +23,10 @@ RDEPEND="
 	>=sys-libs/zlib-1.1.4
 "
 
-src_uri_base="$HOMEPAGE/download"
-pkg_name_muster="$PN-$PV-1.<ARCH>.manualinstall"
+src_uri_base="${HOMEPAGE}/download/${P}-1.<ARCH>.manualinstall.tar.gz"
 SRC_URI="
-	x86?	( $src_uri_base/${pkg_name_muster/<ARCH>/i686}.tar.gz )
-	amd64?	( $src_uri_base/${pkg_name_muster/<ARCH>/x86_64}.tar.gz )
+	x86?	( ${src_uri_base/<ARCH>/i686} )
+	amd64?	( ${src_uri_base/<ARCH>/x86_64} )
 "
 
 S="$WORKDIR/${A/.tar.gz}"
