@@ -28,7 +28,7 @@ IUSE="
 min_qt_ver=5.3
 
 DEPEND="
-	>=sys-devel/gcc-4.8
+	>=sys-devel/gcc-4.8:*
 
 	>=dev-qt/designer-${min_qt_ver}
 	cups? ( >=dev-qt/qtprintsupport-${min_qt_ver} )
