@@ -64,6 +64,6 @@ src_install() {
 	doins doc/example*.c
 	if use doc; then
 		insinto /usr/share/doc/${PF}/
-		doins libhd
+		doins doc/libhd
 	fi
 }
