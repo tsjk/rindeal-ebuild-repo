@@ -35,15 +35,12 @@ S="$WORKDIR"
 src_prepare() {
 	cd ${PN_PRETTY}-*/
 	S="$PWD"
-
 	default
 
 	sed -i 's/IS_EAP="true"/IS_EAP="false"/' "bin/${PN}.sh"
 
 	# use system JDK
 	rm -rf jre/
-
-	mv "bin/webide.png" "bin/${bin_name}.png"
 }
 
 src_install() {
@@ -52,10 +49,10 @@ src_install() {
 	insinto "$install_dir"
 	doins -r .
 
-	fperms a+x "$install_dir/bin/"{${PN}.sh,fsnotifier{,64,-arm}}
-	dosym "$install_dir/bin/${PN}.sh" /usr/bin/${bin_name}
+	fperms a+x "${install_dir}/bin/"{${PN}.sh,fsnotifier{,64,-arm}}
+	dosym "${install_dir}/bin/${PN}.sh" /usr/bin/${bin_name}
 
-	doicon -s 256 "bin/${bin_name}.png"
+	newicon -s 256 "${install_dir}/bin/webide.png" "${bin_name}.png"
 
 	make_desktop_entry_args=(
 		"${bin_name} %U"						# exec
