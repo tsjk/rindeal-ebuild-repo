@@ -1,32 +1,38 @@
-# Copyright 1999-2013 Gentoo Foundation
+# Copyright 1999-2016 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/dev-util/universalindentgui/universalindentgui-1.2.0-r1.ebuild,v 1.2 2013/03/02 21:07:26 hwoarang Exp $
+# $Id$
 
-EAPI=4
+EAPI=5
 PYTHON_DEPEND="python? 2"
 LANGS="de fr ja ru uk zh_TW"
+PYTHON_COMPAT=( "python2_7" )
 
-inherit eutils python qt4-r2
+inherit eutils python-r1 qmake-utils qt4-r2
 
 DESCRIPTION="Cross platform GUI for several code formatters, beautifiers and indenters"
 HOMEPAGE="http://universalindent.sourceforge.net/"
+LICENSE="GPL-2"
 SRC_URI="mirror://sourceforge/universalindent/${P}.tar.gz"
 
-LICENSE="GPL-2"
 SLOT="0"
-KEYWORDS="~amd64 ~x86"
-IUSE="debug examples html perl php python ruby xml uncrustify"
+KEYWORDS="amd64 ~x86"
+IUSE="
+	debug examples
 
-DEPEND="dev-qt/qtcore:4
+	html perl php python ruby uncrustify xml
+"
+
+DEPEND="
+	dev-qt/qtcore:4
 	dev-qt/qtgui:4
 	dev-qt/qtscript:4
 	x11-libs/qscintilla
 "
-RDEPEND="${DEPEND}
+RDEPEND+="
 	dev-util/astyle
 	dev-util/indent
 	html? (
-	app-text/htmltidy
+		app-text/htmltidy
 		perl? ( dev-lang/perl )
 	)
 	perl? ( dev-perl/perltidy )
@@ -47,12 +53,12 @@ pkg_setup() {
 
 src_prepare() {
 	# correct translation binaries
-	sed -e "s/lupdate-qt4/lupdate/" \
-		-e "s/lrelease-qt4/lrelease/" \
+	sed -e "s|lupdate-qt4|$(qt4_get_bindir)/lupdate|" \
+		-e "s|lrelease-qt4|$(qt4_get_bindir)/lrelease|" \
 		-i UniversalIndentGUI.pro || die "sed pro translation binary"
 
 	if use debug; then
-		sed -i -e 's:release,:debug,:g' UniversalIndentGUI.pro || die
+		sed -i -e 's|release,|debug,|g' UniversalIndentGUI.pro || die
 	fi
 
 	# patch .pro file according to our use flags
@@ -62,55 +68,55 @@ src_prepare() {
 	local UIGUIFILES="shellindent gnuindent astyle"
 
 	if use html; then
-		UEXAMPLES="${UEXAMPLES} html"
-		UIGUIFILES="${UIGUIFILES} tidy"
+		UEXAMPLES+=" html"
+		UIGUIFILES+=" tidy"
 		if use perl; then
-			UINDENTERS="${UINDENTERS} hindent"
-			UIGUIFILES="${UIGUIFILES} hindent"
+			UINDENTERS+=" hindent"
+			UIGUIFILES+=" hindent"
 		fi
 	fi
 
 	if use perl; then
-		UEXAMPLES="${UEXAMPLES} pl"
-		UIGUIFILES="${UIGUIFILES} perltidy"
+		UEXAMPLES+=" pl"
+		UIGUIFILES+=" perltidy"
 	fi
 
 	if use php; then
-		UEXAMPLES="${UEXAMPLES} php"
-		UINDENTERS="${UINDENTERS} phpStylist.php"
-		UIGUIFILES="${UIGUIFILES} php_Beautifier phpStylist"
+		UEXAMPLES+=" php"
+		UINDENTERS+=" phpStylist.php"
+		UIGUIFILES+=" php_Beautifier phpStylist"
 	fi
 
 	if use python; then
-		UEXAMPLES="${UEXAMPLES} py"
-		UINDENTERS="${UINDENTERS} pindent.py"
-		UIGUIFILES="${UIGUIFILES} pindent"
+		UEXAMPLES+=" py"
+		UINDENTERS+=" pindent.py"
+		UIGUIFILES+=" pindent"
 		python_convert_shebangs -r 2 .
 	fi
 
 	if use ruby; then
-		UEXAMPLES="${UEXAMPLES} rb"
-		UINDENTERS="${UINDENTERS} rbeautify.rb ruby_formatter.rb"
-		UIGUIFILES="${UIGUIFILES} rbeautify rubyformatter"
+		UEXAMPLES+=" rb"
+		UINDENTERS+=" rbeautify.rb ruby_formatter.rb"
+		UIGUIFILES+=" rbeautify rubyformatter"
 	fi
 
 	if use xml; then
-		UEXAMPLES="${UEXAMPLES} xml"
-		UIGUIFILES="${UIGUIFILES} xmlindent"
+		UEXAMPLES+=" xml"
+		UIGUIFILES+=" xmlindent"
 	fi
 
 	if use uncrustify; then
-		UIGUIFILES="${UIGUIFILES} uncrustify"
+		UIGUIFILES+=" uncrustify"
 	fi
 
 	local IFILES= I=
 	for I in ${UINDENTERS}; do
-		IFILES="${IFILES} indenters/${I}"
+		IFILES+=" indenters/${I}"
 		chmod +x indenters/${I}
 	done
 
 	for I in ${UIGUIFILES}; do
-		IFILES="${IFILES} indenters/uigui_${I}.ini"
+		IFILES+=" indenters/uigui_${I}.ini"
 	done
 
 	# apply fixes in .pro file
@@ -143,6 +149,19 @@ src_install() {
 		done
 	fi
 
-	newicon resources/universalIndentGUI_512x512.png ${PN}
-	make_desktop_entry ${PN} UniversalIndentGUI ${PN} "Qt;Development"
+	newicon -s 512 resources/universalIndentGUI_512x512.png ${PN}
+	
+	make_desktop_entry_args=(
+		"${PN}"	 				# exec
+		"UniversalIndentGUI"	# name
+		"${PN}"					# icon
+		"Development;Utility"	# categories
+	)
+	make_desktop_entry_extras=(
+		'Terminal=false'
+		# TODO: "MimeType=;"
+	)
+	make_desktop_entry \
+		"${make_desktop_entry_args[@]}" \
+		"$( printf '%s\n' "${make_desktop_entry_extras[@]}" )"
 }
