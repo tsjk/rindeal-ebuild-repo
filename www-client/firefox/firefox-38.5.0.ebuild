@@ -42,7 +42,7 @@ KEYWORDS="~alpha amd64 ~arm hppa ~ia64 ppc ppc64 x86 ~amd64-linux ~x86-linux"
 
 SLOT="0"
 LICENSE="MPL-2.0 GPL-2 LGPL-2.1"
-IUSE="bindist egl hardened +minimal neon pgo selinux +gmp-autoupdate test"
+IUSE="bindist egl hardened +minimal pgo selinux +gmp-autoupdate test"
 RESTRICT="!bindist? ( bindist )"
 
 # More URIs appended below...
@@ -140,7 +140,7 @@ src_prepare() {
 	EPATCH_SUFFIX="patch" \
 	EPATCH_FORCE="yes" \
 	EPATCH_EXCLUDE="8011_bug1194520-freetype261_until_moz43.patch
-					8010_bug114311-freetype26.patch" \
+			8010_bug114311-freetype26.patch" \
 	epatch "${WORKDIR}/firefox"
 
 	# Allow user to apply any additional patches without modifing ebuild
@@ -182,14 +182,14 @@ src_prepare() {
 	# Need to update jemalloc's configure
 	cd "${S}"/memory/jemalloc/src || die
 	WANT_AUTOCONF= eautoconf
-
-	# !PATCHED LINE BELOW!
+	
+	# PGO PATCH START
 	if use pgo; then
 		printf "\n\n%s\n\t%s\n" 'pgo-profile-run:' '$(PYTHON) $(topsrcdir)/build/pgo/profileserver.py $(EXTRA_TEST_ARGS)' >> "${S}/Makefile.in"
-		cp -r "$FILESDIR/pgo/" "$S/build/"
+		cp -r "${FILESDIR}/pgo/" "${S}/build/"
 	fi
+	# PGO PATCH END
 }
-
 
 src_configure() {
 	MOZILLA_FIVE_HOME="/usr/$(get_libdir)/${PN}"
@@ -214,22 +214,6 @@ src_configure() {
 	# Add full relro support for hardened
 	use hardened && append-ldflags "-Wl,-z,relro,-z,now"
 
-	if use neon ; then
-		mozconfig_annotate '' --with-fpu=neon
-		mozconfig_annotate '' --with-thumb=yes
-		mozconfig_annotate '' --with-thumb-interwork=no
-	fi
-
-	if [[ ${CHOST} == armv* ]] ; then
-		mozconfig_annotate '' --with-float-abi=hard
-		mozconfig_annotate '' --enable-skia
-
-		if ! use system-libvpx ; then
-			sed -i -e "s|softfp|hard|" \
-				"${S}"/media/libvpx/moz.build
-		fi
-	fi
-
 	use egl && mozconfig_annotate 'Enable EGL as GL provider' --with-gl-provider=EGL
 
 	# Setup api key for location services
@@ -244,9 +228,10 @@ src_configure() {
 
 	# Allow for a proper pgo build
 	if use pgo; then
-		# !PATCHED LINE BELOW!
-		echo "mk_add_options PROFILE_GEN_SCRIPT='EXTRA_TEST_ARGS=10 \$(MAKE) -C \$(MOZ_OBJDIR) pgo-profile-run'" >> "${S}"/.mozconfig 
-
+# 		echo "mk_add_options PROFILE_GEN_SCRIPT='\$(PYTHON) \$(OBJDIR)/_profile/pgo/profileserver.py'" >> "${S}"/.mozconfig
+		# PGO PATCH START
+		echo "mk_add_options PROFILE_GEN_SCRIPT='EXTRA_TEST_ARGS=10 \\$(MAKE) -C \\$(MOZ_OBJDIR) pgo-profile-run'" >> "${S}/.mozconfig"
+		# PGO PATCH END
 	fi
 
 	echo "mk_add_options MOZ_OBJDIR=${BUILD_OBJ_DIR}" >> "${S}"/.mozconfig
@@ -405,3 +390,5 @@ pkg_postinst() {
 pkg_postrm() {
 	gnome2_icon_cache_update
 }
+
+
