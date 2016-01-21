@@ -22,7 +22,7 @@ DEPEND_COMMON="
 DEPEND="${DEPEND_COMMON}
 	sys-devel/flex
 	>=sys-kernel/linux-headers-2.6.17
-	dev-util/pkgconfig
+	virtual/pkgconfig
 	doc? ( app-doc/doxygen )
 "
 RDEPEND="${DEPEND_COMMON}
