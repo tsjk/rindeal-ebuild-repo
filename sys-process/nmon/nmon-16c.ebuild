@@ -12,7 +12,7 @@ LICENSE="GPL-3"
 SRC_URI="mirror://sourceforge/${PN}/lmon${PV}.c"
 
 SLOT="0"
-KEYWORDS="~amd64 ~x86"
+KEYWORDS="~amd64 ~x86 ~arm"
 
 RDEPEND="sys-libs/ncurses:0="
 DEPEND="${RDEPEND}
