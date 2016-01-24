@@ -38,7 +38,7 @@ src_prepare() {
 		"${FILESDIR}"/${PN}-0.9.4-tinfo.patch
 
 	# use wiki, man pages are outdated - https://github.com/rakshasa/rtorrent/issues/332
-	
+
 	eautoreconf
 }
 
