@@ -32,6 +32,8 @@ DEPEND="${COMMON_DEPEND}
 DOCS=( doc/rtorrent.rc )
 
 src_prepare() {
+	default
+
 	# bug #358271
 	epatch \
 		"${FILESDIR}"/${PN}-0.9.1-ncurses.patch \
@@ -43,6 +45,8 @@ src_prepare() {
 }
 
 src_configure() {
+	default
+
 	# configure needs bash or script bombs out on some null shift, bug #291229
 	CONFIG_SHELL=${BASH} econf \
 		--disable-dependency-tracking \
