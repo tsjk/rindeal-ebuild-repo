@@ -14,7 +14,7 @@ SRC_URI="https://github.com/rakshasa/${PN}/archive/${PV}.tar.gz -> ${P}.tar.gz"
 RESTRICT="mirror"
 SLOT="0"
 KEYWORDS="amd64 arm ~hppa ~ia64 ppc ~ppc64 ~sparc ~x86 ~x86-fbsd ~amd64-linux ~arm-linux ~x86-linux ~ppc-macos ~x64-macos ~x86-macos ~sparc-solaris ~x64-solaris"
-IUSE="daemon debug ipv6 selinux test xmlrpc fallocate"
+IUSE="daemon debug ipv6 selinux test xmlrpc fallocate unicode"
 
 COMMON_DEPEND="~net-libs/libtorrent-0.13.${PV##*.}
 	>=dev-libs/libsigc++-2.2.2:2
@@ -52,8 +52,9 @@ src_configure() {
 		--disable-dependency-tracking \
 		$(use_enable debug) \
 		$(use_enable ipv6) \
-		$(use_with xmlrpc xmlrpc-c)
-		$(use_with fallocate posix-fallocate)
+		$(use_with xmlrpc xmlrpc-c) \
+		$(use_with fallocate posix-fallocate) \
+		$(use_with unicode ncursesw)
 }
 
 src_install() {
