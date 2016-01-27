@@ -61,7 +61,9 @@ src_install() {
 	default
 
 	if use daemon; then
-		newinitd "${FILESDIR}/${PN}.init" $PN
-		newconfd "${FILESDIR}/${PN}.conf" $PN
+		local daemon_name="${PN}d"
+
+		newinitd "${FILESDIR}/${daemon_name}.init" "${daemon_name}"
+		newconfd "${FILESDIR}/${daemon_name}.conf" "${daemon_name}"
 	fi
 }

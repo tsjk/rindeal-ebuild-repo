@@ -9,9 +9,9 @@ command="/usr/bin/rtorrent"
 command_args="${rtorrent_args}"
 command_background=true
 screen_command="/usr/bin/screen"
-: ${screen_session_name:=rtorrent}
+: ${screen_session_name:=${RC_SVCNAME}}
 screen_args="-D -m -S ${screen_session_name} ${screen_args}"
-pidfile="/run/${name}.pid"
+pidfile="/run/${RC_SVCNAME}.pid"
 
 : ${nicelevel:=0}
 : ${ionice:=0}
@@ -21,15 +21,15 @@ depend()
     use net
 
     if [ -z "${username}" ]; then
-        eerror "You must set '\${username}' in $( realpath "../conf.d" )/${name} before running this service"
+        eerror "You must set '\${username}' in $( realpath "../conf.d" )/${RC_SVCNAME} before running this service"
         return 1
     fi
 }
 
 start()
 {
-    ebegin "Starting '${name}'"
-    
+    ebegin "Starting '${RC_SVCNAME}'"
+
     [ -z "$grpname" ] && grpname="$( id -gn "${username}" )"
     [ -z "$umask" ] && umask="$( umask )"
 
@@ -53,10 +53,10 @@ start()
         \
         $screen_command -- ${screen_args} ${command} ${command_args}
 
-    eend $?    
+    eend $?
 }
 
-start_post() 
+start_post()
 {
     read -r screen_pid < "$pidfile"
     pgrep -P $screen_pid -o -x $command | head -n 1 > "$pidfile"
@@ -64,15 +64,15 @@ start_post()
 
 stop()
 {
-    ebegin "Stopping '${name}'"
-    
+    ebegin "Stopping '${RC_SVCNAME}'"
+
     { read -r pid < "$pidfile"; } &>/dev/null
 
-    start-stop-daemon --pidfile "$pidfile" --stop "$command"  
+    start-stop-daemon --pidfile "$pidfile" --stop "$command"
     # screen quit is a forceful way to stop any remaining daemon with the same session name
     su - "$username" \
         -c "${screen_command} -X -S '${screen_session_name}' quit" &>/dev/null
-    
+
     ret=0
     if  { [ -n "$pid" ] && checkpath -d "/proc/$pid"; } || \
         su - "$username" -c "${screen_command} -ls" &>/dev/null | \
@@ -81,7 +81,7 @@ stop()
     then
         ret=1
     fi
-    
+
     eend $ret
 }
 
