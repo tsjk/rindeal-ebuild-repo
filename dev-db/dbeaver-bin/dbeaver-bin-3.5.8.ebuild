@@ -17,7 +17,10 @@ RESTRICT="mirror strip"
 SLOT="0"
 KEYWORDS="~amd64"
 
-RDEPEND="|| ( >=virtual/jdk-1.7 >=virtual/jre-1.7 )"
+RDEPEND="
+	|| ( >=virtual/jdk-1.7 >=virtual/jre-1.7 )
+	!dev-db/dbeaver
+"
 
 S="$WORKDIR/$PN_BASE"
 
