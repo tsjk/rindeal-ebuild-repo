@@ -31,7 +31,7 @@ src_install (){
 	fperms a+x "${install_dir}/${PN_BASE}"
 	dosym "${install_dir}/${PN_BASE}" "$bin"
 
-	doicon -s 256 "icon.xpm"
+	newicon -s 256 "icon.xpm" "${PN_BASE}.xpm"
 
 	make_desktop_entry_args=(
 		"${bin} %U"							# exec
