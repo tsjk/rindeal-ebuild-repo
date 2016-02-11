@@ -12,7 +12,7 @@ LICENSE="GPL-2"
 SRC_URI="https://github.com/openSUSE/${PN}/archive/${PV}.tar.gz -> ${P}.tar.gz"
 
 SLOT="0"
-KEYWORDS="~amd64 ~ppc ~x86 ~amd64-linux ~arm-linux ~x86-linux"
+KEYWORDS="~amd64 ~arm"
 IUSE="doc"
 
 DEPEND_COMMON="
