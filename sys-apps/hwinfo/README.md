@@ -1,1 +1,3 @@
-Provides more up-to-date versions
+- provides more up-to-date versions
+- contains `doc` USE flag, which builds _doxygen_ docs for _libhd_ and installs additional docs, such as examples
+- uses git sources instead of OpenSuse package sources
