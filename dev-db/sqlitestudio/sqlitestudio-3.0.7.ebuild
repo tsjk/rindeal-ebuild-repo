@@ -7,13 +7,10 @@ EAPI=5
 
 inherit qmake-utils fdo-mime versionator
 
-PV_MAJ="$( get_major_version "$PV" )"
-PN_PRETTY="SQLiteStudio${PV_MAJ}"
-
-DESCRIPTION="${PN_PRETTY} is a powerful cross-platform SQLite database manager"
-HOMEPAGE="http://${PN}.pl"
+DESCRIPTION="SQLiteStudio3 is a powerful cross-platform SQLite database manager"
+HOMEPAGE="http://sqlitestudio.pl"
 LICENSE="GPL-3"
-SRC_URI="${HOMEPAGE}/files/${PN}${PV_MAJ}/complete/tar/${P}.tar.gz"
+SRC_URI="${HOMEPAGE}/files/sqlitestudio3/complete/tar/${P}.tar.gz"
 
 SLOT="0"
 KEYWORDS="~amd64"
@@ -50,7 +47,7 @@ RDEPEND="${DEPEND}"
 
 S="$WORKDIR"
 core_build_dir="${S}/output/build"
-core_src_dir="${S}/${PN_PRETTY}"
+core_src_dir="${S}/SQLiteStudio3"
 plugins_build_dir="${core_build_dir}/Plugins"
 plugins_src_dir="${S}/Plugins"
 
@@ -81,7 +78,7 @@ src_prepare () {
 
 	use cli || disabled_modules+=( "cli" )
 
-	disable_modules "${core_src_dir}/${PN_PRETTY}.pro" "${disabled_modules[@]}"
+	disable_modules "${core_src_dir}/SQLiteStudio3.pro" "${disabled_modules[@]}"
 
 	## Plugins
 	disabled_plugins=( 'DbSqlite2' )
@@ -125,12 +122,12 @@ src_install () {
 	cd "$core_build_dir"	&& emake INSTALL_ROOT="$D" install
 	cd "$plugins_build_dir" && emake INSTALL_ROOT="$D" install
 
-	dodoc "${core_src_dir}/docs/${PN}${PV_MAJ}_docs.cfg"
+	dodoc "${core_src_dir}/docs/sqlitestudio3_docs.cfg"
 	doicon "${FILESDIR}/${PN}.svg"
 
 	make_desktop_entry_args=(
 		"${EPREFIX}/usr/bin/${PN} %F"	# exec
-		"${PN_PRETTY}"					# name
+		"SQLiteStudio3"					# name
 		"${PN}"							# icon
 		"Development;Utility"			# categories
 	)
