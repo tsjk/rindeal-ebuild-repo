@@ -9,7 +9,7 @@ PYTHON_COMPAT=( python2_7 )
 inherit python-single-r1 eutils fdo-mime
 
 DESCRIPTION="A hierarchical note taking application"
-HOMEPAGE="http://www.giuspen.com/cherrytree/"
+HOMEPAGE="http://www.giuspen.com/cherrytree"
 LICENSE="GPL-3"
 SRC_URI="https://github.com/giuspen/${PN}/archive/${PV}.tar.gz -> ${P}.tar.gz"
 
