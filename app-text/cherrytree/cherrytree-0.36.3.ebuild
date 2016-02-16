@@ -16,11 +16,10 @@ SRC_URI="https://github.com/giuspen/${PN}/archive/${PV}.tar.gz -> ${P}.tar.gz"
 RESRICT="mirror"
 SLOT="0"
 KEYWORDS="~amd64"
+
 IUSE="nls"
 linguas_=( linguas_{cs,de,es,fr,hy,it,ja,lt,nl,pl,pt_BR,ru,tr,uk,zh_CN} )
 IUSE+=" ${linguas_[*]}"
-
-RESTRICT="mirror"
 
 RDEPEND="${PYTHON_DEPS}
 	x11-libs/libX11
