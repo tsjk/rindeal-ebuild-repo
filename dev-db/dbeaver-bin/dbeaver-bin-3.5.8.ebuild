@@ -7,11 +7,11 @@ EAPI=6
 inherit eutils fdo-mime
 
 PN_PRETTY="DBeaver"
-PN_BASE="dbeaver"
+MY_PN="dbeaver"
 DESCRIPTION="Free universal database manager and SQL client"
 HOMEPAGE="http://dbeaver.jkiss.org/"
 LICENSE="GPL-2"
-SRC_URI="https://github.com/serge-rider/${PN_BASE}/releases/download/${PV}/${PN_BASE}-ce-${PV}-linux.gtk.x86_64.tar.gz"
+SRC_URI="https://github.com/serge-rider/${MY_PN}/releases/download/${PV}/${MY_PN}-ce-${PV}-linux.gtk.x86_64.tar.gz"
 
 RESTRICT="mirror strip"
 SLOT="0"
@@ -22,24 +22,24 @@ RDEPEND="
 	!dev-db/dbeaver
 "
 
-S="$WORKDIR/$PN_BASE"
+S="$WORKDIR/$MY_PN"
 
 src_install (){
 	local install_dir="/opt/${PN_PRETTY}"
-	local bin="/usr/bin/${PN_BASE}"
+	local bin="/usr/bin/${MY_PN}"
 
 	insinto "$install_dir"
 	doins -r .
 
-	fperms a+x "${install_dir}/${PN_BASE}"
-	dosym "${install_dir}/${PN_BASE}" "$bin"
+	fperms a+x "${install_dir}/${MY_PN}"
+	dosym "${install_dir}/${MY_PN}" "$bin"
 
-	newicon -s 256 "icon.xpm" "${PN_BASE}.xpm"
+	newicon -s 256 "icon.xpm" "${MY_PN}.xpm"
 
 	make_desktop_entry_args=(
 		"${bin} %U"							# exec
 		"$PN_PRETTY"						# name
-		"$PN_BASE"							# icon
+		"$MY_PN"							# icon
 		"Development"						# categories
 	)
 	make_desktop_entry_extras=(
