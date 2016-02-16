@@ -57,13 +57,13 @@ src_install()
 
 	doicon -s scalable "glade/svg/${PN}.svg"
 	domenu "linux/${PN}.desktop"
-	doman linux/cherrytree.1
+	doman "linux/${PN}.1"
 
 	insinto "/usr/share/mime-info"
 	doins "linux/${PN}".{mime,keys}
 
 	insinto "/usr/share/mime/packages"
-	doins "linux/cherrytree.xml"
+	doins "linux/${PN}.xml"
 
 	if use nls; then
 		for l in $LINGUAS; do
