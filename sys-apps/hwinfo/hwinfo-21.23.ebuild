@@ -50,7 +50,6 @@ src_prepare() {
 
 src_compile() {
 	export HWINFO_VERSION=$PV
-	tc-export AR
 
 	emake CC="$(tc-getCC)" RPM_OPT_FLAGS="${CFLAGS}"
 	use doc && emake doc
@@ -59,13 +58,11 @@ src_compile() {
 src_install() {
 	emake DESTDIR="${ED}" LIBDIR="/usr/$(get_libdir)" install
 
+	dodoc README*
 	doman doc/*.{1,8}
 
-	dodoc README*
-
 	if use doc; then
-		insinto /usr/share/doc/${PF}/
-		doins doc/libhd
+		dodoc -r doc/libhd
 		insinto /usr/share/doc/${PF}/examples
 		doins doc/example*.c
 	fi
