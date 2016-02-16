@@ -11,6 +11,7 @@ HOMEPAGE="http://nmon.sourceforge.net/"
 LICENSE="GPL-3"
 SRC_URI="mirror://sourceforge/${PN}/lmon${PV}.c"
 
+RESTRICT="mirror"
 SLOT="0"
 KEYWORDS="~amd64 ~x86 ~arm"
 
