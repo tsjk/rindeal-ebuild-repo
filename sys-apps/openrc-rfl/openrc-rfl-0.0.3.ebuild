@@ -15,4 +15,9 @@ KEYWORDS="~amd64 ~arm"
 
 RDEPEND="sys-apps/openrc"
 
-export RFL_ROOT_DIR="$( echo "${ROOT}/usr/share/${PN}" | tr -s '/' )"
+src_prepare()
+{
+	default
+
+	export RFL_ROOT_DIR="$( echo "${ROOT}/usr/share/${PN}" | tr -s '/' )"
+}
