@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "http://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<upstream>
+		<remote-id type="sourceforge">ebook-tools</remote-id>
+	</upstream>
+	<use>
+		<flag name="lit2epub">Install lit2epub script</flag>
+	</use>
+</pkgmetadata>
