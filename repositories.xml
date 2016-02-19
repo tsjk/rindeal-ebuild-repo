@@ -1,0 +1,18 @@
+<!-- https://gitweb.gentoo.org/proj/repositories-xml-format.git/tree/schema/repositories.dtd -->
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE repositories SYSTEM "/dtd/repositories.dtd">
+<repositories version="1.0">
+  <repo quality="testing" status="unofficial">
+    <name>rindeal</name>
+    <description lang="en">Rindeal's overlay'</description>
+    <homepage>https://github.com/rindeal/gentoo-overlay</homepage>
+    <owner type="person">
+      <name>Jan Chren (rindeal)</name>
+      <email>dev.rindeal@gmail.com</email>
+    </owner>
+    <source type="git">https://github.com/rindeal/gentoo-overlay.git</source>
+    <source type="git">git://git@github.com:rindeal/gentoo-overlay.git</source>
+    <source type="git">git+ssh://git@github.com:rindeal/gentoo-overlay.git</source>
+    <feed>https://github.com/rindeal/gentoo-overlay/commits/master.atom</feed>
+  </repo>
+</repositories>
