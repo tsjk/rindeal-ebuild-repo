@@ -1,6 +1,6 @@
-<!-- https://gitweb.gentoo.org/proj/repositories-xml-format.git/tree/schema/repositories.dtd -->
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE repositories SYSTEM "/dtd/repositories.dtd">
+<!-- https://gitweb.gentoo.org/proj/repositories-xml-format.git/tree/schema/repositories.dtd -->
 <repositories version="1.0">
   <repo quality="testing" status="unofficial">
     <name>rindeal</name>
