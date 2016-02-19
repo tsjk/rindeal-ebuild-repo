@@ -6,7 +6,7 @@ EAPI=6
 
 DESCRIPTION="Rindeal's Function Library for OpenRC"
 HOMEPAGE="https://github.com/rindeal/openrc-rfl"
-LICENSE="BSD-3"
+LICENSE="BSD"
 SRC_URI="https://github.com/rindeal/openrc-rfl/archive/v${PV}.tar.gz -> ${P}.tar.gz"
 
 RESTRICT="mirror"
@@ -19,5 +19,7 @@ src_prepare()
 {
 	default
 
-	export RFL_ROOT_DIR="$( echo "${ROOT}/usr/share/${PN}" | tr -s '/' )"
+	RFL_ROOT_DIR="${ROOT}/usr/share/${PN}"
+	RFL_ROOT_DIR="${RFL_ROOT_DIR//\/\///}"
+	export RFL_ROOT_DIR
 }
