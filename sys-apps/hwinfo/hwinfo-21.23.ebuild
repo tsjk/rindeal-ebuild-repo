@@ -13,7 +13,7 @@ SRC_URI="https://github.com/openSUSE/${PN}/archive/${PV}.tar.gz -> ${P}.tar.gz"
 
 SLOT="0"
 KEYWORDS="~amd64 ~arm"
-IUSE="doc"
+IUSE="doc examples"
 
 DEPEND_COMMON="
 	amd64? ( dev-libs/libx86emu )
@@ -63,7 +63,9 @@ src_install() {
 
 	if use doc; then
 		dodoc -r doc/libhd
-		insinto /usr/share/doc/${PF}/examples
-		doins doc/example*.c
+	fi
+	if use examples; then
+		docinto examples
+		dodoc doc/example*.c
 	fi
 }
