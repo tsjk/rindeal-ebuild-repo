@@ -6,20 +6,12 @@ EAPI=6
 inherit eutils fdo-mime
 
 SLOT="10"
-PN_PRETTY="PhpStorm"
-pn_pretty_uniq="${PN_PRETTY}${SLOT}"
-bin_name="${PN}${SLOT}"
+MY_PN="${PN}${SLOT}"
 
 DESCRIPTION="PhpStorm is a commercial, cross-platform IDE for PHP"
-HOMEPAGE="https://www.jetbrains.com/${PN}/"
-SRC_URI="https://download.jetbrains.com/webide/${PN_PRETTY}-${PV}.tar.gz"
-LICENSE="
-	PhpStorm_personal_license
-	PhpStorm_OpenSource_license
-	PhpStorm_Academic_license
-	PhpStorm_Classroom_license
-	PhpStorm_license
-"
+HOMEPAGE="https://www.jetbrains.com/phpstorm"
+SRC_URI="https://download.jetbrains.com/webide/PhpStorm-${PV}.tar.gz"
+LICENSE="PhpStorm PhpStorm_Academic PhpStorm_Classroom PhpStorm_OpenSource PhpStorm_personal"
 
 KEYWORDS="~amd64 ~x86 ~arm"
 RESTRICT="strip mirror"
@@ -33,35 +25,36 @@ S="$WORKDIR"
 # src_unpack() { }
 
 src_prepare() {
-	cd ${PN_PRETTY}-*/
+	cd PhpStorm-*/
 	S="$PWD"
-	default
 
 	sed -i 's/IS_EAP="true"/IS_EAP="false"/' "bin/${PN}.sh"
 
 	# use system JDK
 	rm -rf jre/
+
+	default
 }
 
 src_install() {
-	local install_dir="/opt/${pn_pretty_uniq}"
+	local install_dir="/opt/${MY_PN}"
 
 	insinto "$install_dir"
 	doins -r .
 
 	fperms a+x "${install_dir}/bin/"{${PN}.sh,fsnotifier{,64,-arm}}
-	dosym "${install_dir}/bin/${PN}.sh" /usr/bin/${bin_name}
+	dosym "${install_dir}/bin/${PN}.sh" /usr/bin/${MY_PN}
 
-	newicon -s 256 "${install_dir}/bin/webide.png" "${bin_name}.png"
+	newicon -s 256 "bin/webide.png" "${MY_PN}.png"
 
 	make_desktop_entry_args=(
-		"${bin_name} %U"						# exec
-		"$pn_pretty_uniq"						# name
-		"${bin_name}"							# icon
-		"Development"							# categories
+		"${MY_PN} %U"						# exec
+		"PhpStorm ${SLOT}"					# name
+		"${MY_PN}"							# icon
+		"Development"						# categories
 	)
 	make_desktop_entry_extras=(
-		"MimeType=text/x-php;text/html;"		# MUST end with semicolon
+		"MimeType=text/x-php;text/html;"	# MUST end with semicolon
 	)
 
 	make_desktop_entry "${make_desktop_entry_args[@]}" "$( printf '%s\n' "${make_desktop_entry_extras[@]}" )"
