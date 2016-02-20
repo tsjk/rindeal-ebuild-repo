@@ -13,7 +13,7 @@ LICENSE="GPL-3"
 SRC_URI="${HOMEPAGE}/files/sqlitestudio3/complete/tar/${P}.tar.gz"
 
 SLOT="0"
-KEYWORDS="~amd64"
+KEYWORDS="amd64"
 
 IUSE="
 	cli
