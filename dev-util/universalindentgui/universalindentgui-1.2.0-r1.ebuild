@@ -150,7 +150,7 @@ src_install() {
 	fi
 
 	newicon -s 512 resources/universalIndentGUI_512x512.png ${PN}
-	
+
 	make_desktop_entry_args=(
 		"${PN}"	 				# exec
 		"UniversalIndentGUI"	# name
