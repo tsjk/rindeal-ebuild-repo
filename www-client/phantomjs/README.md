@@ -1,1 +1,2 @@
-- provides more up-to-date version
+- more up-to-date version
+- manpage
