@@ -6,13 +6,13 @@ EAPI=6
 
 inherit php-pear-r1
 
-KEYWORDS="amd64 ~x86"
-
 DESCRIPTION="Code Beautifier for PHP"
 LICENSE="PHP-3"
-SLOT="0"
 
-DEPEND="dev-lang/php[tokenizer]"
+SLOT="0"
+KEYWORDS="amd64 ~x86"
+
+DEPEND="dev-lang/php:*[tokenizer]"
 RDEPEND="$DEPEND >=dev-php/PEAR-Log-1.8"
 
 pkg_postinst() {
