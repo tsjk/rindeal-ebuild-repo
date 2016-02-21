@@ -8,7 +8,7 @@ inherit eutils
 
 DESCRIPTION="Xt7-Player-mpv is a graphical interface to mpv, focused on usability"
 HOMEPAGE="http://xt7-player.sourceforge.net/xt7forum/"
-SRC_URI="https://github.com/kokoko3k/${PN}/archive/${PV}.tar.gz -> ${P}.tar.gz"
+SRC_URI="https://github.com/kokoko3k/xt7-player-mpv/archive/${PV}.tar.gz -> ${P}.tar.gz"
 LICENSE="GPL-3"
 
 RESTRICT="mirror"
@@ -30,10 +30,10 @@ src_compile (){
 }
 
 src_install (){
-	mv ${PN}*.gambas "${PN}.gambas" || true
-	newbin "${PN}.gambas" "$PN"
-	sed -r -i "s/${PN}.gambas/${PN}/" "${PN}.desktop"
+	newbin ${PN}*.gambas "$PN"
 
+	sed -r -i "s|${PN}.*\.gambas|${PN}|" "${PN}.desktop"
 	domenu "${PN}.desktop"
+
 	doicon -s 48 "${PN}.png"
 }
