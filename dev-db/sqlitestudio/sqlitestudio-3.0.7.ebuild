@@ -6,33 +6,27 @@
 
 EAPI=6
 
-inherit qmake-utils fdo-mime versionator
+inherit qmake-utils fdo-mime
 
 DESCRIPTION="SQLiteStudio3 is a powerful cross-platform SQLite database manager"
 HOMEPAGE="http://sqlitestudio.pl"
 LICENSE="GPL-3"
 SRC_URI="${HOMEPAGE}/files/sqlitestudio3/complete/tar/${P}.tar.gz"
 
+RESTRICT="mirror"
 SLOT="0"
 KEYWORDS="amd64"
 
-IUSE="cli tcl cups test"
+IUSE="cli cups tcl test"
 
 qt_min=5.3
 
-RDEPEND="
-	>=dev-qt/qtcore-${qt_min}:5
-	>=dev-qt/qtgui-${qt_min}:5
-	>=dev-qt/qtwidgets-${qt_min}:5
-	>=dev-qt/qtscript-${qt_min}:5
-	>=dev-qt/qtnetwork-${qt_min}:5
-	>=dev-qt/qtxml-${qt_min}:5
-	>=dev-qt/qtsvg-${qt_min}:5
+RDEPEND=(
+    '>=dev-qt/'{qt{core,gui,network,script,svg,widgets,xml},designer}-${qt_min}:5
+    'dev-db/sqlite:3'
+)
+RDEPEND="${RDEPEND[@]}
 	cups? ( >=dev-qt/qtprintsupport-${qt_min}:5 )
-	>=dev-qt/designer-${qt_min}:5
-
-	dev-db/sqlite:3
-
 	cli? ( sys-libs/readline:= )
 	tcl? ( dev-lang/tcl:= )
 "
@@ -47,7 +41,7 @@ core_src_dir="${S}/SQLiteStudio3"
 plugins_build_dir="${core_build_dir}/Plugins"
 plugins_src_dir="${S}/Plugins"
 
-disable_modules (){
+disable_modules() {
 	local file="$1"
 	shift
 	if [ $# -gt 0 ]; then
@@ -64,27 +58,25 @@ disable_modules (){
 	fi
 }
 
-src_prepare () {
-	epatch "${FILESDIR}/${PN}-3.0.6-qt5_5-QDataStream.patch"
-	epatch "${FILESDIR}/${PN}-3.0.6-portable.patch"
-	epatch "${FILESDIR}/${PN}-3.0.7-paths.patch"
+PATCHES=( "${FILESDIR}/${PN}-"{3.0.6-qt5_5-QDataStream,3.0.6-portable,3.0.7-paths}'.patch' )
+
+src_prepare() {
+    default
 
 	## Core
 	local disabled_modules=()
 
-	use cli	|| disabled_modules+=( "cli" )
+	use cli	|| disabled_modules+=( 'cli' )
 
 	disable_modules "${core_src_dir}/SQLiteStudio3.pro" "${disabled_modules[@]}" || die
 
 	## Plugins
 	local disabled_plugins=( 'DbSqlite2' )
 
-	use tcl		|| disabled_plugins+=( "ScriptingTcl" )
-	use cups	|| disabled_plugins+=( "Printing" )
+	use tcl		|| disabled_plugins+=( 'ScriptingTcl' )
+	use cups	|| disabled_plugins+=( 'Printing' )
 
 	disable_modules "${plugins_src_dir}/Plugins.pro" "${disabled_plugins[@]}" || die
-
-	default
 }
 
 src_configure() {
@@ -96,9 +88,9 @@ src_configure() {
 		"DEFINES+=FORMS_DIR=${ROOT}usr/share/${PN}/forms"
 
 		# not strictly needed since 3.0.6, but nevermind
-		"DEFINES+=NO_AUTO_UPDATES"
+		'DEFINES+=NO_AUTO_UPDATES'
 	)
-	use test && qmake_args+=( "DEFINES+=tests" )
+	use test && qmake_args+=( 'DEFINES+=tests' )
 
 	## Core
 	mkdir -p "$core_build_dir" && cd "$core_build_dir" || die
@@ -109,7 +101,7 @@ src_configure() {
 	eqmake5 "${qmake_args[@]}" "$plugins_src_dir"
 }
 
-src_compile () {
+src_compile() {
 	## Core
 	cd "$core_build_dir"	&& emake
 
@@ -117,7 +109,7 @@ src_compile () {
 	cd "$plugins_build_dir"	&& emake
 }
 
-src_install () {
+src_install() {
 	cd "$core_build_dir"	&& emake INSTALL_ROOT="$D" install
 	cd "$plugins_build_dir"	&& emake INSTALL_ROOT="$D" install
 
@@ -126,13 +118,12 @@ src_install () {
 
 	make_desktop_entry_args=(
 		"${ROOT}usr/bin/${PN} %F"	# exec
-		"SQLiteStudio3"				# name
+		'SQLiteStudio3'				# name
 		"${PN}"						# icon
-		"Development;Utility"		# categories
+		'Development;Utility'		# categories
 	)
 	make_desktop_entry_extras=(
-		'Terminal=false'
-		"MimeType=application/x-sqlite3;"
+		'MimeType=application/x-sqlite3;'
 	)
 	make_desktop_entry "${make_desktop_entry_args[@]}" \
 		"$( printf '%s\n' "${make_desktop_entry_extras[@]}" )"
