@@ -4,18 +4,16 @@
 
 EAPI=6
 
-DESCRIPTION="Simple benchmark for memory throughput and latency"
-HOMEPAGE="https://github.com/ssvb/${PN}"
-LICENSE="MIT"
-EGIT_REPO_URI="https://github.com/ssvb/${PN}.git git://git@github.com:ssvb/${PN}.git"
-
 inherit git-r3
+
+DESCRIPTION="Simple benchmark for memory throughput and latency"
+HOMEPAGE="https://github.com/ssvb/tinymembench"
+LICENSE="MIT"
+EGIT_REPO_URI="https://github.com/ssvb/tinymembench.git"
 
 SLOT="0"
 KEYWORDS="~amd64 ~arm ~mips"
-IUSE=""
 
-src_install()
-{
+src_install() {
 	dobin "$PN"
 }
