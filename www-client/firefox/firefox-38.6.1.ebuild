@@ -182,7 +182,7 @@ src_prepare() {
 	# Need to update jemalloc's configure
 	cd "${S}"/memory/jemalloc/src || die
 	WANT_AUTOCONF= eautoconf
-	
+
 	# PGO PATCH START
 	if use pgo; then
 		printf "\n\n%s\n\t%s\n" 'pgo-profile-run:' '$(PYTHON) $(topsrcdir)/build/pgo/profileserver.py $(EXTRA_TEST_ARGS)' >> "${S}/Makefile.in"
@@ -390,5 +390,3 @@ pkg_postinst() {
 pkg_postrm() {
 	gnome2_icon_cache_update
 }
-
-
