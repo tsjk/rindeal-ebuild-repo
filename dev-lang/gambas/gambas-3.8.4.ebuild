@@ -9,7 +9,7 @@ inherit autotools eutils fdo-mime
 SLOT="3"
 MY_PN="${PN}${SLOT}"
 
-DESCRIPTION="Gambas is a free development environment based on a Basic interpreter with object extensions"
+DESCRIPTION="Gambas is a free development environment based on a Basic interpreter"
 HOMEPAGE="http://gambas.sourceforge.net/en/main.html"
 LICENSE="GPL-2"
 SRC_URI="mirror://sourceforge/${PN}/${MY_PN}-${PV}.tar.bz2"
@@ -59,32 +59,32 @@ RDEPEND="
 	curl? ( net-misc/curl )
 	dbus? ( sys-apps/dbus )
 	gnome? ( gnome-base/gnome-keyring )
-	gmp? ( dev-libs/gmp )
+	gmp? ( dev-libs/gmp:* )
 	gsl? ( sci-libs/gsl )
-	gstreamer? ( media-libs/gst-plugins-base media-libs/gstreamer )
+	gstreamer? ( media-libs/gst-plugins-base:0.10 media-libs/gstreamer:0.10 )
 	gtk2? ( x11-libs/gtk+:2 )
 	gtk3? ( x11-libs/gtk+:3 )
 	jit? ( sys-devel/llvm )
 	image-imlib? ( media-libs/imlib2 )
-	image-io? ( dev-libs/glib x11-libs/gdk-pixbuf )
+	image-io? ( dev-libs/glib:2 x11-libs/gdk-pixbuf )
 	libxml? ( dev-libs/libxml2 )
 	mime? ( dev-libs/gmime )
 	mysql?  ( virtual/mysql )
-	ncurses? ( sys-libs/ncurses )
+	ncurses? ( sys-libs/ncurses:5 )
 	odbc? ( dev-db/unixODBC )
 	openal? ( media-libs/openal )
 	opengl? ( media-libs/mesa )
-	openssl? ( dev-libs/openssl )
+	openssl? ( dev-libs/openssl:0 )
 	pcre? ( dev-libs/libpcre )
 	pdf? ( app-text/poppler )
-	postgres? ( virtual/postgresql-base )
+	postgres? ( dev-db/postgresql:* )
 	qt4? (
 		dev-qt/qtcore:4[qt3support]
 		dev-qt/qtgui:4[qt3support]
 		dev-qt/qtsvg:4
 	)
-	qt4-opengl? ( dev-qt/qtwebkit:4 )
-	qt4-webkit? ( dev-qt/qtopengl:4[qt3support] )
+	qt4-opengl? ( dev-qt/qtopengl:4[qt3support] )
+	qt4-webkit? ( dev-qt/qtwebkit:4 )
 	qt5? (
 		>=dev-qt/qtcore-5.4.0:5
 		>=dev-qt/qtopengl-5.4.0:5
@@ -101,7 +101,7 @@ RDEPEND="
 		media-libs/sdl2-image
 		media-libs/sdl2-mixer
 	)
-	v4l? ( virtual/jpeg:0 media-libs/libpng )
+	v4l? ( virtual/jpeg:0 media-libs/libpng:* )
 	x11? ( x11-libs/libX11 x11-libs/libXtst )
 	xml? ( dev-libs/libxml2 dev-libs/libxslt )
 	zlib? ( sys-libs/zlib )
@@ -175,7 +175,7 @@ src_configure() {
 	local args=
 
 	if use qt4; then
-		cd ${S}/gb.qt4
+		cd "${S}/gb.qt4"
 		args=( $(use_enable qt4-opengl qtopengl) $(use_enable qt4-webkit qtwebkit) )
 		econf "${args[@]}"
 	fi
@@ -219,11 +219,11 @@ src_configure() {
 		$(use_enable xml)
 		$(use_enable zlib)
 	)
-	cd ${S} && econf "${args[@]}"
+	cd "${S}" && econf "${args[@]}"
 }
 
 src_install() {
-	emake DESTDIR="${D}" install -j1
+	emake -j1 DESTDIR="${D}" install
 
 	dodoc AUTHORS ChangeLog NEWS README
 
