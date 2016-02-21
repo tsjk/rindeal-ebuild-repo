@@ -132,11 +132,11 @@ src_prepare() {
 	sed -i -r "${args[@]}" -- 'SourceFiles/pspecific_linux.cpp'
 
 	# now add corrected dependencies back
-	local libs=(
-		xkbcommon zlib openssl openal liblzma libavformat libavcodec libswresample libswscale
-		libavutil opus libva breakpad-client minizip appindicator3-0.1
-	)
-	local includes=( glib-2.0 gtk+-2.0 opus breakpad-client minizip appindicator3-0.1 )
+	local deps=( 'appindicator3-0.1' 'breakpad-client' 'minizip' 'opus')
+	local libs=( "${deps[@]}"
+		'lib'{av{codec,format,util},lzma,sw{scale,resample},va}
+		'xkbcommon' 'zlib' 'openssl' 'openal' )
+	local includes=( "${deps[@]}" 'glib-2.0' 'gtk+-2.0' )
 	local pkg_config="$(tc-getPKG_CONFIG)"
 	(
 		for p in ${libs[@]}; do
