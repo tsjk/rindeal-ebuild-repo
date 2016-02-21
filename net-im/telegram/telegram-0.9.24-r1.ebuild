@@ -37,14 +37,14 @@ RDEPEND=(
 	'dev-libs/libinput'
 	'net-libs/libproxy'
 	'sys-libs/mtdev'
-	'=media-libs/openal-9999'
+	'>=media-libs/openal-1.17.2'	# Telegram requires shiny new versions
 	'x11-libs/libva'
 	'media-libs/opus'
 
 	# custom deps
 	'x11-libs/gtk+:2'
 	'dev-libs/glib:2'
-	'app-arch/xz-utils' # lzma
+	'app-arch/xz-utils'	# lzma
 	'dev-util/google-breakpad'
 	'sys-libs/zlib[minizip]'
 	'virtual/jpeg:*'
