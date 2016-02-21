@@ -78,7 +78,7 @@ src_unpack() {
 	rm -rf "${qtstatic_dir}"
 	mkdir -p "$( dirname "$qtstatic_dir" )"
 	mv "qt-everywhere-opensource-src-${qt_ver}" "${qtstatic_dir}"
-	cd "${qtstatic_dir}"
+	cd "${qtstatic_dir}" || die
 	# save some space
 	rm -rf qt{webengine,webkit}
 }
@@ -114,7 +114,7 @@ src_prepare() {
 		# use release versions
 		-e 's:Debug(Style|Lang):Release\1:g'
 	)
-	sed -i -r "${args[@]}" -- "${tg_pro}"
+	sed -i -r "${args[@]}" -- "${tg_pro}" || die
 
 	# nuke libunity references
 	args=(
@@ -129,7 +129,7 @@ src_prepare() {
 		-e '\|ps_unity_|d'
 		-e '\|UnityLauncher|d'
 	)
-	sed -i -r "${args[@]}" -- 'SourceFiles/pspecific_linux.cpp'
+	sed -i -r "${args[@]}" -- 'SourceFiles/pspecific_linux.cpp' || die
 
 	# now add corrected dependencies back
 	local deps=( 'appindicator3-0.1' 'breakpad-client' 'minizip' 'opus')
@@ -137,17 +137,13 @@ src_prepare() {
 		'lib'{av{codec,format,util},lzma,sw{scale,resample},va}
 		'xkbcommon' 'zlib' 'openssl' 'openal' )
 	local includes=( "${deps[@]}" 'glib-2.0' 'gtk+-2.0' )
-	local pkg_config="$(tc-getPKG_CONFIG)"
-	(
-		for p in ${libs[@]}; do
-			"$pkg_config" --libs $p | awk '{print "LIBS += ",$0}'
-			assert
-		done
-		for p in ${includes[@]}; do
-			"$pkg_config" --cflags-only-I $p | sed -r 's| *-I([^ ]*) *|INCLUDEPATH += "\1"\n|g'
-			assert
-		done
-	) >> "${tg_pro}"
+
+	"$(tc-getPKG_CONFIG)" --libs "${libs[@]}" | \
+		awk '{print "LIBS += ",$0}' >> "${tg_pro}"
+	assert
+	"$(tc-getPKG_CONFIG)" --cflags-only-I "${includes[@]}" | \
+		sed -r 's| *-I([^ ]*) *|INCLUDEPATH += "\1"\n|g'  >> "${tg_pro}"
+	assert
 
 	(
 		# disable updater
@@ -193,7 +189,7 @@ src_configure() {
 	use gtkstyle && conf+=( '-gtkstyle' ) || conf+=( '-no-gtkstyle' )
 
 	# econf fails with `invalid command-line switch`es
-	[ -f Makefile ] || ./configure "${conf[@]}"
+	[ -f Makefile ] || ./configure "${conf[@]}" || die
 }
 
 src_compile() {
@@ -216,7 +212,7 @@ src_compile() {
 
 	for module in Style Lang; do	# order of modules matters
 		d="${S}/Linux/${mode^}Intermediate${module}"
-		mkdir -p "${d}" && cd "${d}"
+		mkdir -p "${d}" && cd "${d}" || die
 
 		elog "Building: ${PWD/$S\/}"
 		eqmake5 CONFIG+="${mode}" "${tg_dir}/Meta${module}.pro"
@@ -224,13 +220,15 @@ src_compile() {
 	done
 
 	d="${S}/Linux/${mode^}Intermediate"
-	mkdir -p "${d}" && cd "${d}"
+	mkdir -p "${d}" && cd "${d}" || die
 
 	elog "Preparing the main build ..."
 	# this qmake will fail to find "${tg_dir}/GeneratedFiles/*", but it's required for ...
 	eqmake5 CONFIG+="${mode}" "${tg_pro}"
 	# ... this make, which will generate those files
-	emake $( awk '/^PRE_TARGETDEPS \+=/ { $1=$2=""; print }' -- "${tg_pro}" )
+	local targets=( $( awk '/^PRE_TARGETDEPS \+=/ { $1=$2=""; print }' -- "${tg_pro}" ) )
+	[ ${#targets[@]} -eq 0 ] && die
+	emake ${targets[@]}
 
 	# now we have everything we need, so let's begin!
 	elog "Building Telegram ..."
