@@ -6,7 +6,7 @@ EAPI=6
 
 VIRTUALX_REQUIRED='always'
 
-inherit eutils fdo-mime virtualx qmake-utils
+inherit eutils fdo-mime virtualx qmake-utils flag-o-matic
 
 DESCRIPTION="Desktop client of Telegram, the messaging app."
 HOMEPAGE="https://telegram.org"
