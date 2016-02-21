@@ -111,8 +111,10 @@ src_prepare() {
 		-e '\|CUSTOM_API_ID|d'
 		# remove hardcoded flags
 		-e '\|QMAKE_[A-Z]*FLAGS|d'
+		# use release versions
+		-e 's:Debug(Style|Lang):Release\1:g'
 	)
-	sed -i -r "${args[@]}" "${tg_pro}"
+	sed -i -r "${args[@]}" -- "${tg_pro}"
 
 	# nuke libunity references
 	args=(
@@ -127,7 +129,7 @@ src_prepare() {
 		-e '\|ps_unity_|d'
 		-e '\|UnityLauncher|d'
 	)
-	sed -i -r "${args[@]}" 'SourceFiles/pspecific_linux.cpp'
+	sed -i -r "${args[@]}" -- 'SourceFiles/pspecific_linux.cpp'
 
 	# now add corrected dependencies back
 	local libs=(
@@ -160,6 +162,8 @@ src_prepare() {
 
 src_configure() {
 	append-cxxflags '-fno-strict-aliasing' # taken from "${tg_pro}"
+	# a bit more silence
+	append-cxxflags '-Wno-unused-'{function,parameter,variable,but-set-variable}
 
 	cd "${qtstatic_dir}"
 
@@ -168,16 +172,14 @@ src_configure() {
 		'-static' '-release' '-opensource' '-confirm-license'
 		'-no-strip' '-no-qml-debug'
 		'-no-warnings-are-errors'
+		# use system libs
+		'-system-'{zlib,pcre,harfbuzz,libpng,libjpeg,freetype,xcb}
 		# unneeded features
 		'-no-'{opengl,cups,evdev,nis,tslib,eglfs,directfb,linuxfb,kms,gstreamer}
 		'-skip' 'qtquick1'
 		'-skip' 'qtdeclarative'
-		# telegram doesn't support sending files >4GB
-		'-no-largefile'
 		# disable all SQL drivers
 		'-no-sql-'{db2,ibase,mysql,oci,odbc,psql,sqlite{,2},tds}
-		# use system libs
-		'-system-'{zlib,pcre,harfbuzz,libpng,libjpeg,freetype,xcb}
 		# disable obsolete/unused X11-related flags
 		# (not shown in ./configure -help output)
 		'-no-'{mitshm,x{cursor,fixes,inerama,input,randr,shape,sync,video}}
@@ -185,11 +187,13 @@ src_configure() {
 		'-no-compile-examples'
 		'-nomake' 'examples'
 		'-nomake' 'tests'
+		# Telegram doesn't support sending files >4GB
+		'-no-largefile'
 	)
 	use gtkstyle && conf+=( '-gtkstyle' ) || conf+=( '-no-gtkstyle' )
 
 	# econf fails with `invalid command-line switch`es
-	./configure "${conf[@]}"
+	[ -f Makefile ] || ./configure "${conf[@]}"
 }
 
 src_compile() {
@@ -208,29 +212,25 @@ src_compile() {
 	export PATH="${qt_dir}/bin:$PATH"
 
 	local d=
-	local mode=
-	# `debug` must be built first, because `release` references some files from `debug` (I think)
-	for mode in debug release; do
-		# order of modules matters
-		for module in Style Lang; do
-			d="${S}/Linux/${mode^}Intermediate${module}"
-			mkdir -p "${d}" && cd "${d}"
+	local mode='release'
 
-			elog "Building: ${PWD/$S\/}"
-			eqmake5 CONFIG+="${mode}" "${tg_dir}/Meta${module}.pro"
-			emake
-		done
+	for module in Style Lang; do	# order of modules matters
+		d="${S}/Linux/${mode^}Intermediate${module}"
+		mkdir -p "${d}" && cd "${d}"
+
+		elog "Building: ${PWD/$S\/}"
+		eqmake5 CONFIG+="${mode}" "${tg_dir}/Meta${module}.pro"
+		emake
 	done
 
 	d="${S}/Linux/${mode^}Intermediate"
 	mkdir -p "${d}" && cd "${d}"
 
 	elog "Preparing the main build ..."
-	local pre_targetdeps="$(awk '/^PRE_TARGETDEPS \+=/ { $1=$2=""; print }' "${tg_pro}")"
 	# this qmake will fail to find "${tg_dir}/GeneratedFiles/*", but it's required for ...
 	eqmake5 CONFIG+="${mode}" "${tg_pro}"
 	# ... this make, which will generate those files
-	emake $pre_targetdeps
+	emake $( awk '/^PRE_TARGETDEPS \+=/ { $1=$2=""; print }' -- "${tg_pro}" )
 
 	# now we have everything we need, so let's begin!
 	elog "Building Telegram ..."
