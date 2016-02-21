@@ -11,7 +11,7 @@ for cat in *-*/; do
     pushd $cat/ >/dev/null 2>&1
     for pn in */; do
         pn="${pn%/}"
-        echo " - [$pn]($URL_PREFIX/$cat/$pn)"
+        echo "    - [$pn]($URL_PREFIX/$cat/$pn)"
     done
     popd >/dev/null 2>&1
 
