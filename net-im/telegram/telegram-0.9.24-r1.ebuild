@@ -226,7 +226,7 @@ src_compile() {
 	# this qmake will fail to find "${tg_dir}/GeneratedFiles/*", but it's required for ...
 	eqmake5 CONFIG+="${mode}" "${tg_pro}"
 	# ... this make, which will generate those files
-	local targets=( $( awk '/^PRE_TARGETDEPS \+=/ { $1=$2=""; print }' -- "${tg_pro}" ) )
+	local targets=( $( awk '/^PRE_TARGETDEPS \+=/ { $1=$2=""; print }' "${tg_pro}" ) )
 	[ ${#targets[@]} -eq 0 ] && die
 	emake ${targets[@]}
 
