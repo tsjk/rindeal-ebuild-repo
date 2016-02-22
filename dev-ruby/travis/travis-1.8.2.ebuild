@@ -3,6 +3,7 @@
 # $Id$
 
 EAPI=5
+
 USE_RUBY="ruby20 ruby21 jruby"
 
 inherit ruby-fakegem
@@ -13,5 +14,4 @@ LICENSE="MIT"
 
 RESTRICT="mirror"
 SLOT="0"
-KEYWORDS="~amd64 ~x86"
-IUSE=""
+KEYWORDS="~amd64"
