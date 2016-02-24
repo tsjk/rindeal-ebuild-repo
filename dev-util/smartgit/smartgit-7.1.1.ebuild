@@ -28,14 +28,14 @@ S="${WORKDIR}/${PN}"
 src_install() {
 	local install_dir="/opt/${PN_PRETTY}"
 
-	fperms a+x {bin,lib}/*.sh
-
 	for s in 32 48 64 128 256; do
 		newicon -s $s "bin/smartgit-${s}.png" "${PN}.png"
 	done
 
 	insinto "$install_dir"
 	doins -r .
+
+	fperms a+x "$install_dir/"{bin,lib}/*.sh
 
 	dosym "$install_dir/bin/smartgit.sh" "/usr/bin/${PN}"
 
