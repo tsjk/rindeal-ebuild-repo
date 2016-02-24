@@ -134,8 +134,8 @@ src_prepare() {
 	# now add corrected dependencies back
 	local deps=( 'appindicator3-0.1' 'breakpad-client' 'minizip' 'opus')
 	local libs=( "${deps[@]}"
-		'lib'{av{codec,format,util},lzma,sw{scale,resample},va}
-		'xkbcommon' 'zlib' 'openssl' 'openal' )
+		'lib'{av{codec,format,util},lzma,sw{resample,scale},va}
+		'openal' 'openssl' 'xkbcommon' 'zlib' )
 	local includes=( "${deps[@]}" 'glib-2.0' 'gtk+-2.0' )
 
 	"$(tc-getPKG_CONFIG)" --libs "${libs[@]}" | \
