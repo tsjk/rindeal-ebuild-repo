@@ -51,7 +51,7 @@ RDEPEND=(
 	'media-libs/libpng:*'
 	'media-libs/freetype'
 	'x11-libs/libxcb'
-	'dev-libs/libpcre'
+	'dev-libs/libpcre[pcre16]'
 	'media-libs/harfbuzz'
 )
 RDEPEND="${RDEPEND[@]}"
