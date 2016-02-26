@@ -169,9 +169,9 @@ src_configure() {
 		'-no-strip' '-no-qml-debug'
 		'-no-warnings-are-errors'
 		# use system libs
-		'-system-'{zlib,pcre,harfbuzz,libpng,libjpeg,freetype,xcb}
+		'-system-'{freetype,harfbuzz,libjpeg,libpng,pcre,xcb,zlib}
 		# unneeded features
-		'-no-'{opengl,cups,evdev,nis,tslib,eglfs,directfb,linuxfb,kms,gstreamer}
+		'-no-'{cups,directfb,eglfs,evdev,gstreamer,kms,linuxfb,nis,opengl,tslib}
 		'-skip' 'qtquick1'
 		'-skip' 'qtdeclarative'
 		# disable all SQL drivers
