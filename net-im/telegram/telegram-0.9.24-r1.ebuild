@@ -244,10 +244,10 @@ src_install(){
 	done
 
 	make_desktop_entry_args=(
-		"\"${EROOT}usr/bin/${PN}\" -- %u"	# exec
+		"${EROOT}usr/bin/${PN} -- %u"	# exec
 		"${PN^}"	# name
 		"${PN}"		# icon
-		"Network;InstantMessaging;Chat"		# categories
+		"Network;InstantMessaging;Chat"	# categories
 	)
 	make_desktop_entry_extras=(
 		'MimeType=application/x-xdg-protocol-tg;x-scheme-handler/tg;'
