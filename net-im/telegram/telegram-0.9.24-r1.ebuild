@@ -46,12 +46,12 @@ RDEPEND=(
 	'dev-libs/glib:2'
 	'app-arch/xz-utils'	# lzma
 	'dev-util/google-breakpad'
-	'sys-libs/zlib[minizip]'
+	'>=sys-libs/zlib-1.2.5[minizip]'
 	'virtual/jpeg:*'
 	'media-libs/libpng:*'
 	'media-libs/freetype'
 	'x11-libs/libxcb'
-	'dev-libs/libpcre[pcre16]'
+	'>=dev-libs/libpcre-8.35[pcre16]'
 	'media-libs/harfbuzz'
 )
 RDEPEND="${RDEPEND[@]}"
