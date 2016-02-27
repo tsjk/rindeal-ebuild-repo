@@ -4,39 +4,29 @@
 
 EAPI=6
 
-VIRTUALX_REQUIRED='always'
+VIRTUALX_REQUIRED='always'	# TODO: is this indeed required?
 
 inherit eutils fdo-mime virtualx qmake-utils flag-o-matic
 
-DESCRIPTION="Desktop client of Telegram, the messaging app."
-HOMEPAGE="https://telegram.org"
-LICENSE="GPL-3" # with OpenSSL exception
-
-# this path must be in sync with dev-qt/telegram-qtstatic ebuild
-qt_dir="${EROOT}opt/telegram-qt-static"
-
+DESCRIPTION='Desktop client of Telegram, the messaging app.'
+HOMEPAGE='https://telegram.org'
+LICENSE='GPL-3' # with OpenSSL exception
 SRC_URI="https://github.com/telegramdesktop/tdesktop/archive/v${PV}.tar.gz -> ${P}.tar.gz"
 
-SLOT="0"
-KEYWORDS="~amd64"
-RESTRICT="mirror test"
+SLOT='0'
+KEYWORDS='~amd64'
+RESTRICT='mirror test'
 
 RDEPEND=(
-	# deps from arch PKGBUILD
+	'~dev-qt/telegram-qtstatic-5.5.1_p20160207'
 	'sys-libs/zlib[minizip]'
-
-	# tg
 	'media-libs/libexif'
 	'media-libs/opus'
 	'>=media-libs/openal-1.17.2'	# Telegram requires shiny new versions
 	'x11-libs/libva'
-
-	# custom deps
 	'app-arch/xz-utils'	# lzma
 	'dev-util/google-breakpad'
 	'dev-libs/libappindicator:3'
-
-	'~dev-qt/telegram-qtstatic-5.5.1_p20160207'
 )
 RDEPEND="${RDEPEND[@]}"
 DEPEND="${RDEPEND}
@@ -46,6 +36,8 @@ DEPEND="${RDEPEND}
 S="${WORKDIR}/tdesktop-${PV}"
 tg_dir="${S}/Telegram"
 tg_pro="${tg_dir}/Telegram.pro"
+# this path must be in sync with dev-qt/telegram-qtstatic ebuild
+qt_dir="${EROOT}opt/telegram-qt-static"
 
 # override qt5 path for use with eqmake5
 qt5_get_bindir() {
