@@ -212,12 +212,6 @@ src_install() {
 	emake INSTALL_ROOT="${D}" module-qt{base,imageformats}-install_subtargets
 }
 
-pkg_postinst() {
-	# do not run qt5-build_pkg_postinst()
-	true
-}
-
-pkg_postrm() {
-	# do not run qt5-build_pkg_postrm()
-	true
-}
+# unneeded funcs
+qt5-build_pkg_postinst() { true; }
+qt5-build_pkg_postrm() { true; }
