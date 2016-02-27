@@ -15,7 +15,9 @@ DESCRIPTION="Patched Qt for net-im/telegram"
 HOMEPAGE="https://github.com/telegramdesktop/tdesktop"
 
 qt_ver="$( get_version_component_range 1-3 )"
-qt_patch_rev='dd0c79ee5642695a39d5ff9d0e58e2f2b9f27534'
+qt_patch_rev="$(get_version_component_range 4)"
+# convert date to ISO8601
+qt_patch_rev="master@{${qt_patch_rev:1:4}-${qt_patch_rev:5:2}-${qt_patch_rev:7:2}}"
 qt_patch_name="${P}-qtbase.patch"
 # this path must be in sync with net-im/telegram ebuild
 qt_prefix="${EROOT}opt/telegram-qt-static"
