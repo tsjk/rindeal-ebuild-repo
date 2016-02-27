@@ -22,8 +22,8 @@ IUSE="cli cups tcl test"
 qt_min=5.3
 
 RDEPEND=(
-    '>=dev-qt/'{qt{core,gui,network,script,svg,widgets,xml},designer}-${qt_min}:5
-    'dev-db/sqlite:3'
+	'>=dev-qt/'{qt{core,gui,network,script,svg,widgets,xml},designer}-${qt_min}:5
+	'dev-db/sqlite:3'
 )
 RDEPEND="${RDEPEND[@]}
 	cups? ( >=dev-qt/qtprintsupport-${qt_min}:5 )
@@ -61,7 +61,7 @@ disable_modules() {
 PATCHES=( "${FILESDIR}/${PN}-"{3.0.6-qt5_5-QDataStream,3.0.6-portable,3.0.7-paths}'.patch' )
 
 src_prepare() {
-    default
+	default
 
 	## Core
 	local disabled_modules=()
