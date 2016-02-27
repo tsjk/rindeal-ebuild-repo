@@ -17,7 +17,6 @@ HOMEPAGE="https://github.com/telegramdesktop/tdesktop"
 qt_ver="$( get_version_component_range 1-3 )"
 qt_patch_rev='dd0c79ee5642695a39d5ff9d0e58e2f2b9f27534'
 qt_patch_name="${P}-qtbase.patch"
-
 # this path must be in sync with net-im/telegram ebuild
 qt_prefix="${EROOT}opt/telegram-qt-static"
 
@@ -54,22 +53,22 @@ RDEPEND=(
 		'x11-libs/pango'
 		'!!x11-libs/cairo[qt4]'
 	')'
-	'virtual/jpeg:0' # QtGUI - jpeg
+	'virtual/jpeg:0'
 	'media-libs/libpng:0='
 	'tslib? ( x11-libs/tslib )'
-	# BEGIN - QtGui - XCB
-	'x11-libs/libICE'
-	'x11-libs/libSM'
-	'x11-libs/libX11'
-	'>=x11-libs/libXi-1.7.4'
-	'x11-libs/libXrender'
-	'>=x11-libs/libxcb-1.10:=[xkb]'
-	'>=x11-libs/libxkbcommon-0.4.1[X]'
-	'x11-libs/xcb-util-image'
-	'x11-libs/xcb-util-keysyms'
-	'x11-libs/xcb-util-renderutil'
-	'x11-libs/xcb-util-wm'
-	# END - QtGui - XCB
+		# BEGIN - QtGui - XCB
+		'x11-libs/libICE'
+		'x11-libs/libSM'
+		'x11-libs/libX11'
+		'>=x11-libs/libXi-1.7.4'
+		'x11-libs/libXrender'
+		'>=x11-libs/libxcb-1.10:=[xkb]'
+		'>=x11-libs/libxkbcommon-0.4.1[X]'
+		'x11-libs/xcb-util-image'
+		'x11-libs/xcb-util-keysyms'
+		'x11-libs/xcb-util-renderutil'
+		'x11-libs/xcb-util-wm'
+		# END - QtGui - XCB
 	'systemd? ( sys-apps/systemd )'
 	## END - QtGui
 
@@ -115,7 +114,6 @@ DEPEND="${DEPEND[@]}"
 PDEPEND=">=net-im/telegram-0.9.24-r2
 	app-i18n/ibus
 "
-
 QT5_TARGET_SUBDIRS=( )
 
 S="${WORKDIR}/qt-everywhere-opensource-src-${qt_ver}"
@@ -194,7 +192,6 @@ src_configure() {
 		# Telegram doesn't support sending files >4GB
 		'-no-largefile'
 
-		$(usex gstreamer '-gstreamer 1.0' '')
 		$(qt_use gtkstyle)
 		$(qt_use libproxy)
 		$(qt_use systemd journald)
@@ -208,8 +205,6 @@ src_configure() {
 
 src_compile() {
 	qt5-build_src_compile
-
-	cd "${S}"
 	emake SHELL='sh -x' module-qt{base,imageformats}
 }
 
