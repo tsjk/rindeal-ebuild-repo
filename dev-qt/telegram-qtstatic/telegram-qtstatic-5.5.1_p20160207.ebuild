@@ -162,18 +162,22 @@ qt5_symlink_tools_to_build_dir() { true; }
 src_prepare() {
 	local qt_patch_file_lock="${T}/.qt_patched"
 	if ! [ -f "${qt_patch_file_lock}" ]; then
-		cd "${S}/qtbase"
+		pushd "${S}/qtbase"
 		eapply "${DISTDIR}/${qt_patch_name}" && touch "${qt_patch_file_lock}"
+		popd
 	fi
 
 	## BEGIN - QtGUI
-	cd "${S}/qtbase"
+	pushd "${S}/qtbase"
 
 	# avoid automagic dep on qtnetwork
 	sed -i -e '/SUBDIRS += tuiotouch/d' \
 		'src/plugins/generic/generic.pro' || die
+
+	popd
 	## END - QtGUI
 
+	cd "${S}/${QT5_MODULE}" || die
 	qt5-build_src_prepare
 }
 
