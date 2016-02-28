@@ -18,7 +18,7 @@ KEYWORDS='~amd64'
 RESTRICT='mirror test'
 
 RDEPEND=(
-	'~dev-qt/telegram-qtstatic-5.5.1_p20160207'
+	'~dev-qt/telegram-qtstatic-5.5.1_p20160208'
 	'sys-libs/zlib[minizip]'
 	'media-libs/libexif'
 	'media-libs/opus'
