@@ -1,0 +1,1 @@
+telegram-0.9.24-r2.ebuild
