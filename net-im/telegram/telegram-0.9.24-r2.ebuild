@@ -112,7 +112,7 @@ src_prepare() {
 	) >> "${tg_pro}"
 
 	# this is surely going to be needed
-	eapply_user
+	cd "${S}" && eapply_user
 }
 
 src_configure() {
