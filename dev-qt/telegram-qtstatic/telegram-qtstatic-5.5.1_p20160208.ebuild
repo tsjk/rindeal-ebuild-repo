@@ -121,7 +121,7 @@ qt5_prepare_env() {
 	QT5_IMPORTDIR="${QT5_ARCHDATADIR}/imports"
 	QT5_QMLDIR="${QT5_ARCHDATADIR}/qml"
 	QT5_DATADIR="${QT5_PREFIX}/share"
-	QT5_DOCDIR="${QT5_PREFIX}/share/doc/qt-${PV}"
+	QT5_DOCDIR="${QT5_PREFIX}/share/doc/qt-${qt_ver}"
 	QT5_TRANSLATIONDIR="${QT5_DATADIR}/translations"
 	QT5_EXAMPLESDIR="${QT5_DATADIR}/examples"
 	QT5_TESTSDIR="${QT5_DATADIR}/tests"
