@@ -8,7 +8,7 @@ JAVA_PKG_IUSE="doc"
 
 inherit java-pkg-2
 
-DESCRIPTION="A similarity analyser that identifies duplication in the source code of many languages and even plain text files"
+DESCRIPTION="A similarity analyser that identifies duplication in the source code"
 HOMEPAGE="http://www.harukizaemon.com/simian/index.html"
 LICENSE="simian"
 SRC_URI="http://www.harukizaemon.com/${PN}/${P}.tar.gz"
