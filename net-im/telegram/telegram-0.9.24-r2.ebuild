@@ -73,7 +73,7 @@ src_prepare() {
 	sed -i -r -e "s|[^ ]*Libraries/QtStatic/qtbase/([^ \"\\]*)|${qt_dir}/\1|g" -- *.pro || die
 
 	sed -i -r 's|".*src/gui/text/qfontengine_p.h"|<private/qfontengine_p.h>|' \
-		-- "${tg_dir}/SourceFiles/gui/text.h" || die
+		-- "SourceFiles/gui/text.h" || die
 
 	# nuke libunity references
 	args=(
@@ -103,7 +103,6 @@ src_prepare() {
 	"$(tc-getPKG_CONFIG)" --cflags-only-I "${includes[@]}" | \
 		sed -r 's| *-I([^ ]*) *|INCLUDEPATH += "\1"\n|g' >> "${tg_pro}"
 	assert
-
 	(
 		# disable updater
 		echo 'DEFINES += TDESKTOP_DISABLE_AUTOUPDATE'
