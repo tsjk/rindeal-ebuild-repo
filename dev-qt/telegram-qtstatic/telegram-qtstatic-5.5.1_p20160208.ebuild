@@ -211,7 +211,7 @@ src_configure() {
 
 src_compile() {
 	qt5-build_src_compile
-	emake SHELL='sh -x' module-qt{base,imageformats}
+	emake module-qt{base,imageformats}
 }
 
 src_install() {
