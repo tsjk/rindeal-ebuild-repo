@@ -30,8 +30,8 @@ SRC_URI="
 RESTRICT="strip test"
 SLOT="0"
 KEYWORDS="~amd64"
-IUSE="alsa bindist gstreamer gstreamer010 gtkstyle libproxy pulseaudio systemd tslib"
-REQUIRED_USE="?? ( gstreamer gstreamer010 )"
+IUSE="bindist gtkstyle libproxy systemd tslib"
+REQUIRED_USE=""
 
 RDEPEND=(
 	## BEGIN - QtCore
@@ -81,23 +81,6 @@ RDEPEND=(
 	'media-libs/tiff:0'
 	## END - QtImageFormats
 
-	## BEGIN - QtMultimedia
-	'alsa? ( media-libs/alsa-lib )'
-	'gstreamer? ('
-		'dev-libs/glib:2'
-		'media-libs/gstreamer:1.0'
-		'media-libs/gst-plugins-bad:1.0'
-		'media-libs/gst-plugins-base:1.0'
-	')'
-	'gstreamer010? ('
-		'dev-libs/glib:2'
-		'media-libs/gstreamer:0.10'
-		'media-libs/gst-plugins-bad:0.10'
-		'media-libs/gst-plugins-base:0.10'
-	')'
-	'pulseaudio? ( media-sound/pulseaudio )'
-	## END - QtMultimedia
-
 	## BEGIN - QtNetwork
 	'dev-libs/openssl:0[bindist=]'
 	'>=sys-libs/zlib-1.2.5'
@@ -107,10 +90,6 @@ RDEPEND=(
 RDEPEND="${RDEPEND[@]}"
 DEPEND=("${RDEPEND}"
 	'virtual/pkgconfig'
-
-	## BEGIN - QtMultimedia
-	'gstreamer? ( x11-proto/videoproto )'
-	## END - QtMultimedia
 )
 DEPEND="${DEPEND[@]}"
 PDEPEND=">=net-im/telegram-0.9.24-r2
@@ -125,7 +104,7 @@ src_unpack() {
 	qt5-build_src_unpack
 
 	# free some space
-	cd "${S}" && rm -rf qt{webengine,webkit}
+	cd "${S}" && rm -rf qt{multimedia,webengine,webkit}
 }
 
 # override env to use our prefix and paths expected by tg sources
@@ -203,8 +182,6 @@ src_configure() {
 		$(qt_use systemd journald)
 		$(qt_use tslib)
 	)
-	use gstreamer	 && myconf+=( '-gstreamer' '1.0' )
-	use gstreamer010 && myconf+=( '-gstreamer' '0.10' )
 
 	qt5_base_configure
 }
