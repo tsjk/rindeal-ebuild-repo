@@ -28,5 +28,5 @@ script:
     - python $HOME/portage/bin/repoman full -d
 
 notifications:
-  email:
-    on_failure: change
+    email:
+        on_failure: change
