@@ -19,7 +19,11 @@ wget https://github.com/gentoo/portage/archive/v${PORTAGE_VER}.tar.gz -O portage
 mkdir portage-src
 tar xf portage.tar.gz -C portage-src --strip-components=1 && rm portage.tar.gz
 cd portage-src
-./setup.py install --root="${PORTAGE_ROOT}"
+args=(
+    --system-prefix="${PORTAGE_ROOT}/usr"
+    --sysconfdir="${PORTAGE_ROOT}/etc"
+)
+./setup.py install "${args[@]}"
 mkdir -p "${PORTAGE_ROOT}/usr/lib/portage/cnf/"
 cp cnf/metadata.dtd "${PORTAGE_ROOT}/usr/lib/portage/cnf/"
 
