@@ -14,7 +14,7 @@ env:
 install:
     - tools/install_portage.sh
     - export PATH="${PORTAGE_ROOT}/usr/bin:${PATH}"
-    - export PORTAGE_CONFIGROOT="${PORTAGE_ROOT}"
+    - export PORTAGE_CONFIGROOT="${PORTAGE_ROOT}" ROOT="${PORTAGE_ROOT}"
 
 script:
     - repoman full -d
