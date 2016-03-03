@@ -10,6 +10,10 @@ mkdir -p "${PORTAGE_ROOT}"
 tmp_dir="$(mktemp -d)"
 
 
+mkdir -p "${PORTAGE_ROOT}/usr/"
+ln -s lib64 "${PORTAGE_ROOT}/usr/lib"
+
+
 cd "${tmp_dir}"
 wget https://github.com/gentoo/portage/archive/v${PORTAGE_VER}.tar.gz -O portage.tar.gz
 mkdir portage-src
