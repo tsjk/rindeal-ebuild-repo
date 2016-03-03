@@ -25,6 +25,7 @@ get_archive() {
 tmp_dir="$(mktemp -d)"
 gentoo_tree_dir="${PORTAGE_ROOT}/usr/portage"
 portage_conf_dir="${PORTAGE_ROOT}/etc/portage"
+DISTDIR="$(mktemp -d)"
 mkdir -p "${PORTAGE_ROOT}/usr/lib64" && ln -s lib64 "${PORTAGE_ROOT}/usr/lib"
 
 
@@ -54,7 +55,7 @@ location = ${gentoo_tree_dir}
 _EOF_
 
 cat > "${portage_conf_dir}/make.conf" << _EOF_
-DISTDIR="$(mktemp -d)"
+DISTDIR="${DISTDIR}"
 PKGDIR="$(mktemp -d)"
 PORTAGE_TMPDIR="$(mktemp -d)"
 RPMDIR="$(mktemp -d)"
