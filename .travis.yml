@@ -1,31 +1,22 @@
 # Based on https://github.com/mrueg/repoman-travis
 
+sudo: false
 language: python
 python:
     - pypy
 
 env:
-    - PORTAGE_VER="2.2.27"
+    global:
+        - PORTAGE_ROOT="$(mktemp -d)"
+    matrix:
+        - PORTAGE_VER="2.2.27"
 
-before_install:
-    - # permit access to system dirs
-    - sudo chmod a+rwX /etc/passwd /etc/group /etc /usr
 install:
-    # create portage user+group
-    - echo "portage:x:250:250:portage:/var/tmp/portage:/bin/false" >> /etc/passwd
-    - echo "portage::250:portage,travis" >> /etc/group
-    # populate
-    - mkdir -p /etc/portage /usr/portage/distfiles $HOME/portage
-    - wget https://github.com/gentoo/portage/archive/v${PORTAGE_VER}.tar.gz -O portage-${PORTAGE_VER}.tar.gz
-    - tar xzf portage-${PORTAGE_VER}.tar.gz -C $HOME/portage --strip-components=1
-    - wget https://github.com/gentoo-mirror/gentoo/archive/master.tar.gz -O portage-tree.tar.gz
-    - tar xzf portage-tree.tar.gz -C /usr/portage --strip-components=1
-    - cp $HOME/portage/cnf/repos.conf /etc/portage/
-    - cp $HOME/portage/cnf/metadata.dtd /usr/portage/distfiles/
-    - ln -s /usr/portage/profiles/base/ /etc/portage/make.profile
+    - tools/install_portage.sh
+    - export PATH="${PORTAGE_ROOT}/usr/bin:${PATH}"
 
 script:
-    - python $HOME/portage/bin/repoman full -d
+    - repoman full -d
 
 notifications:
     email:
