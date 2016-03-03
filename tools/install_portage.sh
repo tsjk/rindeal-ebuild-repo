@@ -10,7 +10,7 @@ mkdir -p "${PORTAGE_ROOT}"
 tmp_dir="$(mktemp -d)"
 
 
-mkdir -p "${PORTAGE_ROOT}/usr/"
+mkdir -p "${PORTAGE_ROOT}/usr/lib64"
 ln -s lib64 "${PORTAGE_ROOT}/usr/lib"
 
 
