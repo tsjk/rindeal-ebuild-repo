@@ -42,6 +42,13 @@ main-repo = gentoo
 location = ${PORTAGE_ROOT}/usr/portage
 _EOF_
 
+cat > "${PORTAGE_ROOT}/etc/portage/make.conf" << _EOF_
+DISTDIR="$(mktemp -d)"
+PKGDIR="$(mktemp -d)"
+PORTAGE_TMPDIR="$(mktemp -d)"
+_EOF_
+
+
 ln -s "${PORTAGE_ROOT}/usr/portage/profiles/base" "${PORTAGE_ROOT}/etc/portage/make.profile"
 
 
