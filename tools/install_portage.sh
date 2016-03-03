@@ -52,6 +52,9 @@ main-repo = gentoo
 
 [gentoo]
 location = ${gentoo_tree_dir}
+
+[rindeal]
+location = ${TRAVIS_BUILD_DIR}
 _EOF_
 
 cat > "${portage_conf_dir}/make.conf" << _EOF_
