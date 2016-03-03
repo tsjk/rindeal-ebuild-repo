@@ -35,7 +35,7 @@ get_archive https://github.com/gentoo/portage/archive/v${PORTAGE_VER}.tar.gz "${
 cd "${tmp_dir}/portage-src"
 ./setup.py install -O2 --system-prefix="${PORTAGE_ROOT}/usr" --sysconfdir="${PORTAGE_ROOT}/etc"
 mkdir -p "${PORTAGE_ROOT}/usr/lib/portage/cnf/"
-cp cnf/metadata.dtd "${PORTAGE_ROOT}/usr/lib/portage/cnf/"
+cp cnf/metadata.dtd "${DISTDIR}/"
 
 
 ## install gentoo tree
