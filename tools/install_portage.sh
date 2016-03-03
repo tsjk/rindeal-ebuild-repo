@@ -32,7 +32,7 @@ mkdir -p "${PORTAGE_ROOT}/usr/lib64" && ln -s lib64 "${PORTAGE_ROOT}/usr/lib"
 ## ----------------
 get_archive https://github.com/gentoo/portage/archive/v${PORTAGE_VER}.tar.gz "${tmp_dir}/portage-src"
 cd "${tmp_dir}/portage-src"
-./setup.py install --system-prefix="${PORTAGE_ROOT}/usr" --sysconfdir="${PORTAGE_ROOT}/etc"
+./setup.py install -O2 --system-prefix="${PORTAGE_ROOT}/usr" --sysconfdir="${PORTAGE_ROOT}/etc"
 mkdir -p "${PORTAGE_ROOT}/usr/lib/portage/cnf/"
 cp cnf/metadata.dtd "${PORTAGE_ROOT}/usr/lib/portage/cnf/"
 
