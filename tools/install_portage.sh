@@ -46,7 +46,7 @@ get_archive https://github.com/gentoo-mirror/gentoo/archive/master.tar.gz "${gen
 ## install portage configs
 ## ------------------------
 mkdir -p "${portage_conf_dir}/repos.conf"
-cat > "${portage_conf_dir}/repos.conf/gentoo" << _EOF_
+cat > "${portage_conf_dir}/repos.conf/repos" << _EOF_
 [DEFAULT]
 main-repo = gentoo
 
