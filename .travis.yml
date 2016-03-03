@@ -23,6 +23,7 @@ script:
 
 after_success:
     - repoman manifest
+    - cat "${PORTAGE_ROOT}/etc/portage/repos.conf/repos"
     - egencache --update --repo rindeal --jobs 2 --load-average 2
     - git status
 
