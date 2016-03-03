@@ -46,7 +46,7 @@ cat > "${PORTAGE_ROOT}/etc/portage/make.conf" << _EOF_
 DISTDIR="$(mktemp -d)"
 PKGDIR="$(mktemp -d)"
 PORTAGE_TMPDIR="$(mktemp -d)"
-RMPDIR="$(mktemp -d)"
+RPMDIR="$(mktemp -d)"
 _EOF_
 
 
