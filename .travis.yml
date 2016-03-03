@@ -12,6 +12,7 @@ env:
         - PORTAGE_VER="2.2.26"
         - PORTAGE_VER="2.2.27"
 
+
 install:
     - tools/install_portage.sh
     - export PATH="${PORTAGE_ROOT}/usr/bin:${PATH}"
@@ -19,6 +20,12 @@ install:
 
 script:
     - repoman full -d
+
+after_success:
+    - repoman manifest
+    - egencache --update --repo rindeal --jobs 2 --load-average 2
+    - git status
+
 
 notifications:
     email:
