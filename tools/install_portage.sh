@@ -14,7 +14,7 @@ get_archive() {
     pushd "${tmpd}"
     wget "$url" -O "${file}" || return 1
     mkdir -p "${dir}"
-    tar xf "${f}" -C "${dir}" --strip-components=1 || return 2
+    tar xf "${file}" -C "${dir}" --strip-components=1 || return 2
     popd
     rm -r -f "${tmpd}"
 }
