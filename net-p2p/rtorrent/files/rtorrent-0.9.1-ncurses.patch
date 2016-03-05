@@ -1,5 +1,5 @@
---- src/display/canvas.h
-+++ src/display/canvas.h
+--- a/src/display/canvas.h
++++ b/src/display/canvas.h
 @@ -48,5 +48,5 @@ class Canvas {
  public:
    typedef std::vector<Attributes> attributes_list;
