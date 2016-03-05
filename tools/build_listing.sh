@@ -2,7 +2,7 @@
 
 URL_PREFIX="."
 
-cd "$( dirname "${BASH_SOURCE[0]}" )"
+cd "$( dirname "${BASH_SOURCE[0]}" )/../"
 
 for cat in *-*/; do
     cat="${cat%/}"
