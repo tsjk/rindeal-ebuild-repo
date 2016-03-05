@@ -6,6 +6,8 @@ cd "$( dirname "${BASH_SOURCE[0]}" )/../"
 
 for cat in *-*/; do
     cat="${cat%/}"
+    [ $(ls $cat | wc -l) -eq 0 ] && continue
+
     echo "- [$cat]($URL_PREFIX/$cat)"
 
     pushd $cat/ >/dev/null 2>&1
