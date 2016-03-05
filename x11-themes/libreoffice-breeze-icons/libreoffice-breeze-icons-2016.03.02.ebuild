@@ -6,7 +6,7 @@ EAPI=6
 
 DESCRIPTION="Breeze dark icons set for Libreoffice"
 HOMEPAGE="https://github.com/NitruxSA/plasma-next-icons"
-LICENSE="LGPL"
+LICENSE="LGPL-3"
 SRC_URI="https://github.com/aitorpazos/archlinux-libreoffice-breeze-icons/releases/download/${PV}/libreoffice-breeze-icons-${PV}.tar.gz"
 RESTRICT="mirror"
 
