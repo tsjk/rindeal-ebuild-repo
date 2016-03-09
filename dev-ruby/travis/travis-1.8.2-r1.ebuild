@@ -14,6 +14,6 @@ LICENSE="MIT"
 
 RESTRICT="mirror"
 SLOT="0"
-KEYWORDS="~amd64"
+KEYWORDS="~amd64 ~arm"
 
 RUBY_FAKEGEM_EXTRAINSTALL="assets"
