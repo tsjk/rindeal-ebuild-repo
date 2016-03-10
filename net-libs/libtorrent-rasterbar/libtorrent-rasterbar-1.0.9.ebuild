@@ -4,7 +4,7 @@
 
 EAPI=6
 
-PYTHON_COMPAT=( python2_7 python3_{3,4,5} )
+PYTHON_COMPAT=( python2_7 python3_{4,5} )
 PYTHON_REQ_USE="threads"
 DISTUTILS_OPTIONAL=true
 
@@ -19,7 +19,7 @@ SRC_URI="https://github.com/arvidn/libtorrent/archive/libtorrent-${MY_PV}.tar.gz
 
 SLOT="0"
 KEYWORDS="~amd64 ~arm"
-RESTRICT=""
+RESTRICT="test"
 
 IUSE="debug doc examples python ssl static-libs test"
 REQUIRED_USE="python? ( ${PYTHON_REQUIRED_USE} )"
@@ -74,12 +74,12 @@ src_configure() {
 }
 
 src_compile() {
-	emake
+	default
 	use python && distutils-r1_src_compile
 }
 
 src_install() {
-	emake DESTDIR="${D}" install
+	default
 	use python && distutils-r1_src_install
 
 	use doc && HTML_DOCS=( "${S}"/docs )
