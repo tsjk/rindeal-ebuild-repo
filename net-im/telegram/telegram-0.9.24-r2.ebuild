@@ -37,7 +37,7 @@ S="${WORKDIR}/tdesktop-${PV}"
 tg_dir="${S}/Telegram"
 tg_pro="${tg_dir}/Telegram.pro"
 # this path must be in sync with dev-qt/telegram-qtstatic ebuild
-qt_dir="${EROOT}opt/telegram-qt-static"
+qt_dir="${EROOT}opt/telegram-qtstatic"
 
 # override qt5 path for use with eqmake5
 qt5_get_bindir() {
