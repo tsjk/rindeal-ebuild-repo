@@ -7,7 +7,7 @@ EAPI=6
 QT5_MODULE='qtbase' # base ( core dbus gui network widgets ) imageformats
 QT_MODULES=(qtbase qtimageformats)
 
-inherit qmake-utils versionator eutils qt5-build
+inherit qmake-utils versionator eutils qt5-build check-reqs
 
 # prevent qttest from being assigned to DEPEND
 E_DEPEND="${E_DEPEND/test? \( \~dev-qt\/qttest-* \)}"
@@ -124,6 +124,8 @@ QT5_TARGET_SUBDIRS=(
 	'qtbase/src/'{tools/uic,widgets}
 	## END - QtWidgets
 )
+
+CHECKREQS_DISK_BUILD='800M'
 
 S="${WORKDIR}"
 QT5_BUILD_DIR="${S}"
