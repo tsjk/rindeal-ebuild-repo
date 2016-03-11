@@ -6,7 +6,7 @@ EAPI=6
 
 VIRTUALX_REQUIRED='always'	# TODO: is this indeed required?
 
-inherit eutils fdo-mime virtualx qmake-utils flag-o-matic
+inherit eutils fdo-mime virtualx qmake-utils flag-o-matic check-reqs
 
 DESCRIPTION='Desktop client of Telegram, the messaging app.'
 HOMEPAGE='https://telegram.org'
@@ -32,6 +32,8 @@ RDEPEND="${RDEPEND[@]}"
 DEPEND="${RDEPEND}
 	virtual/pkgconfig
 "
+
+CHECKREQS_DISK_BUILD='800M'
 
 S="${WORKDIR}/tdesktop-${PV}"
 tg_dir="${S}/Telegram"
