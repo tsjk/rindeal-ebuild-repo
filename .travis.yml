@@ -19,7 +19,7 @@ env:
 
 matrix:
     allow_failures:
-        - PORTAGE_VER="2.2.24"
+        - env: PORTAGE_VER="2.2.24"
     fast_finish: true
 
 
