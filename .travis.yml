@@ -5,6 +5,9 @@ language: python
 python:
     - pypy
 
+git:
+    depth: 1
+
 env:
     global:
         - PORTAGE_ROOT="$(mktemp -d)"
