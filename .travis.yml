@@ -1,4 +1,4 @@
-# Based on https://github.com/mrueg/repoman-travis
+# Initial idea of repoman checks: https://github.com/mrueg/repoman-travis
 
 sudo: false
 language: python
