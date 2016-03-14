@@ -31,10 +31,6 @@ install:
 script:
     - repoman full -d
 
-after_success:
-    - repoman manifest
-    - git status
-
 
 notifications:
     email:
