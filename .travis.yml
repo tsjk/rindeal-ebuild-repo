@@ -9,6 +9,7 @@ env:
     global:
         - PORTAGE_ROOT="$(mktemp -d)"
     matrix:
+        - PORTAGE_VER="2.2.24"
         - PORTAGE_VER="2.2.26"
         - PORTAGE_VER="2.2.27"
         - PORTAGE_VER="2.2.28"
