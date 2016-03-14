@@ -17,6 +17,10 @@ env:
         - PORTAGE_VER="2.2.27"
         - PORTAGE_VER="2.2.28"
 
+matrix:
+    allow_failures:
+        - PORTAGE_VER="2.2.24"
+
 
 install:
     - tools/install_portage.sh
