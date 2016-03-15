@@ -8,7 +8,7 @@ PYTHON_COMPAT=( python2_7 python3_{4,5} )
 PYTHON_REQ_USE="threads"
 DISTUTILS_OPTIONAL=true
 
-inherit distutils-r1
+inherit autotools distutils-r1
 
 MY_PV="${PV//./_}"
 
@@ -30,8 +30,7 @@ RDEPEND="
 	sys-libs/zlib
 	examples? ( !net-p2p/mldonkey )
 	ssl? ( dev-libs/openssl:0= )
-	python? (
-		${PYTHON_DEPS}
+	python? ( ${PYTHON_DEPS}
 		dev-libs/boost:=[python,${PYTHON_USEDEP}]
 	)"
 DEPEND="${RDEPEND}
@@ -39,16 +38,24 @@ DEPEND="${RDEPEND}
 
 S=${WORKDIR}/libtorrent-libtorrent-${MY_PV}
 
-src_prepare() {
-	# python2 -> 2/3
-	sed -i -r -e "s|execfile\('([^']*)'\)|exec(open('\1').read())|" -- 'setup.py' || die
+do_python() {
+    use python || return 0
+    pushd "${S}/bindings/python" && "$@" || return 1
+    popd
+}
 
+src_prepare() {
 	default
-	./autotool.sh
+
+    # needed or else eautoreconf fails
+	mkdir build-aux || die
+	cp {m4,build-aux}/config.rpath || die
+
+	eautoreconf
 }
 
 src_configure() {
-	use python && python_setup
+	use python && python_setup $(usex python_targets_python2_7 'python2*' '')
 
 	local econfargs=(
 		--disable-silent-rules # bug 441842
@@ -57,30 +64,29 @@ src_configure() {
 		$(use_enable test tests)
 		$(use_enable examples)
 		$(use_enable ssl encryption)
+		$(use_enable static-libs static)
 		$(use_enable python python-binding)
 		$(usex debug '--enable-logging=verbose' '')
 		$(usex python_targets_python2_7 '--with-boost-python=2.7' '')
 	)
-	if use python_targets_python3_3 ;then
-		econfargs+=( '--with-boost-python=3.3' )
-	elif use python_targets_python3_4 ;then
+	if use python_targets_python3_4 ;then
 		econfargs+=( '--with-boost-python=3.4' )
 	elif use python_targets_python3_5 ;then
 		econfargs+=( '--with-boost-python=3.5' )
 	fi
 
 	econf "${econfargs[@]}"
-	use python && distutils-r1_src_configure
+	do_python distutils-r1_src_configure || die
 }
 
 src_compile() {
 	default
-	use python && distutils-r1_src_compile
+	do_python distutils-r1_src_compile || die
 }
 
 src_install() {
 	default
-	use python && distutils-r1_src_install
+	do_python distutils-r1_src_install || die
 
 	use doc && HTML_DOCS=( "${S}"/docs )
 	einstalldocs
