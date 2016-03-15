@@ -98,7 +98,7 @@ python_install_all() {
 		systemd_install_serviced "${FILESDIR}"/deluge-web.service.conf
 	else
 		rm -rvf "${D}"/usr/bin/deluge-web "${D}"/usr/lib*/python*/*-packages/deluge/ui/web/ \
-		"${D}"/usr/share/man/man1/deluge-web.*
+			"${D}"/usr/share/man/man1/deluge-web.*
 	fi
 
 	if ! use gtk ;then
@@ -109,6 +109,6 @@ python_install_all() {
 
 	if ! use console ;then
 		rm -rvf "${D}"/usr/bin/deluge-console "${D}"/usr/lib*/python*/*-packages/deluge/ui/console/* \
-		"${D}"/usr/share/man/man1/deluge-console.*
+			"${D}"/usr/share/man/man1/deluge-console.*
 	fi
 }
