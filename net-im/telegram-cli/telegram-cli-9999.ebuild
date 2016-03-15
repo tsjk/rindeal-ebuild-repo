@@ -2,45 +2,46 @@
 # Distributed under the terms of the GNU General Public License v2
 # $Id$
 
-EAPI=5
+EAPI=6
 
-EGIT_REPO_URI="https://github.com/vysheng/tg.git"
-EGIT_BRANCH="master"
-EGIT_HAS_SUBMODULES=1
+inherit git-r3
 
-inherit git-2
-
-IUSE="+lua +json +python"
 DESCRIPTION="Command line interface client for Telegram"
 HOMEPAGE="https://github.com/vysheng/tg"
 LICENSE="GPL-2"
+EGIT_REPO_URI="https://github.com/vysheng/tg.git"
+
 SLOT="0"
-KEYWORDS="~amd64 ~x86"
+KEYWORDS="~amd64 ~arm"
+IUSE="lua json python"
 
 DEPEND="sys-libs/zlib
 	sys-libs/readline
 	dev-libs/libconfig
 	dev-libs/openssl
 	dev-libs/libevent
-	lua? ( dev-lang/lua )
+	lua? ( dev-lang/lua dev-lua/lgi )
 	json? ( dev-libs/jansson )
 	python? ( dev-lang/python )"
-
-src_unpack() {
-	git-2_src_unpack
-	cd $EGIT_SOURCEDIR
-	git submodule update --init --recursive
-}
+RDEPEND="${DEPEND}"
 
 src_configure() {
-	econf $(use_enable lua liblua )
-	econf $(use_enable python python )
-	econf $(use_enable json json )
+	sed -i -r -e 's| -ggdb||' -- {,tgl/{,tl-parser/}}Makefile.in || die
+
+	local econfargs=(
+		'--disable-valgrind'
+		$(use_enable lua liblua )
+		$(use_enable python python )
+		$(use_enable json json )
+	)
+	econf "${econfargs[@]}"
 }
 
 src_install() {
-	newbin bin/telegram-cli telegram-cli
+	dobin bin/${PN}
 
-	insinto /etc/telegram-cli/
+	insinto /etc/${PN}/
 	newins tg-server.pub server.pub
+
+	einstalldocs
 }
