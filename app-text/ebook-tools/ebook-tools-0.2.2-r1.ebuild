@@ -27,7 +27,7 @@ DOCS=( INSTALL README TODO )
 
 src_prepare()
 {
-	use lit2epub || sed -i -r '|lit2epub|d' src/tools/CMakeLists.txt
-
 	default
+
+	use lit2epub || sed -i -e '\|lit2epub|d' -- 'src/tools/CMakeLists.txt' || die
 }
