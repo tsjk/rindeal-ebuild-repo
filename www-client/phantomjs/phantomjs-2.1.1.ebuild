@@ -65,7 +65,7 @@ src_prepare() {
 
 	default
 
-	# c&p from emake5()
+	# c&p from qmake5()
 	local qmake_args=(
 		-makefile
 		QMAKE_AR="$(tc-getAR) cqs"
@@ -108,7 +108,7 @@ src_compile() {
 		'--skip-qtwebkit'
 	)
 
-	"$PYTHON" ./build.py "${args[@]}" || die
+	"${PYTHON}" ./build.py "${args[@]}" || die
 }
 
 src_test() {
@@ -116,13 +116,13 @@ src_test() {
 }
 
 src_install() {
-	pax-mark m bin/phantomjs || die
-	dobin bin/phantomjs
+	pax-mark m bin/${PN} || die
+	dobin bin/${PN}
 
 	dodoc ChangeLog README.md
-	doman "${FILESDIR}/${PN}.1"
+	doman "${FILESDIR}"/${PN}.1
 
-	if use examples; then
+	if use examples ;then
 		docinto examples
 		dodoc examples/*
 	fi
