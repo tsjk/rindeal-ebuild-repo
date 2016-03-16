@@ -25,7 +25,7 @@ LANGS=(af ar ast be bg bn bs ca cs cy da de el en_AU en_CA en_GB eo es et eu fa 
 	he hi hr hu id is it ja ka kk km kn ko ku ky la lb lt lv mk ml ms nb nds nl nn oc pl
 	pt pt_BR ro ru si sk sl sr sv ta te th tl tlh tr uk ur vi zh_CN zh_HK zh_TW)
 for l in "${LANGS[@]}" ; do
-    IUSE+=" linguas_${l}"
+	IUSE+=" linguas_${l}"
 done
 
 CDEPEND="daemon? ( >=net-libs/libtorrent-rasterbar-0.14.9[python] )"
