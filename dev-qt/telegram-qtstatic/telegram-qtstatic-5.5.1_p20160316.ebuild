@@ -1,0 +1,1 @@
+telegram-qtstatic-5.5.1_p20160208-r1.ebuild
