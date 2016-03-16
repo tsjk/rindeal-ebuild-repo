@@ -21,5 +21,7 @@ Add an entry to `/etc/portage/repos.conf`:
 # location = /usr/local/portage/rindeal
 sync-type = git
 sync-uri = https://github.com/rindeal/gentoo-overlay.git
+# or if you don't mind a small delay, you might use gentoo-mirror which includes metadata cache
+#sync-uri =  https://github.com/gentoo-mirror/rindeal.git
 auto-sync = yes
 ```
