@@ -6,7 +6,7 @@
 
 EAPI=6
 
-inherit qmake-utils fdo-mime
+inherit qmake-utils fdo-mime kde5-functions
 
 DESCRIPTION="SQLiteStudio3 is a powerful cross-platform SQLite database manager"
 HOMEPAGE="http://sqlitestudio.pl"
@@ -19,20 +19,25 @@ KEYWORDS="amd64"
 
 IUSE="cli cups tcl test"
 
-qt_min=5.3
+QT_MINIMAL=5.3
 
-RDEPEND=(
-	'>=dev-qt/'{qt{core,gui,network,script,svg,widgets,xml},designer}-${qt_min}:5
-	'dev-db/sqlite:3'
-)
-RDEPEND="${RDEPEND[@]}
-	cups? ( >=dev-qt/qtprintsupport-${qt_min}:5 )
+RDEPEND="
+	dev-db/sqlite:3
+	$(add_qt_dep qtcore)
+	$(add_qt_dep qtgui)
+	$(add_qt_dep qtnetwork)
+	$(add_qt_dep qtscript)
+	$(add_qt_dep qtsvg)
+	$(add_qt_dep qtwidgets)
+	$(add_qt_dep qtxml)
+	$(add_qt_dep designer)
+	cups? ( $(add_qt_dep qtprintsupport) )
 	cli? ( sys-libs/readline:= )
 	tcl? ( dev-lang/tcl:= )
 "
 DEPEND="${RDEPEND}
 	>=sys-devel/gcc-4.8:*
-	test? ( >=dev-qt/qttest-${qt_min}:5 )
+	test? ( $(add_qt_dep qttest) )
 "
 
 S="$WORKDIR"
