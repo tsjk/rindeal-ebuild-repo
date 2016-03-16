@@ -6,7 +6,7 @@ EAPI=6
 
 PYTHON_COMPAT=( python2_7 )
 
-inherit python-r1 multiprocessing pax-utils qmake-utils virtualx
+inherit python-r1 multiprocessing pax-utils qmake-utils virtualx kde5-functions
 
 DESCRIPTION="A headless WebKit scriptable with a JavaScript API"
 HOMEPAGE="http://phantomjs.org"
@@ -17,15 +17,18 @@ SLOT="0"
 KEYWORDS="~amd64 ~x86"
 IUSE="test examples"
 
+QT_MINIMAL=5.5
+
 # http://phantomjs.org/build.html - says pretty much nothing
 # https://anonscm.debian.org/cgit/collab-maint/phantomjs.git/tree/debian
 RDEPEND="
-	>=dev-qt/qtcore-5.5:5
-	>=dev-qt/qtwebkit-5.5:5
-	>=dev-qt/qtwidgets-5.5:5
-	>=dev-qt/qtprintsupport-5.5:5
-	>=dev-qt/qtnetwork-5.5:5
-	>=dev-qt/qtgui-5.5:5
+	$(add_qt_dep qtcore)
+	$(add_qt_dep qtwebkit)
+	$(add_qt_dep qtwidgets)
+	$(add_qt_dep qtprintsupport)
+	$(add_qt_dep qtnetwork)
+	$(add_qt_dep qtgui)
+	$(add_qt_dep qtcore)
 
 	dev-libs/icu:=
 	dev-libs/openssl:0
