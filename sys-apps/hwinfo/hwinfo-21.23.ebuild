@@ -9,7 +9,7 @@ inherit multilib toolchain-funcs
 DESCRIPTION="Hardware detection tool used in SuSE Linux"
 HOMEPAGE="http://www.opensuse.org/"
 LICENSE="GPL-2"
-SRC_URI="https://github.com/openSUSE/${PN}/archive/${PV}.tar.gz -> ${P}.tar.gz"
+SRC_URI="https://github.com/openSUSE/hwinfo/archive/${PV}.tar.gz -> ${P}.tar.gz"
 
 SLOT="0"
 KEYWORDS="~amd64 ~arm"
@@ -30,8 +30,6 @@ RDEPEND="${DEPEND_COMMON}
 	virtual/udev
 "
 
-MAKEOPTS="${MAKEOPTS} -j1"
-
 src_prepare() {
 	default
 
@@ -46,6 +44,8 @@ src_prepare() {
 
 	# Skip forced -pipe and -g
 	sed -i 's:-pipe -g::' Makefile.common || die
+
+	export MAKEOPTS="${MAKEOPTS} -j1"
 }
 
 src_compile() {
@@ -56,7 +56,7 @@ src_compile() {
 }
 
 src_install() {
-	emake DESTDIR="${ED}" LIBDIR="/usr/$(get_libdir)" install
+	emake DESTDIR="${D}" LIBDIR="${ROOT}usr/$(get_libdir)" install
 
 	dodoc README*
 	doman doc/*.{1,8}
