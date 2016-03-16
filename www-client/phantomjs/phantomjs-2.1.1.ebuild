@@ -14,7 +14,7 @@ SRC_URI="https://github.com/ariya/phantomjs/archive/${PV}.tar.gz -> ${P}.tar.gz"
 
 LICENSE="BSD"
 SLOT="0"
-KEYWORDS="~amd64 ~x86"
+KEYWORDS="~amd64 ~arm"
 IUSE="test examples"
 
 QT_MINIMAL=5.5
