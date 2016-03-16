@@ -55,11 +55,15 @@ pkg_setup() {
 }
 
 src_prepare() {
-	epatch "${FILESDIR}/phantomjs-no-ghostdriver.patch"
-	epatch "${FILESDIR}/phantomjs-qt-components.patch"
-	epatch "${FILESDIR}/phantomjs-qt55-evaluateJavaScript.patch"
-	epatch "${FILESDIR}/phantomjs-qt55-no-websecurity.patch"
-	epatch "${FILESDIR}/phantomjs-qt55-print.patch"
+	local PATCHES=(
+		"${FILESDIR}/${PN}-no-ghostdriver.patch"
+		"${FILESDIR}/${PN}-qt-components.patch"
+		"${FILESDIR}/${PN}-qt55-evaluateJavaScript.patch"
+		"${FILESDIR}/${PN}-qt55-no-websecurity.patch"
+		"${FILESDIR}/${PN}-qt55-print.patch"
+	)
+
+	default
 
 	# c&p from emake5()
 	local qmake_args=(
@@ -89,8 +93,6 @@ src_prepare() {
 		-e "s|qmake = qmakePath.*|qmake = \"$(qt5_get_bindir)/qmake\"|" \
 		-e "s|command = \[qmake\].*|command = [qmake, $( printf '"%s",' "${qmake_args[@]}" )\"\"]|" \
 		build.py || die
-
-	default
 }
 
 src_compile() {
