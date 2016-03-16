@@ -39,15 +39,15 @@ DEPEND="${RDEPEND}
 S=${WORKDIR}/libtorrent-libtorrent-${MY_PV}
 
 do_python() {
-    use python || return 0
-    pushd "${S}/bindings/python" && "$@" || return 1
-    popd
+	use python || return 0
+	pushd "${S}/bindings/python" && "$@" || return 1
+	popd
 }
 
 src_prepare() {
 	default
 
-    # needed or else eautoreconf fails
+	# needed or else eautoreconf fails
 	mkdir build-aux || die
 	cp {m4,build-aux}/config.rpath || die
 
