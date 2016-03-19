@@ -13,10 +13,8 @@ HOMEPAGE="http://sqlitestudio.pl"
 LICENSE="GPL-3"
 SRC_URI="${HOMEPAGE}/files/sqlitestudio3/complete/tar/${P}.tar.gz"
 
-RESTRICT="mirror"
 SLOT="0"
 KEYWORDS="amd64"
-
 IUSE="cli cups tcl test"
 
 QT_MINIMAL=5.3
@@ -40,17 +38,25 @@ DEPEND="${RDEPEND}
 	test? ( $(add_qt_dep qttest) )
 "
 
-S="$WORKDIR"
+S="${WORKDIR}"
 core_build_dir="${S}/output/build"
 core_src_dir="${S}/SQLiteStudio3"
 plugins_build_dir="${core_build_dir}/Plugins"
 plugins_src_dir="${S}/Plugins"
 
-disable_modules() {
-	local file="$1"
-	shift
-	if [ $# -gt 0 ]; then
-		edos2unix "$file"
+src_prepare() {
+	PATCHES=(
+		"${FILESDIR}"/${PN}-3.0.6-qt5_5-QDataStream.patch
+		"${FILESDIR}"/${PN}-3.0.6-portable.patch
+		"${FILESDIR}"/${PN}-3.0.7-paths.patch
+	)
+	default
+
+	disable_modules() {
+		[ $# -lt 2 ] && return 0
+		local file="$1"; shift
+
+		edos2unix "${file}"
 
 		local regex=""
 		for m in "$@"; do
@@ -58,78 +64,68 @@ disable_modules() {
 		done
 		regex="${regex:0:-1}" # last pipe
 
-		elog "Disabling modules: '$*' in '${file}'"
-		sed -i -r "/${regex}/d" "$file" || return 1
-	fi
-}
-
-PATCHES=( "${FILESDIR}/${PN}-"{3.0.6-qt5_5-QDataStream,3.0.6-portable,3.0.7-paths}'.patch' )
-
-src_prepare() {
-	default
+		elog "Disabling modules: '$*' in '${file#${S}/}'"
+		sed -i -r -e "/${regex}/d" -- "${file}" || return 1
+	}
 
 	## Core
-	local disabled_modules=()
-
-	use cli	|| disabled_modules+=( 'cli' )
-
+	local disabled_modules=(
+		$(usex cli '' 'cli')
+	)
 	disable_modules "${core_src_dir}/SQLiteStudio3.pro" "${disabled_modules[@]}" || die
 
 	## Plugins
-	local disabled_plugins=( 'DbSqlite2' )
-
-	use tcl		|| disabled_plugins+=( 'ScriptingTcl' )
-	use cups	|| disabled_plugins+=( 'Printing' )
-
+	local disabled_plugins=(
+		'DbSqlite2'
+		$(usex tcl '' 'ScriptingTcl')
+		$(usex cups '' 'Printing')
+	)
 	disable_modules "${plugins_src_dir}/Plugins.pro" "${disabled_plugins[@]}" || die
 }
 
 src_configure() {
 	local qmake_args=(
-		"LIBDIR=${ROOT}usr/$(get_libdir)"
-		"BINDIR=${ROOT}usr/bin"
-		"DEFINES+=PLUGINS_DIR=${ROOT}usr/$(get_libdir)/${PN}"
-		"DEFINES+=ICONS_DIR=${ROOT}usr/share/${PN}/icons"
-		"DEFINES+=FORMS_DIR=${ROOT}usr/share/${PN}/forms"
+		"LIBDIR=${EROOT}usr/$(get_libdir)"
+		"BINDIR=${EROOT}usr/bin"
+		"DEFINES+=PLUGINS_DIR=${EROOT}usr/$(get_libdir)/${PN}"
+		"DEFINES+=ICONS_DIR=${EROOT}usr/share/${PN}/icons"
+		"DEFINES+=FORMS_DIR=${EROOT}usr/share/${PN}/forms"
 
-		# not strictly needed since 3.0.6, but nevermind
-		'DEFINES+=NO_AUTO_UPDATES'
+		'DEFINES+=NO_AUTO_UPDATES' # not strictly needed since 3.0.6, but nevermind
+		$(usex test 'DEFINES+=tests' '')
 	)
-	use test && qmake_args+=( 'DEFINES+=tests' )
 
 	## Core
-	mkdir -p "$core_build_dir" && cd "$core_build_dir" || die
-	eqmake5 "${qmake_args[@]}" "$core_src_dir"
+	mkdir -p "${core_src_dir}" && cd "${core_src_dir}" || die
+	eqmake5 "${qmake_args[@]}" "${core_src_dir}"
 
 	## Plugins
-	mkdir -p "$plugins_build_dir" && cd "$plugins_build_dir" || die
-	eqmake5 "${qmake_args[@]}" "$plugins_src_dir"
+	mkdir -p "${plugins_build_dir}" && cd "${plugins_build_dir}" || die
+	eqmake5 "${qmake_args[@]}" "${plugins_src_dir}"
 }
 
 src_compile() {
 	## Core
-	cd "$core_build_dir"	&& emake
+	cd "${core_src_dir}"	&& emake
 
 	## Plugins
-	cd "$plugins_build_dir"	&& emake
+	cd "${core_src_dir}"	&& emake
 }
 
 src_install() {
-	cd "$core_build_dir"	&& emake INSTALL_ROOT="$D" install
-	cd "$plugins_build_dir"	&& emake INSTALL_ROOT="$D" install
+	cd "$core_build_dir"	&& emake INSTALL_ROOT="${ED}" install
+	cd "${core_src_dir}"	&& emake INSTALL_ROOT="${ED}" install
 
 	dodoc "${core_src_dir}/docs/sqlitestudio3_docs.cfg"
 	doicon -s scalable "${core_src_dir}/guiSQLiteStudio/img/${PN}.svg"
 
 	make_desktop_entry_args=(
-		"${ROOT}usr/bin/${PN} %F"	# exec
+		"${EROOT}usr/bin/${PN} %F"	# exec
 		'SQLiteStudio3'				# name
 		"${PN}"						# icon
 		'Development;Utility'		# categories
 	)
-	make_desktop_entry_extras=(
-		'MimeType=application/x-sqlite3;'
-	)
+	make_desktop_entry_extras=( 'MimeType=application/x-sqlite3;' )
 	make_desktop_entry "${make_desktop_entry_args[@]}" \
 		"$( printf '%s\n' "${make_desktop_entry_extras[@]}" )"
 }
