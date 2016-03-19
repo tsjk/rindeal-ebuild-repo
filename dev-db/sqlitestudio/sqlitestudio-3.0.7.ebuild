@@ -96,7 +96,7 @@ src_configure() {
 	)
 
 	## Core
-	mkdir -p "${core_src_dir}" && cd "${core_src_dir}" || die
+	mkdir -p "${core_build_dir}" && cd "${core_build_dir}" || die
 	eqmake5 "${qmake_args[@]}" "${core_src_dir}"
 
 	## Plugins
@@ -105,16 +105,13 @@ src_configure() {
 }
 
 src_compile() {
-	## Core
-	cd "${core_src_dir}"	&& emake
-
-	## Plugins
-	cd "${core_src_dir}"	&& emake
+	cd "${core_build_dir}"		&& emake
+	cd "${plugins_build_dir}"	&& emake
 }
 
 src_install() {
-	cd "$core_build_dir"	&& emake INSTALL_ROOT="${ED}" install
-	cd "${core_src_dir}"	&& emake INSTALL_ROOT="${ED}" install
+	cd "${core_build_dir}"		&& emake INSTALL_ROOT="${ED}" install
+	cd "${plugins_build_dir}"	&& emake INSTALL_ROOT="${ED}" install
 
 	dodoc "${core_src_dir}/docs/sqlitestudio3_docs.cfg"
 	doicon -s scalable "${core_src_dir}/guiSQLiteStudio/img/${PN}.svg"
