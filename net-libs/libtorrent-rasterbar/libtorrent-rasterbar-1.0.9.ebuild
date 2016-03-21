@@ -36,7 +36,7 @@ RDEPEND="
 DEPEND="${RDEPEND}
 	>=sys-devel/libtool-2.2"
 
-S=${WORKDIR}/libtorrent-libtorrent-${MY_PV}
+S="${WORKDIR}/libtorrent-libtorrent-${MY_PV}"
 
 do_python() {
 	use python || return 0
