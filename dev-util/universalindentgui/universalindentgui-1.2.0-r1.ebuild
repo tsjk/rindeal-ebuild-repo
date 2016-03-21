@@ -35,7 +35,7 @@ RDEPEND+="
 		app-text/htmltidy
 		perl? ( dev-lang/perl )
 	)
-	perl? ( dev-perl/perltidy )
+	perl? ( dev-perl/Perl-Tidy )
 	php? ( dev-php/PEAR-PHP_Beautifier )
 	ruby? ( dev-lang/ruby )
 	xml? ( dev-util/xmlindent )
