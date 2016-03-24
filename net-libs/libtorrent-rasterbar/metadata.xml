@@ -4,4 +4,7 @@
   <upstream>
     <remote-id type="github">arvidn/libtorrent</remote-id>
   </upstream>
+  <use>
+    <flag name="dht">Enable DHT support</flag>
+  </use>
 </pkgmetadata>

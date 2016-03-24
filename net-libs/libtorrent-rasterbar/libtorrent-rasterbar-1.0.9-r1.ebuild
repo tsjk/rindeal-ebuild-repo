@@ -7,6 +7,7 @@ EAPI=6
 PYTHON_COMPAT=( python2_7 python3_{4,5} )
 PYTHON_REQ_USE="threads"
 DISTUTILS_OPTIONAL=true
+DISTUTILS_IN_SOURCE_BUILD=true
 
 inherit autotools distutils-r1
 
@@ -21,15 +22,16 @@ SLOT="0"
 KEYWORDS="~amd64 ~arm"
 RESTRICT="test"
 
-IUSE="debug doc examples python ssl static-libs test"
+IUSE="crypt debug dht doc examples python static-libs test"
 REQUIRED_USE="python? ( ${PYTHON_REQUIRED_USE} )"
 
 RDEPEND="
 	!net-libs/rb_libtorrent
 	>=dev-libs/boost-1.53:=[threads]
 	sys-libs/zlib
+	virtual/libiconv
+	crypt? ( dev-libs/openssl:0= )
 	examples? ( !net-p2p/mldonkey )
-	ssl? ( dev-libs/openssl:0= )
 	python? ( ${PYTHON_DEPS}
 		dev-libs/boost:=[python,${PYTHON_USEDEP}]
 	)"
@@ -38,55 +40,60 @@ DEPEND="${RDEPEND}
 
 S="${WORKDIR}/libtorrent-libtorrent-${MY_PV}"
 
-do_python() {
-	use python || return 0
-	pushd "${S}/bindings/python" && "$@" || return 1
-	popd
-}
-
 src_prepare() {
 	default
 
 	# needed or else eautoreconf fails
-	mkdir build-aux || die
-	cp {m4,build-aux}/config.rpath || die
+	mkdir build-aux && cp {m4,build-aux}/config.rpath || die
 
 	eautoreconf
+
+	use python && python_copy_sources
 }
 
 src_configure() {
-	use python && python_setup $(usex python_targets_python2_7 'python2*' '')
-
 	local econfargs=(
-		--disable-silent-rules # bug 441842
-		--with-boost-system=mt
+		'--disable-silent-rules' # bug 441842
+		'--with-boost-system=mt'
+		'--with-libiconv'
+		$(use_enable crypt encryption)
 		$(use_enable debug)
-		$(use_enable test tests)
-		$(use_enable examples)
-		$(use_enable ssl encryption)
-		$(use_enable static-libs static)
-		$(use_enable python python-binding)
 		$(usex debug '--enable-logging=verbose' '')
-		$(usex python_targets_python2_7 '--with-boost-python=2.7' '')
+		$(use_enable dht)
+		$(use_enable examples)
+		$(use_enable static-libs static)
+		$(use_enable test tests)
 	)
-	if use python_targets_python3_4 ;then
-		econfargs+=( '--with-boost-python=3.4' )
-	elif use python_targets_python3_5 ;then
-		econfargs+=( '--with-boost-python=3.5' )
-	fi
-
 	econf "${econfargs[@]}"
-	do_python distutils-r1_src_configure || die
+
+	python_configure() {
+		local econfargs+=(
+			'--enable-python-binding'
+			'--with-boost-python=yes'
+		)
+		econf "${econfargs[@]}"
+	}
+	use python && distutils-r1_src_configure
 }
 
 src_compile() {
 	default
-	do_python distutils-r1_src_compile || die
+
+	python_compile() {
+		cd "${BUILD_DIR}/../bindings/python" || return 1
+		distutils-r1_python_compile || return 2
+	}
+	use python && distutils-r1_src_compile
 }
 
 src_install() {
 	default
-	do_python distutils-r1_src_install || die
+
+	python_install() {
+		cd "${BUILD_DIR}/../bindings/python" || return 1
+		distutils-r1_python_install || return 2
+	}
+	use python && distutils-r1_src_install
 
 	use doc && HTML_DOCS=( "${S}"/docs )
 	einstalldocs
