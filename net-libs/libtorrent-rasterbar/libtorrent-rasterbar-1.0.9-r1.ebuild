@@ -22,7 +22,7 @@ SLOT="0"
 KEYWORDS="~amd64 ~arm"
 RESTRICT="test"
 
-IUSE="crypt debug dht doc examples python static-libs test"
+IUSE="+crypt debug +dht doc examples python static-libs test"
 REQUIRED_USE="python? ( ${PYTHON_REQUIRED_USE} )"
 
 RDEPEND="
