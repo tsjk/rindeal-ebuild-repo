@@ -16,7 +16,7 @@ HOMEPAGE="https://www.jetbrains.com/phpstorm"
 LICENSE="IDEA || ( IDEA_Academic IDEA_Classroom IDEA_OpenSource IDEA_Personal )"
 SRC_URI="https://download.jetbrains.com/webide/PhpStorm-${MY_PV}.tar.gz"
 
-KEYWORDS="~amd64 ~x86 ~arm"
+KEYWORDS="~amd64 ~x86"
 RESTRICT="mirror strip"
 IUSE="system-jre"
 
