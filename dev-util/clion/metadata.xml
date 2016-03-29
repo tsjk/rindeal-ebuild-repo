@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "http://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+<use>
+	<flag name="system-cmake">Use <pkg>dev-util/cmake</pkg> instead of the bundled copy</flag>
+	<flag name="system-gdb">Use <pkg>sys-devel/gdb</pkg> instead of the bundled copy</flag>
+	<flag name="system-jre">Use system-wide JRE instead of the bundled copy</flag>
+</use>
+</pkgmetadata>
