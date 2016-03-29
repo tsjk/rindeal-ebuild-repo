@@ -16,7 +16,7 @@ HOMEPAGE="https://www.jetbrains.com/clion"
 LICENSE="IDEA || ( IDEA_Academic IDEA_Classroom IDEA_OpenSource IDEA_Personal )"
 SRC_URI="http://download.jetbrains.com/cpp/CLion-${MY_PV}.tar.gz"
 
-KEYWORDS="~amd64 ~x86 ~arm ~ppc"
+KEYWORDS="~amd64 ~x86 ~arm"
 RESTRICT="mirror strip"
 IUSE="system-cmake system-gdb system-jre"
 
@@ -36,10 +36,10 @@ src_prepare() {
 		eval "rm -rvf !(linux)"
 	)
 	cd linux || die
+	rm -rvf ppc || die
 	use amd64	|| rm -rvf x86_64 || die
-	use arm		|| rm -rvf arm "${S}/"bin/fsnotifier-arm || die
-	use ppc		|| rm -rvf ppc || die
 	use x86		|| rm -rvf x86 || die
+	use arm		|| rm -rvf arm "${S}/"bin/fsnotifier-arm || die
 
 	cd "${S}"
 	if use system-cmake	; then rm -rvf bin/cmake license/CMake*	|| die ; fi
