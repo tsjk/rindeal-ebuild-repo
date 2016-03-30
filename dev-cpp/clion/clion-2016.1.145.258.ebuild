@@ -53,8 +53,10 @@ src_install() {
 	insinto "${install_dir}"
 	doins -r *
 	# globbing doesn't work with `fperms()`'
-	chmod a+x "${D}/${install_dir}"/bin/${PN}.sh "${D}/${install_dir}"/bin/fsnotifier*
-	use system-jre || chmod a+x "${D}/${install_dir}"/jre/jre/bin/*
+	chmod a+x "${D}/${install_dir}"/bin/${PN}.sh "${D}/${install_dir}"/bin/fsnotifier* || die
+	use system-cmake	|| chmod a+x "${D}/${install_dir}"/bin/cmake/bin/*	|| die
+	use system-gdb		|| chmod a+x "${D}/${install_dir}"/bin/gdb/bin/*	|| die
+	use system-jre		|| chmod a+x "${D}/${install_dir}"/jre/jre/bin/*	|| die
 
 	dosym "${install_dir}"/bin/${PN}.sh /usr/bin/${PN_SLOTTED}
 
