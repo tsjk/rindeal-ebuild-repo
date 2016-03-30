@@ -1,0 +1,3 @@
+move dev-util/datagrip dev-db/datagrip
+move dev-util/phpstorm dev-php/phpstorm
+move dev-util/clion dev-cpp/clion

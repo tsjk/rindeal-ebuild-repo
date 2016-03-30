@@ -1,0 +1,6 @@
+# moved to `dev-db/datagrip`
+dev-util/datagrip
+# moved to `dev-php/phpstorm`
+dev-util/phpstorm
+# moved to `dev-cpp/clion`
+dev-util/clion
