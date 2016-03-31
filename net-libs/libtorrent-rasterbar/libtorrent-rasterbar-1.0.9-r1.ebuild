@@ -81,20 +81,19 @@ src_compile() {
 
 	python_compile() {
 		cd "${BUILD_DIR}/../bindings/python" || return 1
-		distutils-r1_python_compile || return 2
+		distutils-r1_python_compile
 	}
 	use python && distutils-r1_src_compile
 }
 
 src_install() {
+	use doc && HTML_DOCS+=( "${S}"/docs )
+
 	default
 
 	python_install() {
 		cd "${BUILD_DIR}/../bindings/python" || return 1
-		distutils-r1_python_install || return 2
+		distutils-r1_python_install
 	}
 	use python && distutils-r1_src_install
-
-	use doc && HTML_DOCS=( "${S}"/docs )
-	einstalldocs
 }
