@@ -8,8 +8,12 @@ inherit eutils versionator fdo-mime
 
 SLOT="2016.1"
 PN_SLOTTED="${PN}${SLOT}"
-MY_PV="$(get_version_component_range 1-2)"
-BUILD_NUMBER="$(get_version_component_range 3-4)"
+if [ $(get_version_component_range 3) -eq 0 ] ;then
+	MY_PV="$(get_version_component_range 1-2)"
+else
+	MY_PV="$(get_version_component_range 1-3)"
+fi
+BUILD_NUMBER="$(get_version_component_range 4-5)"
 
 DESCRIPTION="A complete toolset for C and C++ development"
 HOMEPAGE="https://www.jetbrains.com/clion"
