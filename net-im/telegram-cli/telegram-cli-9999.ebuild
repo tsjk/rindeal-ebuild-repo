@@ -16,13 +16,13 @@ KEYWORDS="~amd64 ~arm"
 IUSE="lua json python"
 
 DEPEND="sys-libs/zlib
-	sys-libs/readline
+	sys-libs/readline:*
 	dev-libs/libconfig
-	dev-libs/openssl
+	dev-libs/openssl:=
 	dev-libs/libevent
-	lua? ( dev-lang/lua dev-lua/lgi )
+	lua? ( dev-lang/lua:* dev-lua/lgi )
 	json? ( dev-libs/jansson )
-	python? ( dev-lang/python )"
+	python? ( dev-lang/python:* )"
 RDEPEND="${DEPEND}"
 
 src_configure() {
