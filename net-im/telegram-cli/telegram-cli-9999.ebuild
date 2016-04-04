@@ -30,18 +30,18 @@ src_configure() {
 
 	local econfargs=(
 		'--disable-valgrind'
-		$(use_enable lua liblua )
-		$(use_enable python python )
-		$(use_enable json json )
+		$(use_enable lua liblua)
+		$(use_enable python)
+		$(use_enable json)
 	)
 	econf "${econfargs[@]}"
 }
 
 src_install() {
-	dobin bin/${PN}
+	dobin "bin/${PN}"
 
-	insinto /etc/${PN}/
-	newins tg-server.pub server.pub
+	insinto "/etc/${PN}"
+	newins {,tg-}server.pub
 
 	einstalldocs
 }
