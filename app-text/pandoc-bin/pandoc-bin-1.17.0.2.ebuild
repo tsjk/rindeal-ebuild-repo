@@ -19,8 +19,8 @@ KEYWORDS="-* ~amd64"
 IUSE="citeproc"
 
 DEPEND="
-	dev-libs/gmp
-	sys-libs/zlib"
+	dev-libs/gmp:*
+	sys-libs/zlib:*"
 RDEPEND="${DEPEND}
 	!app-text/pandoc
 	citeproc? ( !dev-haskell/pandoc-citeproc )"
