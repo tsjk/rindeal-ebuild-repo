@@ -96,7 +96,7 @@ DEPEND=("${RDEPEND}"
 )
 DEPEND="${DEPEND[@]}"
 
-PDEPEND=">=net-im/telegram-0.9.24-r2"
+PDEPEND=">=net-im/telegram-0.9.33"
 
 ## order of these matters
 QT5_TARGET_SUBDIRS=(
