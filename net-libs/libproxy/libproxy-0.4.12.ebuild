@@ -5,7 +5,7 @@
 EAPI=6
 PYTHON_COMPAT=( python2_7 )
 
-inherit cmake-multilib eutils flag-o-matic mono python-r1
+inherit cmake-multilib eutils flag-o-matic mono-env python-r1
 
 DESCRIPTION="Library for automatic proxy configuration management"
 HOMEPAGE="https://github.com/libproxy/libproxy"
@@ -13,7 +13,7 @@ LICENSE="LGPL-2.1+"
 SRC_URI="https://github.com/libproxy/libproxy/archive/${PV}.tar.gz -> ${P}.tar.gz"
 
 SLOT="0"
-KEYWORDS="~alpha ~amd64 ~arm ~hppa ~ia64 ~mips ~ppc ~ppc64 ~sh ~sparc ~x86 ~x86-fbsd ~x86-freebsd ~x86-interix ~amd64-linux ~arm-linux ~ia64-linux ~x86-linux ~x64-macos ~x86-macos ~sparc-solaris ~x86-solaris"
+KEYWORDS="~alpha ~amd64 ~hppa ~ia64 ~ppc ~ppc64 ~sh ~sparc ~x86 ~x86-freebsd ~x86-interix ~amd64-linux ~arm-linux ~ia64-linux ~x86-linux ~x64-macos ~x86-macos ~sparc-solaris ~x86-solaris"
 IUSE="gnome kde mono networkmanager perl python spidermonkey test webkit"
 
 REQUIRED_USE="python? ( ${PYTHON_REQUIRED_USE} )"
@@ -34,9 +34,9 @@ DEPEND="${CDEPEND}
 	>=virtual/pkgconfig-0-r1[${MULTILIB_USEDEP}]"
 RDEPEND="${CDEPEND}
 	kde? ( || (
-        kde-frameworks/kconfig:5
-        kde-apps/kreadconfig:4
-    ) )"
+		kde-frameworks/kconfig:5
+		kde-apps/kreadconfig:4
+	) )"
 # avoid dependency loop, bug #467696
 PDEPEND="networkmanager? ( net-misc/networkmanager )"
 
