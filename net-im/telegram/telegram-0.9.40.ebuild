@@ -4,34 +4,34 @@
 
 EAPI=6
 
-VIRTUALX_REQUIRED='always'	# TODO: is this indeed required?
-
-inherit eutils fdo-mime virtualx qmake-utils flag-o-matic check-reqs
+inherit eutils fdo-mime qmake-utils flag-o-matic check-reqs
 
 DESCRIPTION='Desktop client of Telegram, the messaging app.'
 HOMEPAGE='https://telegram.org'
 LICENSE='GPL-3' # with OpenSSL exception
+SLOT='0'
 SRC_URI="https://github.com/telegramdesktop/tdesktop/archive/v${PV}.tar.gz -> ${P}.tar.gz"
 
-SLOT='0'
 KEYWORDS='~amd64'
 RESTRICT='mirror test'
+IUSE=''
+REQUIRED_USE=''
 
 RDEPEND=(
-	'~dev-qt/telegram-qtstatic-5.5.1_p20160316'
+	'~dev-qt/telegram-qtstatic-5.5.1_p20160406'
 	'sys-libs/zlib[minizip]'
 	'media-libs/libexif'
 	'media-libs/opus'
 	'>=media-libs/openal-1.17.2'	# Telegram requires shiny new versions
 	'x11-libs/libva'
 	'app-arch/xz-utils'	# lzma
-	'dev-util/google-breakpad'
 	'dev-libs/libappindicator:3'
 )
-RDEPEND="${RDEPEND[@]}"
-DEPEND="${RDEPEND}
-	virtual/pkgconfig
-"
+DEPEND=("${RDEPEND[@]}"
+	'virtual/pkgconfig'
+)
+DEPEND="${DEPEND[*]}"
+RDEPEND="${RDEPEND[*]}"
 
 CHECKREQS_DISK_BUILD='800M'
 
@@ -72,7 +72,8 @@ src_prepare() {
 	sed -i -r "${args[@]}" -- "${tg_pro}" || die
 
 	# change references to static Qt dir
-	sed -i -r -e "s|[^ ]*Libraries/QtStatic/qtbase/([^ \"\\]*)|${qt_dir}/\1|g" -- *.pro || die
+	sed -i -r "s|[^ ]*Libraries/QtStatic/qtbase/([^ \"\\]*)|${qt_dir}/\1|g" \
+        -- *.pro || die
 
 	sed -i -r 's|".*src/gui/text/qfontengine_p.h"|<private/qfontengine_p.h>|' \
 		-- "SourceFiles/gui/text.h" || die
@@ -93,9 +94,9 @@ src_prepare() {
 	sed -i -r "${args[@]}" -- 'SourceFiles/pspecific_linux.cpp' || die
 
 	# now add corrected dependencies back
-	local deps=( 'appindicator3-0.1' 'breakpad-client' 'minizip' 'opus')
+	local deps=( 'appindicator3-0.1' 'minizip' 'opus')
 	local libs=( "${deps[@]}"
-		'lib'{av{codec,format,util},lzma,sw{resample,scale},va}
+		'lib'{avcodec,avformat,avutil,lzma,swresample,swscale,va}
 		'openal' 'openssl' 'xkbcommon' 'zlib' )
 	local includes=( "${deps[@]}" 'glib-2.0' 'gtk+-2.0' )
 
@@ -108,12 +109,20 @@ src_prepare() {
 	(
 		# disable updater
 		echo 'DEFINES += TDESKTOP_DISABLE_AUTOUPDATE'
+
 		# disable registering `tg://` scheme from within the app
 		echo 'DEFINES += TDESKTOP_DISABLE_REGISTER_CUSTOM_SCHEME'
+
+		# https://github.com/telegramdesktop/tdesktop/commit/0b2bcbc3e93a7fe62889abc66cc5726313170be7
+		# echo 'DEFINES += TDESKTOP_DISABLE_NETWORK_PROXY'
+
+		# disable google-breakpad support
+		echo 'DEFINES += TDESKTOP_DISABLE_CRASH_REPORTS'
 	) >> "${tg_pro}"
 
-	# this is surely going to be needed
-	cd "${S}" && eapply_user
+	pushd "${S}" >/dev/null || die
+	eapply_user
+	popd >/dev/null || die
 }
 
 src_configure() {
@@ -123,14 +132,14 @@ src_configure() {
 	append-cxxflags '-Wno-unused-'{function,parameter,variable,but-set-variable}
 
 	# prefer patched qt
-	export PATH="$(qt5_get_bindir):$PATH"
+	export PATH="$(qt5_get_bindir):${PATH}"
 }
 
 src_compile() {
 	local d=
 	local mode='release'
 
-	for module in Style Lang; do	# order of modules matters
+	for module in Style Lang ;do	# order of modules matters
 		d="${S}/Linux/${mode^}Intermediate${module}"
 		mkdir -p "${d}" && cd "${d}" || die
 
@@ -159,8 +168,8 @@ src_compile() {
 src_install(){
 	newbin "${S}/Linux/Release/Telegram" "${PN}"
 
-	for icon_size in 16 32 48 64 128 256 512; do
-		newicon -s ${icon_size} "${tg_dir}/SourceFiles/art/icon${icon_size}.png" "${PN}.png"
+	for s in 16 32 48 64 128 256 512 ;do
+		newicon -s ${s} "${tg_dir}/SourceFiles/art/icon${s}.png" "${PN}.png"
 	done
 
 	make_desktop_entry_args=(
