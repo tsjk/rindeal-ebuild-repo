@@ -27,7 +27,7 @@ RDEPEND=(
 	'dev-libs/libappindicator:3'
 )
 DEPEND=("${RDEPEND[@]}"
-	'~dev-qt/telegram-qtstatic-5.5.1_p20160406'
+	'~dev-qt/qt-telegram-static-5.5.1_p20160406'
 	'virtual/pkgconfig'
 )
 DEPEND="${DEPEND[*]}"

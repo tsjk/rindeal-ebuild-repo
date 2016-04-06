@@ -1,1 +1,2 @@
 move dev-qt/telegram-qt net-libs/telegram-qt
+move dev-qt/telegram-qtstatic dev-qt/qt-telegram-static
