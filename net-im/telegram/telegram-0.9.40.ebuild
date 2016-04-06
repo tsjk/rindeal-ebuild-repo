@@ -18,7 +18,6 @@ IUSE=''
 REQUIRED_USE=''
 
 RDEPEND=(
-	'~dev-qt/telegram-qtstatic-5.5.1_p20160406'
 	'sys-libs/zlib[minizip]'
 	'media-libs/libexif'
 	'media-libs/opus'
@@ -28,6 +27,7 @@ RDEPEND=(
 	'dev-libs/libappindicator:3'
 )
 DEPEND=("${RDEPEND[@]}"
+	'~dev-qt/telegram-qtstatic-5.5.1_p20160406'
 	'virtual/pkgconfig'
 )
 DEPEND="${DEPEND[*]}"
