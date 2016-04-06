@@ -12,8 +12,9 @@ inherit qmake-utils versionator eutils qt5-build check-reqs
 # prevent qttest from being assigned to DEPEND
 E_DEPEND="${E_DEPEND/test? \( \~dev-qt\/qttest-* \)}"
 
-DESCRIPTION="Patched Qt for net-im/telegram"
-HOMEPAGE="https://github.com/telegramdesktop/tdesktop"
+DESCRIPTION='Patched Qt for net-im/telegram'
+HOMEPAGE='https://github.com/telegramdesktop/tdesktop'
+SLOT='0'
 
 qt_ver="$( get_version_component_range 1-3 )"
 
@@ -23,14 +24,14 @@ qt_patch_rev="master@{${qt_patch_rev:1:4}-${qt_patch_rev:5:2}-${qt_patch_rev:7:2
 qt_patch_name="${P}-qtbase.patch"
 qt_submodules_base_uri="https://download.qt-project.org/official_releases/qt/${qt_ver%.*}/${qt_ver}/submodules"
 SRC_URI="
-	$( eval echo "${qt_submodules_base_uri}/"\{$( IFS=, eval 'echo "${QT_MODULES[*]}"' )\}-opensource-src-${qt_ver}.tar.xz )
+	$( eval echo "${qt_submodules_base_uri}/"\{$( IFS=,; echo "${QT_MODULES[*]}" )\}"-opensource-src-${qt_ver}.tar.xz" )
 	https://github.com/telegramdesktop/tdesktop/raw/${qt_patch_rev}/Telegram/_qtbase_${qt_ver//./_}_patch.diff -> ${qt_patch_name}
 "
 
-RESTRICT="strip test"
-SLOT="0"
-KEYWORDS="~amd64"
-IUSE="bindist gtkstyle libproxy systemd tslib"
+KEYWORDS='~amd64'
+RESTRICT='strip test'
+IUSE='bindist gtkstyle libproxy systemd tslib'
+REQUIRED_USE=''
 
 RDEPEND=(
 	## BEGIN - QtCore
@@ -89,23 +90,25 @@ RDEPEND=(
 	# tools
 	'dev-qt/qt'{core,dbus,widgets}':5'
 )
-RDEPEND="${RDEPEND[@]}"
-
-DEPEND=("${RDEPEND}"
+DEPEND=("${RDEPEND[@]}"
 	'virtual/pkgconfig'
 )
-DEPEND="${DEPEND[@]}"
+PDEPEND=( '>=net-im/telegram-0.9.40' )
 
-PDEPEND=">=net-im/telegram-0.9.40"
+DEPEND="${DEPEND[*]}"
+RDEPEND="${RDEPEND[*]}"
+PDEPEND="${PDEPEND[*]}"
 
-## order of these matters
+## !!! ORDER MATTERS !!!
 QT5_TARGET_SUBDIRS=(
 	## BEGIN - QtCore
-	'qtbase/src/'{tools/{bootstrap,moc,rcc},corelib}
+	'qtbase/src/tools/'{bootstrap,moc,rcc}
+	'qtbase/src/corelib'
 	## END - QtCore
 
 	## BEGIN - QtDbus (core)
-	'qtbase/src/'{dbus,tools/qdbusxml2cpp}
+	'qtbase/src/dbus'
+	'qtbase/src/tools/qdbusxml2cpp'
 	## END - QtDbus
 
 	## BEGIN - QtNetwork (core, dbus)
@@ -113,7 +116,8 @@ QT5_TARGET_SUBDIRS=(
 	## END - QtNetwork
 
 	## BEGIN - QtGui (core,dbus)
-	'qtbase/src/'{gui,platform{headers,support},plugins/{generic,imageformats,platforms,platform{inputcontexts,themes}}}
+	'qtbase/src/'{gui,platform{headers,support}}
+	'qtbase/src/plugins/'{generic,imageformats,platforms,platform{inputcontexts,themes}}
 	## END - QtGui
 
 	## BEGIN - QtImageFormats (core,gui)
@@ -121,7 +125,8 @@ QT5_TARGET_SUBDIRS=(
 	## END - QtImageFormats
 
 	## BEGIN - QtWidgets (core,gui)
-	'qtbase/src/'{tools/uic,widgets}
+	'qtbase/src/tools/uic'
+	'qtbase/src/widgets'
 	## END - QtWidgets
 )
 
@@ -132,20 +137,18 @@ QT5_BUILD_DIR="${S}"
 qtbase_dir="${S}/qtbase"
 # this path must be in sync with net-im/telegram ebuild
 QT5_PREFIX="${EROOT}opt/telegram-qtstatic"
-TOOLS=()
+TOOLS=() # list of all tools which will be linked from system wide qt5 to qt-static bin dir
 
 src_unpack() {
 	qt5-build_src_unpack
 
 	for m in ${QT_MODULES[@]} ;do
-		mv "${m}-opensource-src-${qt_ver}" "${m}"
+		mv "${m}-opensource-src-${qt_ver}" "${m}" || die
 	done
 }
 
 # override env to use our prefix and paths expected by tg sources
 qt5_prepare_env() {
-	# setup installation directories
-	# note: keep paths in sync with qmake-utils.eclass
 	QT5_HEADERDIR="${QT5_PREFIX}/include"
 	QT5_LIBDIR="${QT5_PREFIX}/lib"
 	QT5_ARCHDATADIR="${QT5_PREFIX}"
@@ -176,37 +179,39 @@ src_prepare() {
 	cd "${qtbase_dir}" || die
 
 	local qt_patch_file_lock="${T}/.qt_patched"
-	if ! [ -f "${qt_patch_file_lock}" ]; then
+	if ! [ -f "${qt_patch_file_lock}" ] ;then
 		eapply "${DISTDIR}/${qt_patch_name}" && touch "${qt_patch_file_lock}"
 	fi
 
 	## BEGIN - QtGui
 	# avoid automagic dep on qtnetwork
 	sed -i -e '/SUBDIRS += tuiotouch/d' \
-		'src/plugins/generic/generic.pro' || die
+		-- 'src/plugins/generic/generic.pro' || die
 	## END - QtGui
 
-	# apply user patches now, because qt5-build_src_prepare() calls default() in wrong dir
-	pushd "${S}" >/dev/null && eapply_user; popd >/dev/null
+	# apply user patches now, because qt5-build_src_prepare() calls default() in a wrong dir
+	pushd "${S}" >/dev/null || die
+	eapply_user
+	popd >/dev/null || die
 
 	qt5-build_src_prepare
 }
 
 src_configure() {
 	local myconf=(
-		'-static'
+		-static
 
 		# use system libs
-		'-system-'{freetype,harfbuzz,lib{jpeg,png},pcre,xcb,xkbcommon-x11,zlib}
+		-system-{freetype,harfbuzz,libjpeg,libpng,pcre,xcb,xkbcommon-x11,zlib}
 
 		# enabled features
-		-{fontconfig,glib,gui,iconv,icu,x{cb{,-xlib},input2,kb,render},widgets}
+		-{fontconfig,glib,gui,iconv,icu,xcb,xcb-xlib,xinput2,xkb,xrender,widgets}
 		-{dbus,openssl}-linked
 		# disabled features
-		'-no-'{cups,directfb,eglfs,evdev,kms,libinput,linuxfb,mtdev,nis,opengl}
+		-no-{cups,directfb,eglfs,evdev,kms,libinput,linuxfb,mtdev,nis,opengl}
 
 		# Telegram doesn't support sending files >4GB
-		'-no-largefile'
+		-no-largefile
 
 		$(qt_use gtkstyle)
 		$(qt_use libproxy)
@@ -216,18 +221,21 @@ src_configure() {
 
 	# This configure will build qmake for use in builds of other modules.
 	# The global qmake will not work.
-	S="${qtbase_dir}" QT5_BUILD_DIR="${qtbase_dir}" qt5_base_configure
+	S="${qtbase_dir}" QT5_BUILD_DIR="${qtbase_dir}" \
+		qt5_base_configure
 
 	my_qt5_qmake() {
-		QT5_MODULE='' QT5_BINDIR="${qtbase_dir}/bin" qt5_qmake
+		QT5_MODULE='' QT5_BINDIR="${qtbase_dir}/bin" \
+			qt5_qmake
 	}
-	qt5_foreach_target_subdir my_qt5_qmake
-	unset -f my_qt5_qmake
+	qt5_foreach_target_subdir \
+		my_qt5_qmake
 
-	# The qmake above now registered the tools specified in `QT5_TARGET_SUBDIRS`.
-	# Instead of using QT5_BINDIR, will now use tools from `qtbase/bin` dir.
+	# The qmake above now generated make targets for the tools specified in `QT5_TARGET_SUBDIRS`
+	# for use in other modules. The problem is that it tries to use tools from `qtbase/bin` dir.
 	# These tools don't have to be built though, as we can just use the system ones.
-	# So we'll remove them from the `QT5_TARGET_SUBDIRS` and just symlink them to `qtbase/bin`.
+	# So we'll just symlink them to `qtbase/bin` and remove them from `QT5_TARGET_SUBDIRS`
+	# to prevent them from being built.
 	local qt5_bindir="$(qt5_get_bindir)" QT5_TARGET_SUBDIRS_NEW=()
 	for d in "${QT5_TARGET_SUBDIRS[@]}" ;do
 		if [[ "$d" == *'/tools/'* ]] ;then
@@ -248,12 +256,14 @@ src_configure() {
 }
 
 src_compile() {
-	qt5_foreach_target_subdir emake
+	qt5_foreach_target_subdir \
+		emake
 }
 
 src_install() {
-	qt5_foreach_target_subdir emake INSTALL_ROOT="${D}" install
-	cd "${qtbase_dir}" && emake INSTALL_ROOT="${D}" install_qmake install_mkspecs
+	qt5_foreach_target_subdir \
+		emake INSTALL_ROOT="${D}" install
+	emake -C "${qtbase_dir}" INSTALL_ROOT="${D}" install_qmake install_mkspecs
 
 	local qt5_bindir="$(qt5_get_bindir)"
 	for t in "${TOOLS[@]}" ;do
