@@ -23,7 +23,7 @@ matrix:
 
 
 install:
-    - tools/install_portage.sh
+    - .travis/install_portage.sh
     - export PATH="${PORTAGE_ROOT}/usr/bin:${PATH}"
     - export PORTAGE_CONFIGROOT="${PORTAGE_ROOT}" ROOT="${PORTAGE_ROOT}"
 
