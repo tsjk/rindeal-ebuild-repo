@@ -4,6 +4,8 @@
 
 EAPI=6
 
+# 'module > subdir > package' bindings: https://wiki.gentoo.org/wiki/Project:Qt/Qt5status
+
 QT5_MODULE='qtbase' # base ( core dbus gui network widgets ) imageformats
 QT_MODULES=(qtbase qtimageformats)
 
