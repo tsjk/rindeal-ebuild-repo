@@ -9,7 +9,7 @@ HOMEPAGE="https://github.com/rindeal/openrc-rfl"
 LICENSE="BSD"
 SRC_URI="https://github.com/rindeal/openrc-rfl/archive/v${PV}.tar.gz -> ${P}.tar.gz"
 
-RESTRICT="mirror"
+RESTRICT='mirror binchecks'
 SLOT="0"
 KEYWORDS="~amd64 ~arm"
 
