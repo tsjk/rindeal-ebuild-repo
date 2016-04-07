@@ -11,7 +11,7 @@ branches:
     only:
         - master
         - dev
-        - /^pr-.*$/
+        - /^mr-.*$/
 
 env:
     global:
