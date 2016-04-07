@@ -17,4 +17,6 @@ RESTRICT="mirror test"
 SLOT="0"
 KEYWORDS="~amd64 ~arm"
 
-## ebuild generated for gem `addressable-2.4.0` by gem2ebuild on 2016-03-09
+RUBY_FAKEGEM_EXTRAINSTALL='data'
+
+## ebuild generated for gem `addressable-2.4.0` by gem2ebuild on 2016-04-07
