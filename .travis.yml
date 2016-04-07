@@ -4,8 +4,14 @@ sudo: false
 language: python
 python:
     - "3.4"
+
 git:
     depth: 1
+branches:
+    only:
+        - master
+        - dev
+        - /^pr-.*$/
 
 env:
     global:
