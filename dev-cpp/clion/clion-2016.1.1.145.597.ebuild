@@ -74,6 +74,7 @@ src_install() {
 	)
 	make_desktop_entry_extras=( # MUST end with semicolon
 		"MimeType=text/plain;text/x-c;text/x-h;"
+		"StartupWMClass=jetbrains-clion"
 	)
 	make_desktop_entry "${make_desktop_entry_args[@]}" "$( printf '%s\n' "${make_desktop_entry_extras[@]}" )"
 
