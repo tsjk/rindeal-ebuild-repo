@@ -35,6 +35,9 @@ DEPEND=("${RDEPEND[@]}"
 DEPEND="${DEPEND[*]}"
 RDEPEND="${RDEPEND[*]}"
 
+PLOCALES='de es it ko nl pt_BR'
+inherit l10n
+
 CHECKREQS_DISK_BUILD='800M'
 
 tg_dir="${S}/Telegram"
@@ -49,6 +52,14 @@ qt5_get_bindir() {
 
 src_prepare() {
 	cd "${tg_dir}"
+
+	l10n_find_plocales_changes 'SourceFiles/langs' 'lang_' '.strings'
+	rm_loc() {
+		rm -f "SourceFiles/langs/lang_${1}.strings" || return 1
+		sed -i "\|lang_${1}.strings|d" \
+			-- "${tg_pro}" 'SourceFiles/telegram.qrc' || return 2
+	}
+	l10n_for_each_disabled_locale_do rm_loc
 
 	local args=
 
@@ -94,7 +105,11 @@ src_prepare() {
 	)
 	sed -i -r "${args[@]}" -- 'SourceFiles/pspecific_linux.cpp' || die
 
-	# now add corrected dependencies back
+	## now add corrected dependencies back
+
+	# make sure there is at least one empty line at the end before adding anything
+	echo >> "${tg_pro}"
+
 	local deps=( 'appindicator3-0.1' 'minizip' 'opus')
 	local libs=( "${deps[@]}"
 		'lib'{avcodec,avformat,avutil,lzma,swresample,swscale,va}
