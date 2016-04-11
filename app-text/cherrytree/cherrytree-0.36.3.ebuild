@@ -17,8 +17,6 @@ SLOT='0'
 KEYWORDS='~amd64'
 
 IUSE='nls'
-linguas_=( linguas_{cs,de,es,fr,hy,it,ja,lt,nl,pl,pt_BR,ru,tr,uk,zh_CN} )
-IUSE+=" ${linguas_[*]}"
 
 RDEPEND="${PYTHON_DEPS}
 	x11-libs/libX11
@@ -31,21 +29,28 @@ DEPEND="${RDEPEND}
 	nls? ( sys-devel/gettext )
 "
 
-pkg_setup()
-{
+PLOCALES='cs de es fr hy it ja nl pl pt_BR ru tr uk zh_CN'
+
+inherit l10n
+
+pkg_setup() {
 	python-single-r1_pkg_setup
 }
 
-src_compile()
-{
+src_prepare() {
+	use nls && l10n_find_plocales_changes 'locale' '' '.po'
+
+	default
+}
+
+src_compile() {
 	local args=
 	use nls || args+=' --without-gettext'
 
 	${EPYTHON} setup.py $args build
 }
 
-src_install()
-{
+src_install() {
 	cd "${S}"
 
 	exeinto '/usr/bin'
@@ -65,10 +70,11 @@ src_install()
 	doins "linux/${PN}.xml"
 
 	if use nls; then
-		for l in $LINGUAS; do
-			insinto "/usr/share/locale/${l}/LC_MESSAGES"
-			doins "build/mo/${l}/${PN}.mo"
-		done
+		ins_loc() {
+			insinto "/usr/share/locale/${1}/LC_MESSAGES"
+			doins "build/mo/${1}/${PN}.mo"
+		}
+		l10n_for_each_locale_do ins_loc
 	fi
 }
 
