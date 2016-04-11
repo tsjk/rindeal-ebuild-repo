@@ -35,7 +35,7 @@ inherit versionator
 # @ECLASS-VARIABLE: GH_TAG
 # @DESCRIPTION:
 # Tag/commit that is fetched from Github
-: ${GH_TAG:=${PV}}
+: ${GH_TAG:=v${PV}}
 
 # @ECLASS-VARIABLE: GH_BUILD_TYPE
 # @DEFAULT_UNSET
