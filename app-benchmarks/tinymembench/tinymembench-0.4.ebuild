@@ -8,11 +8,12 @@ GH_USER='ssvb'
 
 inherit github
 
-DESCRIPTION='Simple benchmark for memory throughput and latency'
-LICENSE='MIT'
+DESCRIPTION="Simple benchmark for memory throughput and latency"
+LICENSE="MIT"
 
-SLOT='0'
+SLOT="0"
+KEYWORDS="~amd64 ~arm ~mips"
 
 src_install() {
-	dobin "${PN}"
+	dobin "$PN"
 }
