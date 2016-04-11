@@ -51,8 +51,6 @@ src_compile() {
 }
 
 src_install() {
-	cd "${S}"
-
 	exeinto '/usr/bin'
 	doexe "${PN}"
 
