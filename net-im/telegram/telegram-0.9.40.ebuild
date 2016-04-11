@@ -37,7 +37,6 @@ RDEPEND="${RDEPEND[*]}"
 
 CHECKREQS_DISK_BUILD='800M'
 
-S="${WORKDIR}/tdesktop-${PV}"
 tg_dir="${S}/Telegram"
 tg_pro="${tg_dir}/Telegram.pro"
 # this path must be in sync with dev-qt/telegram-qtstatic ebuild
