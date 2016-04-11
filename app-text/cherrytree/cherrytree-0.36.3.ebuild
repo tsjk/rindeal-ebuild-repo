@@ -5,19 +5,18 @@
 EAPI=6
 
 PYTHON_COMPAT=( python2_7 )
+GH_USER='giuspen'
 
-inherit python-single-r1 eutils fdo-mime
+inherit github python-single-r1 eutils fdo-mime
 
-DESCRIPTION="A hierarchical note taking application"
-HOMEPAGE="http://www.giuspen.com/cherrytree"
-LICENSE="GPL-3"
-SRC_URI="https://github.com/giuspen/${PN}/archive/${PV}.tar.gz -> ${P}.tar.gz"
+DESCRIPTION='A hierarchical note taking application'
+HOMEPAGE='http://www.giuspen.com/cherrytree'
+LICENSE='GPL-3'
 
-RESRICT="mirror"
-SLOT="0"
-KEYWORDS="~amd64"
+SLOT='0'
+KEYWORDS='~amd64'
 
-IUSE="nls"
+IUSE='nls'
 linguas_=( linguas_{cs,de,es,fr,hy,it,ja,lt,nl,pl,pt_BR,ru,tr,uk,zh_CN} )
 IUSE+=" ${linguas_[*]}"
 
@@ -40,7 +39,7 @@ pkg_setup()
 src_compile()
 {
 	local args=
-	use nls || args+=" --without-gettext"
+	use nls || args+=' --without-gettext'
 
 	${EPYTHON} setup.py $args build
 }
@@ -49,20 +48,20 @@ src_install()
 {
 	cd "${S}"
 
-	exeinto "/usr/bin"
+	exeinto '/usr/bin'
 	doexe "${PN}"
 
 	insinto "/usr/share/${PN}"
-	doins -r "glade/" "modules/" "language-specs/"
+	doins -r 'glade/' 'modules/' 'language-specs/'
 
 	doicon -s scalable "glade/svg/${PN}.svg"
 	domenu "linux/${PN}.desktop"
 	doman "linux/${PN}.1"
 
-	insinto "/usr/share/mime-info"
+	insinto '/usr/share/mime-info'
 	doins "linux/${PN}".{mime,keys}
 
-	insinto "/usr/share/mime/packages"
+	insinto '/usr/share/mime/packages'
 	doins "linux/${PN}.xml"
 
 	if use nls; then
