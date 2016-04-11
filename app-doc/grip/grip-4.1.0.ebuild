@@ -4,18 +4,18 @@
 
 EAPI=6
 
-PYTHON_COMPAT=( python2_{6,7} pypy{,3} python3_{3,4,5} )
+PYTHON_COMPAT=( python2_7 pypy{,3} python3_{3,4,5} )
 
 inherit distutils-r1 python-r1
 
-DESCRIPTION="Preview GitHub Markdown files like Readme locally before committing them."
-HOMEPAGE="https://github.com/joeyespo/grip"
-LICENSE="MIT"
+DESCRIPTION='Preview GitHub Markdown files like Readme locally before committing them.'
+HOMEPAGE='https://github.com/joeyespo/grip'
+LICENSE='MIT'
 SRC_URI="mirror://pypi/${PN:0:1}/${PN}/${P}.zip"
 
-RESTRICT="mirror"
-SLOT="0"
-KEYWORDS="~amd64"
+RESTRICT='primaryuri'
+SLOT='0'
+KEYWORDS='~amd64'
 
 RDEPEND="
 	>=dev-python/docopt-0.6.2
