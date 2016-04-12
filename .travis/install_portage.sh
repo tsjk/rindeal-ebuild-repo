@@ -13,35 +13,41 @@ get_archive() {
     local tmpd="$(mktemp -d)" file="${url##*/}"
 
     pushd "${tmpd}"
+
     wget "$url" -O "${file}" || return 1
-    mkdir -v -p "${dir}"
+    mkdir -p "${dir}"
     tar xf "${file}" -C "${dir}" --strip-components=1 || return 2
+
     popd
-    rm -v -r -f "${tmpd}"
+    rm -r -f "${tmpd}"
 }
 
 
 ## prepare env
 ## ------------
 tmp_dir="$(mktemp -d)"
-gentoo_tree_dir="${PORTAGE_ROOT}/usr/portage"
-portage_conf_dir="${PORTAGE_ROOT}/etc/portage"
+gentoo_tree_dir="${PORTAGE_ROOT}/usr/portage"   && mkdir -v -p "${gentoo_tree_dir}"
+portage_conf_dir="${PORTAGE_ROOT}/etc/portage"  && mkdir -v -p "${portage_conf_dir}"
 DISTDIR="$(mktemp -d --suffix=-distdir)"
-mkdir -v -p "${PORTAGE_ROOT}/usr/lib64" && ln -s lib64 "${PORTAGE_ROOT}/usr/lib"
+
+mkdir -v -p "${PORTAGE_ROOT}/usr/lib64"
+ln -v -s lib64 "${PORTAGE_ROOT}/usr/lib"
 
 
 ## install portage
 ## ----------------
-get_archive https://github.com/gentoo/portage/archive/v${PORTAGE_VER}.tar.gz "${tmp_dir}/portage-src"
+get_archive "https://github.com/gentoo/portage/archive/v${PORTAGE_VER}.tar.gz" "${tmp_dir}/portage-src"
 cd "${tmp_dir}/portage-src"
+
 ./setup.py install -O2 --system-prefix="${PORTAGE_ROOT}/usr" --sysconfdir="${PORTAGE_ROOT}/etc"
+
 mkdir -v -p "${PORTAGE_ROOT}/usr/lib/portage/cnf/"
-cp -v cnf/metadata.dtd "${DISTDIR}/"
+cp -v 'cnf/metadata.dtd' "${DISTDIR}/"
 
 
 ## install gentoo tree
 ## --------------------
-get_archive https://github.com/gentoo-mirror/gentoo/archive/master.tar.gz "${gentoo_tree_dir}"
+get_archive 'https://github.com/gentoo-mirror/gentoo/archive/master.tar.gz' "${gentoo_tree_dir}"
 
 
 ## install portage configs
@@ -70,5 +76,5 @@ ln -v -s "${gentoo_tree_dir}/profiles/base" "${portage_conf_dir}/make.profile"
 
 ## cleanup
 ## --------
-rm -v -rf "${tmp_dir}"
+rm -rf "${tmp_dir}"
 
