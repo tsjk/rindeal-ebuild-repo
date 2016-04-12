@@ -3,6 +3,7 @@
 [ -z "${PORTAGE_ROOT}" ] && { echo "PORTAGE_ROOT not set"; exit 1; }
 mkdir -v -p "${PORTAGE_ROOT}"
 [ -z "${PORTAGE_VER}" ] && { echo "PORTAGE_VER not set"; exit 1; }
+: ${OVERLAY_NAME:=${TRAVIS_REPO_SLUG##*/}}
 
 set -e
 
@@ -53,7 +54,7 @@ main-repo = gentoo
 [gentoo]
 location = ${gentoo_tree_dir}
 
-[rindeal]
+[${OVERLAY_NAME}]
 location = ${TRAVIS_BUILD_DIR}
 _EOF_
 
