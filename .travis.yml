@@ -15,7 +15,7 @@ branches:
 
 env:
     global:
-        - PORTAGE_ROOT="$(mktemp -d)"
+        - PORTAGE_ROOT="$(mktemp -d --suffix=-portage_root)"
         - OVERLAY_NAME='rindeal'
     matrix:
         - PORTAGE_VER="2.2.26"
