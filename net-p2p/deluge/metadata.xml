@@ -1,10 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE pkgmetadata SYSTEM "http://www.gentoo.org/dtd/metadata.dtd">
 <pkgmetadata>
-<use>
-	<flag name="console">Enable the console UI</flag>
-	<flag name="daemon">Build the system daemon</flag>
-	<flag name="setproctitle">Install dependencies needed for beautifying the process name</flag>
-	<flag name="webui">Enable the Web UI</flag>
-</use>
+  <maintainer type="person">
+    <email>dev.rindeal+gentoo-overlay@gmail.com</email>
+    <name>Jan Chren (rindeal)</name>
+  </maintainer>
+  <use>
+    <flag name="console">Enable the console UI</flag>
+    <flag name="daemon">Build the system daemon</flag>
+    <flag name="setproctitle">Install dependencies needed for beautifying the process name</flag>
+    <flag name="webui">Enable the Web UI</flag>
+  </use>
 </pkgmetadata>
