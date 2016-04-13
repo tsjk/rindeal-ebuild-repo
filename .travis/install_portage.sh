@@ -112,4 +112,5 @@ fold_end configuration
 
 ## cleanup
 ## --------
+cd ~
 rm -rf "${tmp_dir}"
