@@ -1,4 +1,1 @@
 - so far, this is the most complete source based package for Telegram
-
-TODO list:
-- LINGUAS
