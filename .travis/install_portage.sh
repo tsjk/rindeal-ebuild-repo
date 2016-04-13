@@ -46,7 +46,9 @@ fold_start portage.install "Install Portage"
 {
     fold_start portage.install.pre
     {
-        get_archive "https://github.com/gentoo/portage/archive/v${PORTAGE_VER}.tar.gz" "${tmp_dir}/portage-src"
+        get_archive \
+            "https://github.com/gentoo/portage/archive/v${PORTAGE_VER}.tar.gz" \
+            "${tmp_dir}/portage-src"
         cd "${tmp_dir}/portage-src"
     }
     fold_end portage.install.pre
@@ -75,7 +77,9 @@ fold_end portage.install
 ## --------------------
 fold_start gentoo_tree "Install Gentoo Portage Tree"
 
-get_archive 'https://github.com/gentoo-mirror/gentoo/archive/master.tar.gz' "${gentoo_tree_dir}"
+get_archive \
+    'https://github.com/gentoo-mirror/gentoo/archive/master.tar.gz' \
+    "${gentoo_tree_dir}"
 
 fold_end gentoo_tree
 
