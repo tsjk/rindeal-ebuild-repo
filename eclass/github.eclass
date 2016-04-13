@@ -69,7 +69,7 @@ esac
 
 HOMEPAGE="https://github.com/${GH_USER}/${GH_REPO}"
 
-RESTRICT='primaryuri'
+RESTRICT+=' primaryuri'
 
 
 # @FUNCTION: github_src_unpack
