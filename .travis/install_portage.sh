@@ -66,8 +66,7 @@ fold_start portage.install "Install Portage"
 
     fold_start portage.install.post
     {
-        mkdir -v -p "${PORTAGE_ROOT}/usr/lib/portage/cnf/"
-        cp -v 'cnf/metadata.dtd' "${DISTDIR}/"
+        wget 'https://www.gentoo.org/dtd/metadata.dtd' -P "${DISTDIR}/"
     }
     fold_end portage.install.post
 }
