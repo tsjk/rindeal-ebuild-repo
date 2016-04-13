@@ -53,7 +53,12 @@ fold_start portage.install "Install Portage"
 
     fold_start portage.install.run
     {
-        ./setup.py install -O2 --system-prefix="${PORTAGE_ROOT}/usr" --sysconfdir="${PORTAGE_ROOT}/etc"
+        args=(
+            -O2
+            --system-prefix="${PORTAGE_ROOT}/usr"
+            --sysconfdir="${PORTAGE_ROOT}/etc"
+        )
+        ./setup.py install "${args[@]}"
     }
     fold_end portage.install.run
 
