@@ -32,7 +32,7 @@ fold_start environment "Prepare environment"
 tmp_dir="$(mktemp -d)"
 gentoo_tree_dir="${PORTAGE_ROOT}/usr/portage"   && mkdir -v -p "${gentoo_tree_dir}"
 portage_conf_dir="${PORTAGE_ROOT}/etc/portage"  && mkdir -v -p "${portage_conf_dir}"
-DISTDIR="$(mktemp -d --suffix=-distdir)"
+DISTDIR="$(mktemp -d --suffix=-distdir)"        && echo "DISTDIR: ${DISTDIR}"
 
 mkdir -v -p "${PORTAGE_ROOT}/usr/lib64"
 ln -v -s lib64 "${PORTAGE_ROOT}/usr/lib"
@@ -84,7 +84,7 @@ fold_end gentoo_tree
 fold_start configuration "Configure"
 
 mkdir -v -p "${portage_conf_dir}/repos.conf"
-cat > "${portage_conf_dir}/repos.conf/repos" << _EOF_
+announce tee "${portage_conf_dir}/repos.conf/repos" << _EOF_
 [DEFAULT]
 main-repo = gentoo
 
@@ -95,7 +95,7 @@ location = ${gentoo_tree_dir}
 location = ${TRAVIS_BUILD_DIR}
 _EOF_
 
-cat > "${portage_conf_dir}/make.conf" << _EOF_
+announce tee "${portage_conf_dir}/make.conf" << _EOF_
 DISTDIR="${DISTDIR}"
 PKGDIR="$(mktemp -d --suffix=-pkdir)"
 PORTAGE_TMPDIR="$(mktemp -d --suffix=-portage_tmpdir)"
