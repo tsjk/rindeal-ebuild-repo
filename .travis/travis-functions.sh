@@ -2,8 +2,8 @@
 # https://github.com/travis-ci/travis-rubies
 
 announce() {
-  echo \$ $@
-  $@
+  echo \$ "$@"
+  "$@"
 }
 
 travis_retry() {
