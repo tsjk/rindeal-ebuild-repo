@@ -7,7 +7,7 @@ EAPI=6
 GH_USER='telegramdesktop'
 GH_REPO='tdesktop'
 
-inherit github eutils fdo-mime qmake-utils flag-o-matic check-reqs
+inherit flag-o-matic check-reqs fdo-mime eutils qmake-utils github
 
 DESCRIPTION='Desktop client of Telegram, the messaging app'
 HOMEPAGE='https://telegram.org'
@@ -15,7 +15,7 @@ LICENSE='GPL-3' # with OpenSSL exception
 SLOT='0'
 
 KEYWORDS='~amd64'
-RESTRICT='test'
+RESTRICT+=' test'
 IUSE=''
 REQUIRED_USE=''
 
