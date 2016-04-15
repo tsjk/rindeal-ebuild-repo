@@ -1,1 +1,0 @@
-- contains a fix for bug [#576270](https://bugs.gentoo.org/show_bug.cgi?id=576270)
