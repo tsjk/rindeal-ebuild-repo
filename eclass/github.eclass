@@ -20,7 +20,6 @@ case "${EAPI:-0}" in
 		;;
 esac
 
-inherit versionator
 
 # @ECLASS-VARIABLE: GH_REPO
 # @DESCRIPTION:
@@ -47,7 +46,7 @@ fi
 # @DESCRIPTION:
 # Defines if fetched from git ("live") or tarball ("release")
 if [ -z "${GH_BUILD_TYPE}" ] ; then
-	if version_is_at_least 9999 ; then
+	if [[ "${PV}" == *9999* ]] ; then
 		GH_BUILD_TYPE='live'
 	else
 		GH_BUILD_TYPE='release'
