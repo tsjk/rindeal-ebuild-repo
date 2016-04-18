@@ -16,7 +16,7 @@ LICENSE='GPL-3' # with OpenSSL exception
 SLOT='0'
 
 RESTRICT+=' test'
-KEYWORDS='~amd64'
+KEYWORDS='~amd64 ~x86'
 IUSE=''
 REQUIRED_USE=''
 
