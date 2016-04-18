@@ -30,7 +30,7 @@ SRC_URI="
 	https://github.com/telegramdesktop/tdesktop/raw/${qt_patch_rev}/Telegram/_qtbase_${qt_ver//./_}_patch.diff -> ${qt_patch_name}
 "
 
-KEYWORDS='~amd64'
+KEYWORDS='~amd64 ~x86'
 RESTRICT='strip test'
 IUSE='bindist gtkstyle libproxy systemd tslib'
 REQUIRED_USE=''
