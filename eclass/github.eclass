@@ -77,6 +77,9 @@ HOMEPAGE="https://github.com/${GH_USER}/${GH_REPO}"
 RESTRICT+=' primaryuri'
 
 
+EXPORT_FUNCTIONS src_unpack
+
+
 # @FUNCTION: github_src_unpack
 # @DESCRIPTION:
 # Function for unpacking Github packages
