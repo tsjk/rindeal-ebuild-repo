@@ -24,8 +24,13 @@ inherit versionator
 
 # @ECLASS-VARIABLE: GH_REPO
 # @DESCRIPTION:
-# Github repository name
+# Github repository name or a string in the format: `<user_name>/<repository_name>`
 : ${GH_REPO:=${PN}}
+
+if [[ "${GH_REPO}" == *'/'* ]] ; then
+	GH_USER="${GH_REPO%%/*}"
+	GH_REPO="${GH_REPO##*/}"
+fi
 
 # @ECLASS-VARIABLE: GH_USER
 # @DESCRIPTION:
