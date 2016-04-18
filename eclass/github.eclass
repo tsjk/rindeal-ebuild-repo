@@ -10,7 +10,7 @@
 # Support eclass for packages hosted on Github
 # Based on https://github.com/mrueg/mrueg-overlay/blob/master/eclass/github.eclass
 
-if [ -z "${_GH_ECLASS}" ] ;then
+if [ -z "${_GH_ECLASS}" ] ; then
 
 case "${EAPI:-0}" in
 	5|6)
@@ -41,8 +41,8 @@ inherit versionator
 # @DEFAULT_UNSET
 # @DESCRIPTION:
 # Defines if fetched from git ("live") or tarball ("release")
-if [ -z "${GH_BUILD_TYPE}" ] ;then
-	if version_is_at_least 9999 ;then
+if [ -z "${GH_BUILD_TYPE}" ] ; then
+	if version_is_at_least 9999 ; then
 		GH_BUILD_TYPE='live'
 	else
 		GH_BUILD_TYPE='release'
@@ -78,7 +78,7 @@ RESTRICT+=' primaryuri'
 github_src_unpack() {
 	debug-print-function ${FUNCNAME} "$@"
 
-	if [ ${GH_BUILD_TYPE} = 'live' ] ;then
+	if [ "${GH_BUILD_TYPE}" = 'live' ] ; then
 		git-r3_src_unpack
 	else
 		vcs-snapshot_src_unpack
