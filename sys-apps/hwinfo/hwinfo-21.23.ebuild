@@ -5,6 +5,7 @@
 EAPI=6
 
 GH_USER='openSUSE'
+GH_TAG="${PV}"
 
 inherit github multilib toolchain-funcs
 
