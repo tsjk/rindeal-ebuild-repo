@@ -21,7 +21,7 @@ esac
 # @ECLASS-VARIABLE: GH_REPO
 # @DESCRIPTION:
 # Github repository name or a string in the format: `<user_name>/<repository_name>`
-: ${GH_REPO:=${PN}}
+: ${GH_REPO:="${PN}"}
 
 if [[ "${GH_REPO}" == *'/'* ]] ; then
 	GH_USER="${GH_REPO%%/*}"
@@ -31,7 +31,7 @@ fi
 # @ECLASS-VARIABLE: GH_USER
 # @DESCRIPTION:
 # Github user/group name
-: ${GH_USER:=${PN}}
+: ${GH_USER:="${PN}"}
 
 # @ECLASS-VARIABLE: GH_TAG
 # @DESCRIPTION:
@@ -58,7 +58,7 @@ case "${GH_BUILD_TYPE}" in
 		# - no tags: 158
 		# - `v` prefix: 350
 		# - no prefix: 192
-		: ${GH_TAG:=v${PV}}
+		: ${GH_TAG:="v${PV}"}
 		SRC_URI="https://github.com/${GH_USER}/${GH_REPO}/archive/${GH_TAG}.tar.gz -> ${P}.tar.gz"
 		;;
 	'live')
