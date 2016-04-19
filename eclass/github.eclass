@@ -72,6 +72,7 @@ esac
 
 HOMEPAGE="https://github.com/${GH_USER}/${GH_REPO}"
 
+# prefer GitHub servers over mirrors
 RESTRICT+=' primaryuri'
 
 
