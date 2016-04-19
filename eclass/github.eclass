@@ -30,7 +30,7 @@ fi
 
 # @ECLASS-VARIABLE: GH_USER
 # @DESCRIPTION:
-# Github username/group name
+# Github user/group name
 : ${GH_USER:=${PN}}
 
 # @ECLASS-VARIABLE: GH_TAG
