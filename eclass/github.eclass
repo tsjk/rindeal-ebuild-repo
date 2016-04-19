@@ -14,7 +14,7 @@ if [ -z "${_GH_ECLASS}" ] ; then
 
 case "${EAPI:-0}" in
 	5|6) ;;
-	*) die "Unsupported EAPI=${EAPI} (unknown) for ${ECLASS}" ;;
+	*) die "Unsupported EAPI='${EAPI}' (unknown) for '${ECLASS}'" ;;
 esac
 
 
