@@ -39,7 +39,6 @@ fi
 # @ECLASS-VARIABLE: GH_TAG
 # @DESCRIPTION:
 # Tag/commit that is fetched from Github
-: ${GH_TAG:=v${PV}}
 
 # @ECLASS-VARIABLE: GH_BUILD_TYPE
 # @DEFAULT_UNSET
@@ -58,11 +57,14 @@ case "${GH_BUILD_TYPE}" in
 	'release')
 		inherit vcs-snapshot
 
+		: ${GH_TAG:=v${PV}}
 		SRC_URI="https://github.com/${GH_USER}/${GH_REPO}/archive/${GH_TAG}.tar.gz -> ${P}.tar.gz"
 		;;
 	'live')
 		inherit git-r3
 
+		[ -n "${GH_TAG}" ] && [ -z "${EGIT_COMMIT}" ] && \
+			EGIT_COMMIT="${GH_TAG}"
 		EGIT_REPO_URI="https://github.com/${GH_USER}/${GH_REPO}.git"
 		;;
 	*)
