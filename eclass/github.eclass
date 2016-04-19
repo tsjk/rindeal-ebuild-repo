@@ -54,6 +54,10 @@ case "${GH_BUILD_TYPE}" in
 	'release')
 		inherit vcs-snapshot
 
+		# a research conducted on April 2016 among the first 700 repos with >10000 stars shows:
+		# - no tags: 158
+		# - `v` prefix: 350
+		# - no prefix: 192
 		: ${GH_TAG:=v${PV}}
 		SRC_URI="https://github.com/${GH_USER}/${GH_REPO}/archive/${GH_TAG}.tar.gz -> ${P}.tar.gz"
 		;;
