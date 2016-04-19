@@ -1,6 +1,6 @@
 Rindeal's Gentoo Overlay
 ==========================
-[![Build Status](https://img.shields.io/travis/rindeal/gentoo-overlay/master.svg?style=flat-square&label=repoman full -d)](https://travis-ci.org/rindeal/gentoo-overlay)
+[![Build Status](https://img.shields.io/travis/rindeal/gentoo-overlay/master.svg?style=flat-square&label=repoman full)](https://travis-ci.org/rindeal/gentoo-overlay)
 
 Repository consists mostly of packages I haven't found anywhere else, more up-to-date versions of official packages, or ebuilds with features enhanced to my liking.
 In each category/package directory you should find a _README_ file describing the exact reason of its inclusion in this repository.
@@ -25,3 +25,4 @@ sync-uri = https://github.com/rindeal/gentoo-overlay.git
 #sync-uri =  https://github.com/gentoo-mirror/rindeal.git
 auto-sync = yes
 ```
+
