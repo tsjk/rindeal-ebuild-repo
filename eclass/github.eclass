@@ -85,11 +85,11 @@ EXPORT_FUNCTIONS src_unpack
 github_src_unpack() {
 	debug-print-function ${FUNCNAME} "$@"
 
-	if [ "${GH_BUILD_TYPE}" = 'live' ] ; then
-		git-r3_src_unpack
-	else
-		vcs-snapshot_src_unpack
-	fi
+	case "${GH_BUILD_TYPE}" in
+		'live') git-r3_src_unpack ;;
+		'release') vcs-snapshot_src_unpack ;;
+		*) die ;;
+	esac
 }
 
 _GH_ECLASS=1
