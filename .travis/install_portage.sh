@@ -14,13 +14,13 @@ get_archive() {
     local url="$1" dir="$2"
     local tmpd="$(mktemp -d)" file="${url##*/}"
 
-    pushd "${tmpd}"
+    pushd "${tmpd}" >/dev/null
 
     wget "$url" -O "${file}" || return 1
     mkdir -p "${dir}"
     tar xf "${file}" -C "${dir}" --strip-components=1 || return 2
 
-    popd
+    popd >/dev/null
     rm -r -f "${tmpd}"
 }
 
