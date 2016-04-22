@@ -62,7 +62,7 @@ src_prepare-locales() {
 src_prepare-delete_and_modify() {
 	local args=
 
-	## patch Telegrm.pro
+	## patch "${tg_pro}"
 	args=(
 		# delete any references to local includes/libs
 		-e '\|/usr/local/|d'
@@ -88,7 +88,7 @@ src_prepare-delete_and_modify() {
 	sed -i -r "s|[^ ]*Libraries/QtStatic/qtbase/([^ \"\\]*)|${qt_dir}/\1|g" \
         -- *.pro || die
 	sed -i -r 's|".*src/gui/text/qfontengine_p.h"|<private/qfontengine_p.h>|' \
-		-- 'SourceFiles/ui/text.h' || die
+		-- 'SourceFiles/ui/text/'{text.h,text_block.h} || die
 
 	## nuke libunity references
 	args=(
@@ -155,8 +155,11 @@ src_prepare() {
 }
 
 src_configure() {
-	# add flags previously stripped from "${tg_pro}"
+	## add flags previously stripped from "${tg_pro}"
 	append-cxxflags '-fno-strict-aliasing'
+	# `append-ldflags '-rdynamic'` was stripped because it's used probably only for GoogleBreakpad
+	# which is not supported anyway
+
 	# a bit more silence
 	append-cxxflags '-Wno-unused-'{function,parameter,variable,but-set-variable}
 
