@@ -210,7 +210,7 @@ src_install() {
 		'Network;InstantMessaging;Chat'	# categories
 	)
 	make_desktop_entry_extras=(
-		'MimeType=application/x-xdg-protocol-tg;x-scheme-handler/tg;'
+		'MimeType=x-scheme-handler/tg;'
 	)
 	make_desktop_entry "${make_desktop_entry_args[@]}" \
 		"$( printf '%s\n' "${make_desktop_entry_extras[@]}" )"
