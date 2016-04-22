@@ -18,11 +18,12 @@ KEYWORDS='~amd64 ~arm'
 SLOT='0'
 
 IUSE='console +daemon geoip +gtk +libnotify +setproctitle +sound webui'
-REQUIRED_USE="${PYTHON_REQUIRED_USE}
-	sound? ( gtk ) libnotify? ( gtk )
-	|| ( console daemon gtk webui )"
+REQUIRED_USE='
+	sound? ( gtk )
+	libnotify? ( gtk )
+	|| ( console daemon gtk webui )'
 
-CDEPEND='daemon? ( >=net-libs/libtorrent-rasterbar-0.14.9[python] )'
+CDEPEND="daemon? ( >=net-libs/libtorrent-rasterbar-0.14.9[python,${PYTHON_USEDEP}] )"
 DEPEND="${CDEPEND}
 	dev-python/setuptools[${PYTHON_USEDEP}]
 	dev-util/intltool"
@@ -35,11 +36,11 @@ RDEPEND="${CDEPEND}
 
 	geoip? ( dev-libs/geoip )
 	gtk? (
+		libnotify? ( dev-python/notify-python[${PYTHON_USEDEP}] )
 		sound? ( dev-python/pygame[${PYTHON_USEDEP}] )
 		dev-python/pygobject:2[${PYTHON_USEDEP}]
-		>=dev-python/pygtk-2.12[${PYTHON_USEDEP}]
+		>=dev-python/pygtk-2.12:2[${PYTHON_USEDEP}]
 		gnome-base/librsvg
-		libnotify? ( dev-python/notify-python[${PYTHON_USEDEP}] )
 	)
 	setproctitle? ( dev-python/setproctitle[${PYTHON_USEDEP}] )
 	webui? ( dev-python/mako[${PYTHON_USEDEP}] )"
