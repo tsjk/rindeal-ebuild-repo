@@ -57,18 +57,20 @@ python_prepare_all() {
 		-e 's|build_libtorrent = True|build_libtorrent = False|'
 		-e "/Compiling po file/a \\\tuptoDate = False"
 	)
-	sed -i "${args[@]}" -- 'setup.py' || die
+	sed -i "${args[@]}" \
+        -- 'setup.py' || die
 	args=(
 		-e 's|"new_release_check": True|"new_release_check": False|'
 		-e 's|"check_new_releases": True|"check_new_releases": False|'
 		-e 's|"show_new_releases": True|"show_new_releases": False|'
 	)
-	sed -i "${args[@]}" -- 'deluge/core/preferencesmanager.py' || die
+	sed -i "${args[@]}" \
+        -- 'deluge/core/preferencesmanager.py' || die
 
-	loc_dir='deluge/i18n'
-	l10n_find_plocales_changes "${loc_dir}" '' '.po'
+	local loc_dir='deluge/i18n' loc_pre='' loc_post='.po'
+	l10n_find_plocales_changes "${loc_dir}" "${loc_pre}" "${loc_post}"
 	rm_loc() {
-		rm -vf "${loc_dir}/${1}.po" || die
+		rm -vf "${loc_dir}/${loc_pre}${1}${loc_post}" || die
 	}
 	l10n_for_each_disabled_locale_do rm_loc
 
