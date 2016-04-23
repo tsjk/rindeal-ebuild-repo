@@ -68,7 +68,7 @@ python_prepare_all() {
 	loc_dir='deluge/i18n'
 	l10n_find_plocales_changes "${loc_dir}" '' '.po'
 	rm_loc() {
-		rm -vf "${loc_dir}/${1}.po"
+		rm -vf "${loc_dir}/${1}.po" || die
 	}
 	l10n_for_each_disabled_locale_do rm_loc
 
@@ -91,7 +91,7 @@ python_install_all() {
 		systemd_newunit "${FILESDIR}/deluged.service" 'deluged.service'
 		systemd_install_serviced "${FILESDIR}/deluged.service.conf"
 	else
-		rm -rvf "${D}/usr/bin/deluged" "${D}"/usr/share/man/man1/deluged.*
+		rm -rvf "${D}/usr/bin/deluged" "${D}"/usr/share/man/man1/deluged.* || die
 	fi
 
 	if use webui ;then
@@ -101,17 +101,17 @@ python_install_all() {
 		systemd_install_serviced "${FILESDIR}/deluge-web.service.conf"
 	else
 		rm -rvf "${D}/usr/bin/deluge-web" "${D}"/usr/lib*/python*/*-packages/deluge/ui/web/ \
-			"${D}"/usr/share/man/man1/deluge-web.*
+			"${D}"/usr/share/man/man1/deluge-web.* || die
 	fi
 
 	if ! use gtk ;then
 		rm -rvf "${D}/usr/bin/deluge-gtk" "${D}"/usr/lib*/python*/*-packages/deluge/ui/gtkui/ \
 			"${D}/usr/share/applications/deluge-gtk.desktop" "${D}"/usr/share/icons/deluge* \
-			"${D}"/usr/share/man/man1/deluge-gtk.*
+			"${D}"/usr/share/man/man1/deluge-gtk.* || die
 	fi
 
 	if ! use console ;then
 		rm -rvf "${D}/usr/bin/deluge-console" "${D}"/usr/lib*/python*/*-packages/deluge/ui/console/* \
-			"${D}"/usr/share/man/man1/deluge-console.*
+			"${D}"/usr/share/man/man1/deluge-console.* || die
 	fi
 }
