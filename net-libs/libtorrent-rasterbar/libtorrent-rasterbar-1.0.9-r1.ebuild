@@ -80,7 +80,7 @@ src_compile() {
 	default
 
 	python_compile() {
-		cd "${BUILD_DIR}/../bindings/python" || return 1
+		cd "${BUILD_DIR}/../bindings/python" || die
 		distutils-r1_python_compile
 	}
 	use python && distutils-r1_src_compile
@@ -92,7 +92,7 @@ src_install() {
 	default
 
 	python_install() {
-		cd "${BUILD_DIR}/../bindings/python" || return 1
+		cd "${BUILD_DIR}/../bindings/python" || die
 		distutils-r1_python_install
 	}
 	use python && distutils-r1_src_install
