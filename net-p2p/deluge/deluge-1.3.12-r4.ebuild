@@ -14,7 +14,7 @@ HOMEPAGE='http://deluge-torrent.org/'
 LICENSE='GPL-2'
 SRC_URI="http://download.deluge-torrent.org/source/${P}.tar.bz2"
 
-KEYWORDS='~amd64 ~arm'
+KEYWORDS='~amd64 ~arm ~x86'
 SLOT='0'
 
 IUSE='console +daemon geoip +gtk +libnotify +setproctitle +sound webui'
