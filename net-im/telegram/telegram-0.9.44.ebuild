@@ -86,7 +86,7 @@ src_prepare-delete_and_modify() {
 
 	## change references to static Qt dir
 	sed -i -r "s|[^ ]*Libraries/QtStatic/qtbase/([^ \"\\]*)|${qt_dir}/\1|g" \
-        -- *.pro || die
+		-- *'.pro' || die
 	sed -i -r 's|".*src/gui/text/qfontengine_p.h"|<private/qfontengine_p.h>|' \
 		-- 'SourceFiles/ui/text/'{text.h,text_block.h} || die
 
@@ -112,7 +112,6 @@ src_prepare-appends() {
 	echo >> "${tg_pro}"
 
 	## add corrected dependencies back
-
 	local deps=( 'appindicator3-0.1' 'minizip')
 	local libs=( "${deps[@]}"
 		'lib'{avcodec,avformat,avutil,swresample,swscale}
