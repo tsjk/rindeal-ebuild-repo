@@ -1,2 +1,4 @@
 move dev-qt/telegram-qt net-libs/telegram-qt
 move dev-qt/telegram-qtstatic dev-qt/qt-telegram-static
+move app-text/cppman app-doc/cppman
+move app-doc/cherrytree app-text/cherrytree
