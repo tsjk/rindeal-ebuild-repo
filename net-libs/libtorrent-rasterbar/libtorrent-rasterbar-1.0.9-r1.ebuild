@@ -42,6 +42,10 @@ DEPEND="${RDEPEND}
 src_prepare() {
 	default
 
+	# make sure lib search dir points to the main `S` dir and not to python copies
+	sed -i "s|-L[^ ]*/src/\.libs|-L${S}/src/.libs|" \
+		-- 'bindings/python/link_flags.in' || die
+
 	# needed or else eautoreconf fails
 	mkdir build-aux && cp {m4,build-aux}'/config.rpath' || die
 
