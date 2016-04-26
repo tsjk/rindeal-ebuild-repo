@@ -87,29 +87,48 @@ _distutils-r1_create_setup_cfg() {
 python_install_all() {
 	distutils-r1_python_install_all
 
-	if use daemon ;then
+	local paths=()
+
+	if use daemon ; then
 		newinitd "${FILESDIR}/deluged.init" 'deluged'
 		newconfd "${FILESDIR}/deluged.conf" 'deluged'
 	else
-		rm -rvf "${D}/usr/bin/deluged" "${D}"/usr/share/man/man1/deluged.* || die
+		paths=(
+			"${ED}/usr/bin/deluged"
+			"${ED}/usr/share/man/man1"/deluged.*
+		)
+		rm -rvf "${paths[@]}" || die
 	fi
 
-	if use webui ;then
+	if use webui ; then
 		newinitd "${FILESDIR}/deluge-web.init" 'deluge-web'
 		newconfd "${FILESDIR}/deluge-web.conf" 'deluge-web'
 	else
-		rm -rvf "${D}/usr/bin/deluge-web" "${D}"/usr/lib*/python*/*-packages/deluge/ui/web/ \
-			"${D}"/usr/share/man/man1/deluge-web.* || die
+		paths=(
+			"${ED}/usr/bin/deluge-web"
+			"${ED}/usr"/lib*/py*/*-packages/deluge/ui/web/
+			"${ED}/usr/share/man/man1"/deluge-web.*
+		)
+		rm -rvf "${paths[@]}" || die
 	fi
 
-	if ! use gtk ;then
-		rm -rvf "${D}/usr/bin/deluge-gtk" "${D}"/usr/lib*/python*/*-packages/deluge/ui/gtkui/ \
-			"${D}/usr/share/applications/deluge-gtk.desktop" "${D}"/usr/share/icons/deluge* \
-			"${D}"/usr/share/man/man1/deluge-gtk.* || die
+	if ! use gtk ; then
+		paths=(
+			"${ED}/usr/bin/deluge-gtk"
+			"${ED}/usr"/lib*/py*/*-packages/deluge/ui/gtkui/
+			"${ED}/usr/share/applications/deluge-gtk.desktop"
+			"${ED}/usr/share/icons"/deluge*
+			"${ED}/usr/share/man/man1"/deluge-gtk.*
+		)
+		rm -rvf "${paths[@]}" || die
 	fi
 
-	if ! use console ;then
-		rm -rvf "${D}/usr/bin/deluge-console" "${D}"/usr/lib*/python*/*-packages/deluge/ui/console/* \
-			"${D}"/usr/share/man/man1/deluge-console.* || die
+	if ! use console ; then
+		paths=(
+			"${ED}/usr/bin/deluge-console"
+			"${ED}/usr"/lib*/py*/*-packages/deluge/ui/console/*
+			"${ED}/usr/share/man/man1"/deluge-console.*
+		)
+		rm -rvf "${paths[@]}" || die
 	fi
 }
