@@ -7,7 +7,7 @@ EAPI='6'
 PYTHON_COMPAT=( python2_7 )
 DISTUTILS_SINGLE_IMPL=1
 
-inherit distutils-r1 eutils systemd user
+inherit distutils-r1 eutils user
 
 DESCRIPTION='BitTorrent client with a client/server model'
 HOMEPAGE='http://deluge-torrent.org/'
@@ -90,8 +90,6 @@ python_install_all() {
 	if use daemon ;then
 		newinitd "${FILESDIR}/deluged.init" 'deluged'
 		newconfd "${FILESDIR}/deluged.conf" 'deluged'
-		systemd_newunit "${FILESDIR}/deluged.service" 'deluged.service'
-		systemd_install_serviced "${FILESDIR}/deluged.service.conf"
 	else
 		rm -rvf "${D}/usr/bin/deluged" "${D}"/usr/share/man/man1/deluged.* || die
 	fi
@@ -99,8 +97,6 @@ python_install_all() {
 	if use webui ;then
 		newinitd "${FILESDIR}/deluge-web.init" 'deluge-web'
 		newconfd "${FILESDIR}/deluge-web.conf" 'deluge-web'
-		systemd_newunit "${FILESDIR}/deluge-web.service" 'deluge-web.service'
-		systemd_install_serviced "${FILESDIR}/deluge-web.service.conf"
 	else
 		rm -rvf "${D}/usr/bin/deluge-web" "${D}"/usr/lib*/python*/*-packages/deluge/ui/web/ \
 			"${D}"/usr/share/man/man1/deluge-web.* || die
