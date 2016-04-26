@@ -4,16 +4,14 @@
 
 EAPI=6
 
-MY_PV="${PV//./_}"
-
-PYTHON_COMPAT=( python2_7 python3_{4,5} )
+PYTHON_COMPAT=( python{2_7,3_{4,5}} )
 PYTHON_REQ_USE="threads"
 
 DISTUTILS_OPTIONAL=true
 DISTUTILS_IN_SOURCE_BUILD=true
 
 GH_REPO='arvidn/libtorrent'
-GH_TAG="libtorrent-${MY_PV}"
+GH_TAG="libtorrent-${PV//./_}"
 
 inherit autotools github distutils-r1
 
@@ -41,8 +39,6 @@ RDEPEND="
 DEPEND="${RDEPEND}
 	>=sys-devel/libtool-2.2"
 
-S="${WORKDIR}/libtorrent-libtorrent-${MY_PV}"
-
 src_prepare() {
 	default
 
@@ -51,7 +47,7 @@ src_prepare() {
 
 	eautoreconf
 
-	use python && python_copy_sources
+	use python && distutils-r1_src_prepare
 }
 
 src_configure() {
