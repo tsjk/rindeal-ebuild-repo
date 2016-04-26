@@ -23,7 +23,7 @@ REQUIRED_USE='
 	libnotify? ( gtk )
 	|| ( console daemon gtk webui )'
 
-CDEPEND="daemon? ( >=net-libs/libtorrent-rasterbar-0.14.9[python,${PYTHON_USEDEP}] )"
+CDEPEND="daemon? ( >=net-libs/libtorrent-rasterbar-0.14.9:0[python,${PYTHON_USEDEP}] )"
 DEPEND="${CDEPEND}
 	dev-python/setuptools[${PYTHON_USEDEP}]
 	dev-util/intltool"
