@@ -19,7 +19,8 @@ DESCRIPTION='C++ BitTorrent implementation focusing on efficiency and scalabilit
 HOMEPAGE='http://libtorrent.org'
 LICENSE='BSD'
 
-SLOT='0'
+SONAME='8'
+SLOT="0/${SONAME}"
 
 KEYWORDS='~amd64 ~arm ~x86'
 RESTRICT+=' test'
