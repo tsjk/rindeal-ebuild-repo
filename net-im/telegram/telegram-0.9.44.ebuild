@@ -4,8 +4,8 @@
 
 EAPI=6
 
-GH_USER='telegramdesktop'
-GH_REPO='tdesktop'
+GH_REPO='telegramdesktop/tdesktop'
+GH_TAG="v${PV}"
 
 inherit flag-o-matic check-reqs fdo-mime eutils qmake-utils github
 

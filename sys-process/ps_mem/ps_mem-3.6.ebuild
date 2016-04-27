@@ -9,6 +9,7 @@ PYTHON_COMPAT=( python{2_7,3_{3,4,5}} )
 DISTUTILS_SINGLE_IMPL=true
 
 GH_USER='pixelb'
+GH_TAG="v${PV}"
 
 inherit github distutils-r1
 

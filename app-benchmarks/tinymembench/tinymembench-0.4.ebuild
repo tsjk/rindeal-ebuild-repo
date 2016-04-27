@@ -5,6 +5,7 @@
 EAPI=6
 
 GH_USER='ssvb'
+GH_TAG="v${PV}"
 
 inherit flag-o-matic github
 
