@@ -11,9 +11,10 @@ inherit python-any-r1 multiprocessing pax-utils qmake-utils virtualx kde5-functi
 
 DESCRIPTION="A headless WebKit scriptable with a JavaScript API"
 HOMEPAGE="http://phantomjs.org"
-
 LICENSE="BSD"
+
 SLOT="0"
+
 KEYWORDS="~amd64 ~arm ~x86"
 IUSE="test examples"
 
@@ -121,14 +122,14 @@ src_test() {
 }
 
 src_install() {
-	pax-mark m bin/${PN} || die
-	dobin bin/${PN}
+	pax-mark m "bin/${PN}"
+	dobin "bin/${PN}"
 
-	dodoc ChangeLog README.md
-	doman "${FILESDIR}"/${PN}.1
+	doman "${FILESDIR}/${PN}.1"
+	einstalldocs
 
-	if use examples ;then
+	if use examples ; then
 		docinto examples
-		dodoc examples/*
+		dodoc -r examples
 	fi
 }
