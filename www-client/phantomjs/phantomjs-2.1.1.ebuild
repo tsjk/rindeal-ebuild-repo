@@ -5,12 +5,12 @@
 EAPI=6
 
 PYTHON_COMPAT=( python2_7 )
+GH_REPO='ariya/phantomjs'
 
-inherit python-any-r1 multiprocessing pax-utils qmake-utils virtualx kde5-functions
+inherit python-any-r1 multiprocessing pax-utils qmake-utils virtualx kde5-functions github
 
 DESCRIPTION="A headless WebKit scriptable with a JavaScript API"
 HOMEPAGE="http://phantomjs.org"
-SRC_URI="https://github.com/ariya/phantomjs/archive/${PV}.tar.gz -> ${P}.tar.gz"
 
 LICENSE="BSD"
 SLOT="0"
