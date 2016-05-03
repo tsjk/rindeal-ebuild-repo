@@ -9,14 +9,14 @@ GH_REPO='ariya/phantomjs'
 
 inherit python-any-r1 multiprocessing pax-utils qmake-utils virtualx kde5-functions github
 
-DESCRIPTION="A headless WebKit scriptable with a JavaScript API"
-HOMEPAGE="http://phantomjs.org"
-LICENSE="BSD"
+DESCRIPTION='A headless WebKit scriptable with a JavaScript API'
+HOMEPAGE='http://phantomjs.org'
+LICENSE='BSD'
 
-SLOT="0"
+SLOT='0'
 
-KEYWORDS="~amd64 ~arm ~x86"
-IUSE="test examples"
+KEYWORDS='~amd64 ~arm ~x86'
+IUSE='test examples'
 
 QT_MINIMAL=5.5
 
