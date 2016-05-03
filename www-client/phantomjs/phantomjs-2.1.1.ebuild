@@ -89,11 +89,12 @@ src_prepare() {
 		QMAKE_LFLAGS_DEBUG=
 	)
 
-	local sed_args=(
+	local sed_args
+
+	sed_args=(
 		-e "s|qmake = qmakePath.*|qmake = \"$(qt5_get_bindir)/qmake\"|"
 		-e "s|command = \[qmake\].*|command = [qmake, $( printf '"%s",' "${qmake_args[@]}" )\"\"]|"
 	)
-
 	sed -i -r "${sed_args[@]}" -- 'build.py' || die
 }
 
