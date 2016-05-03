@@ -96,6 +96,12 @@ src_prepare() {
 		-e "s|command = \[qmake\].*|command = [qmake, $( printf '"%s",' "${qmake_args[@]}" )\"\"]|"
 	)
 	sed -i -r "${sed_args[@]}" -- 'build.py' || die
+
+	sed_args=(
+		# delete check for Qt version as Portage's already taken care of it
+		-e '/^if\(!equals\(QT_MAJOR_VERSION/ , /}/d'
+	)
+	sed -i -r "${sed_args[@]}" -- 'src/phantomjs.pro' || die
 }
 
 src_compile() {
