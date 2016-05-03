@@ -19,35 +19,37 @@ IUSE="test examples"
 
 QT_MINIMAL=5.5
 
-# http://phantomjs.org/build.html - says pretty much nothing
-# https://anonscm.debian.org/cgit/collab-maint/phantomjs.git/tree/debian
-RDEPEND="
-	$(add_qt_dep qtcore)
-	$(add_qt_dep qtgui)
-	$(add_qt_dep qtnetwork)
-	$(add_qt_dep qtprintsupport)
-	$(add_qt_dep qtwebkit)
-	$(add_qt_dep qtwidgets)
+## http://phantomjs.org/build.html - says pretty much nothing
+## https://anonscm.debian.org/cgit/collab-maint/phantomjs.git/tree/debian
+CDEPEND_A=( "${PYTHON_DEPS}"
+	"$(add_qt_dep qtcore)"
+	"$(add_qt_dep qtgui)"
+	"$(add_qt_dep qtnetwork)"
+	"$(add_qt_dep qtprintsupport)"
+	"$(add_qt_dep qtwebkit)"
+	"$(add_qt_dep qtwidgets)"
 
-	dev-libs/icu:=
-	dev-libs/openssl:0
-	sys-libs/zlib
+	'dev-libs/icu:='
+	'dev-libs/openssl:0'
+	'sys-libs/zlib'
 
-	media-libs/mesa
-	media-libs/fontconfig
-	media-libs/freetype
-	media-libs/libpng:0=
-	virtual/jpeg:0
-"
+	'media-libs/mesa'
+	'media-libs/fontconfig'
+	'media-libs/freetype'
+	'media-libs/libpng:0='
+	'virtual/jpeg:0'
+)
+DEPEND_A=( "${CDEPEND_A[@]}"
+	# FIXME: why is this here?
+	'x11-libs/libXext'
+	'x11-libs/libX11'
 
-DEPEND="${RDEPEND}
-	${PYTHON_DEPS}
+	'test? ( dev-lang/ruby )'
+)
+RDEPEND_A=( "${CDEPEND_A[@]}" )
 
-	x11-libs/libXext
-	x11-libs/libX11
-
-	test? ( dev-lang/ruby )
-"
+DEPEND="${DEPEND_A[*]}"
+RDEPEND="${RDEPEND_A[*]}"
 
 pkg_setup() {
 	python_setup
