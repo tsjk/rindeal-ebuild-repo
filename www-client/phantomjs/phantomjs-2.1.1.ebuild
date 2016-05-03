@@ -6,7 +6,7 @@ EAPI=6
 
 PYTHON_COMPAT=( python2_7 )
 
-inherit python-r1 multiprocessing pax-utils qmake-utils virtualx kde5-functions
+inherit python-any-r1 multiprocessing pax-utils qmake-utils virtualx kde5-functions
 
 DESCRIPTION="A headless WebKit scriptable with a JavaScript API"
 HOMEPAGE="http://phantomjs.org"
@@ -50,10 +50,6 @@ RDEPEND_A=( "${CDEPEND_A[@]}" )
 
 DEPEND="${DEPEND_A[*]}"
 RDEPEND="${RDEPEND_A[*]}"
-
-pkg_setup() {
-	python_setup
-}
 
 src_prepare() {
 	local PATCHES=(
@@ -106,21 +102,22 @@ src_prepare() {
 }
 
 src_compile() {
-	local args=(
+	local build_py=(
+		"${PYTHON}" 'build.py'
+
 		'--confirm'
 		'--release'
 		'--jobs' $(makeopts_jobs)
 
-		'--skip-git'
-		'--skip-qtbase'
-		'--skip-qtwebkit'
+		'--skip-'{git,qtbase,qtwebkit}
 	)
 
-	"${PYTHON}" ./build.py "${args[@]}" || die
+	einfo "Executing: '${build_py[*]}'"
+	"${build_py[@]}" || die
 }
 
 src_test() {
-	virtx test/run-tests.py || die
+	virtx "${PYTHON}" 'test/run-tests.py' || die
 }
 
 src_install() {
