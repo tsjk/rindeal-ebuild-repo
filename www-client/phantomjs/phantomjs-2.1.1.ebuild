@@ -23,12 +23,11 @@ QT_MINIMAL=5.5
 # https://anonscm.debian.org/cgit/collab-maint/phantomjs.git/tree/debian
 RDEPEND="
 	$(add_qt_dep qtcore)
+	$(add_qt_dep qtgui)
+	$(add_qt_dep qtnetwork)
+	$(add_qt_dep qtprintsupport)
 	$(add_qt_dep qtwebkit)
 	$(add_qt_dep qtwidgets)
-	$(add_qt_dep qtprintsupport)
-	$(add_qt_dep qtnetwork)
-	$(add_qt_dep qtgui)
-	$(add_qt_dep qtcore)
 
 	dev-libs/icu:=
 	dev-libs/openssl:0
