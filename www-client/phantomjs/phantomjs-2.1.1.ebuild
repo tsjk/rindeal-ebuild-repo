@@ -16,7 +16,7 @@ LICENSE='BSD'
 SLOT='0'
 
 KEYWORDS='~amd64 ~arm ~x86'
-IUSE='test examples'
+IUSE='examples test'
 
 ## http://phantomjs.org/build.html - says pretty much nothing
 ## https://anonscm.debian.org/cgit/collab-maint/phantomjs.git/tree/debian
