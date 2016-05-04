@@ -7,7 +7,7 @@ EAPI=6
 PYTHON_COMPAT=( python2_7 )
 GH_REPO='ariya/phantomjs'
 
-inherit python-any-r1 multiprocessing pax-utils qmake-utils virtualx kde5-functions github
+inherit python-any-r1 multiprocessing pax-utils qmake-utils virtualx github
 
 DESCRIPTION='A headless WebKit scriptable with a JavaScript API'
 HOMEPAGE='http://phantomjs.org'
@@ -18,17 +18,15 @@ SLOT='0'
 KEYWORDS='~amd64 ~arm ~x86'
 IUSE='test examples'
 
-QT_MINIMAL=5.5
-
 ## http://phantomjs.org/build.html - says pretty much nothing
 ## https://anonscm.debian.org/cgit/collab-maint/phantomjs.git/tree/debian
 CDEPEND_A=( "${PYTHON_DEPS}"
-	"$(add_qt_dep qtcore)"
-	"$(add_qt_dep qtgui)"
-	"$(add_qt_dep qtnetwork)"
-	"$(add_qt_dep qtprintsupport)"
-	"$(add_qt_dep qtwebkit)"
-	"$(add_qt_dep qtwidgets)"
+	'>=dev-qt/qtcore-5.5:5'
+	'>=dev-qt/qtgui-5.5:5'
+	'>=dev-qt/qtnetwork-5.5:5'
+	'>=dev-qt/qtprintsupport-5.5:5'
+	'>=dev-qt/qtwebkit-5.5:5'
+	'>=dev-qt/qtwidgets-5.5:5'
 
 	'dev-libs/icu:='
 	'dev-libs/openssl:0'
