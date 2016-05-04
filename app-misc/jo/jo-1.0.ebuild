@@ -17,7 +17,7 @@ SLOT='0'
 KEYWORDS='~amd64 ~arm ~x86'
 
 src_prepare() {
-	eautoreconf
-
 	default
+
+	eautoreconf
 }
