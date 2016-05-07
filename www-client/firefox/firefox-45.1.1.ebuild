@@ -23,12 +23,12 @@ MOZ_PV="${PV}${ESR:+"esr"}"
 MOZ_P="${PN}-${MOZ_PV}"
 
 SLOT='0'
-SRC_URI="https://ftp.mozilla.org/pub/firefox/releases/${MOZ_PV}/source/${MOZ_P}.source.tar.xz"
+SRC_URI="https://archive.mozilla.org/pub/firefox/releases/${MOZ_PV}/source/${MOZ_P}.source.tar.xz"
 
 KEYWORDS='~amd64 ~arm ~x86'
 IUSE_A=(
 	## since v46 gtk3 is default
-	+gtk2 gtk3 -qt5
+	gtk2 +gtk3 -qt5
 
 	## ffmpeg is becoming default, TODO
 	+ffmpeg +gstreamer
@@ -89,7 +89,6 @@ CDEPEND_A=(
 	'sys-libs/zlib:0'
 	'virtual/libffi:0' # system-ffi
 
-	'x11-libs/cairo:0[X,xcb]' # system-cairo
 	'x11-libs/pixman:0' # system-pixman
 
 	'x11-libs/gdk-pixbuf:0'
@@ -129,6 +128,7 @@ CDEPEND_A=(
 	'rust? ( dev-lang/rust )'
 	'startup-notification? ( x11-libs/startup-notification:0 )'
 
+	'system-cairo? ( x11-libs/cairo:0[X,xcb] )'
 	'system-icu? ( dev-libs/icu:0 )'
 	'system-sqlite? ( >=dev-db/sqlite-3.9.1:3[secure-delete,debug=] )'
 
@@ -160,7 +160,7 @@ QA_PRESTRIPPED="usr/lib*/${PN}/firefox" # FIXME
 
 S="${WORKDIR}/${MOZ_P}"
 
-BUILD_OBJ_DIR="${S}/ff"
+BUILD_DIR="${S}/ff"
 
 # --------------------------------------------------------------------------------------------------
 
@@ -190,14 +190,22 @@ get-flag() {
 }
 
 # should be called in both pkg_pretend() and pkg_setup()
+# https://developer.mozilla.org/en-US/docs/Mozilla/Developer_guide/Build_Instructions/Linux_Prerequisites#Hardware
 my_check_reqs() {
-	is-flagq '-flto*' && ! is-flagq '-fno-lto' && CHECKREQS_MEMORY="6G"
+	CHECKREQS_MEMORY="2G"
+	CHECKREQS_DISK_BUILD="5G"
+
+	if is-flagq '-flto*' && ! is-flagq '-fno-lto' ; then
+		local lto=$(get-flag flto)
+		# TODO: for each lto process + 1G of MEMORY
+		CHECKREQS_MEMORY="4G"
+	fi
+
+	use debug && CHECKREQS_MEMORY="6GB"
 
 	# Ensure we have enough disk space to compile
 	if use pgo || use debug || use test ; then
 		: CHECKREQS_DISK_BUILD="9G" # FIXME
-	else
-		CHECKREQS_DISK_BUILD="5G"
 	fi
 
 	check-reqs_pkg_setup
@@ -329,11 +337,61 @@ my_mozconfig_use_with() {
 	my_mozconfig_options "$(my_use_cmt $1)" $(use_with "$@")
 }
 
-# FIXME: remove this func
+# TODO: remove this func
 my_mozconfig_use_extension() {
 	local ext="${2}"
 	my_mozconfig_options "$(my_use_cmt $1)" $(usex $1 --enable-extensions={,-}${ext})
 }
+
+# Display a table describing all configuration options paired with reasons.
+# It also serves as a dumb config checker.
+my_mozconfig_pretty_print() {
+	eshopts_push -s extglob
+
+	echo
+	printf -- '=%.0s' {1..100}	; echo
+	printf -- ' %.0s' {1..20}	; echo "Building ${PF} with the following configuration"
+	printf -- '-%.0s' {1..100}	; echo
+
+	local format="%-20s | %-50s # %s\n"
+	printf "${format}" \
+		' action' ' value' ' comment'
+	printf "${format}" \
+		"$(printf -- '-%.0s' {1..20})" "$(printf -- '-%.0s' {1..50})" "$(printf -- '-%.0s' {1..20})"
+
+	local line
+	while read line ; do
+		eval set -- "${line/\#/@}"
+		local action="$1" val="$2" at="$3"
+		local cmt=
+		[[ "${line}" == *\#* ]] && cmt="${line##*#*( )}"
+		: ${cmt:="default"}
+
+		if [ -n "${at}" ] && [ "${at}" != '@' ] ; then
+			die "error reading mozconfig: '${action}' '${val}' '${at}' '${cmt}'"
+		fi
+
+		printf "${format}" \
+			"${action}" "${val}" "${cmt}" || die
+	done < <( grep '^[^# ]' "${MOZCONFIG}" | sort )
+	printf -- '=%.0s' {1..100} ; echo
+	echo
+
+	eshopts_pop
+}
+
+my_default_pref() {
+	local name="$1" val="$2" cmt="$3"
+
+	if ! [[ "${val}" =~ ^(-?[0-9]+|true|false)$ ]] ; then
+		val="\""${val}\"""
+	fi
+
+	printf 'pref("%s", %s); // %s' \
+		"${name}" "${val}" "${cmt}" >>"${DEFAULT_PREFS_JS}" || die
+}
+
+# --------------------------------------------------------------------------------------------------
 
 my_src_configure-compiler() {
 	# -O* compiler flags are passed only via `--enable-optimize=` option
@@ -378,55 +436,6 @@ my_src_configure-compiler() {
 	fi
 }
 
-my_src_configure-fix_enable-extensions() {
-	# Resolve multiple --enable-extensions down to one
-	local exts=(
-		$(sed -n -r 's|^ac_add_options *--enable-extensions=([^ ]*).*|\1|p' -- "${MOZCONFIG}")
-	)
-	if [ ${#exts[@]} -gt 1 ] ; then
-		local joint="$(IFS=,; echo "${exts[*]}")"
-		echo "mozconfig: merging multiple extensions: '${joint}'"
-		sed -e '/^ac_add_options *--enable-extensions/d' \
-			-i -- "${MOZCONFIG}" || die
-		my_mozconfig_options "extensions" --enable-extensions="${joint}"
-	fi
-}
-
-# Display a table describing all configuration options paired with reasons.
-# It also serves as a dumb config checker.
-my_mozconfig_pretty_print() {
-	eshopts_push -s extglob
-
-	echo
-	printf -- '=%.0s' {1..100}	; echo
-	printf -- ' %.0s' {1..20}	; echo "Building ${PF} with the following configuration"
-	printf -- '-%.0s' {1..100}	; echo
-
-	local format="%-20s | %-50s # %s\n"
-	printf "${format}" \
-		'action' 'value' 'comment'
-	printf "${format}" \
-		"$(printf -- '-%.0s' {1..20})" "$(printf -- '-%.0s' {1..50})" "$(printf -- '-%.0s' {1..20})"
-
-	local line
-	while read line ; do
-		eval set -- "${line/\#/@}"
-		local action="$1" val="$2" at="$3"
-		local cmt="${line##*#*( )}"
-
-		if [ -n "${at}" ] && [ "${at}" != '@' ] ; then
-			die "error reading mozconfig: '${action}' '${val}' '${at}' '${cmt}'"
-		fi
-
-		printf "${format}" \
-			"${action}" "${val}" "${cmt:-"default"}" || die
-	done < <( grep '^[^# ]' "${MOZCONFIG}" | sort )
-	printf -- '=%.0s' {1..100} ; echo
-	echo
-
-	eshopts_pop
-}
-
 my_src_configure-choose_toolkit() {
 	local toolkit toolkit_comment
 
@@ -456,9 +465,13 @@ my_src_configure-choose_toolkit() {
 }
 
 my_src_configure-system_libs() {
+	local cmt='system libs'
+
 	# these are configured via pkg-config
-	options=( --with-system-{libevent,libvpx,nss} --enable-system-{cairo,ffi,hunspell,pixman} )
-	my_mozconfig_options 'system libs' "${options[@]}"
+	options=( --with-system-{libevent,libvpx,nss} --enable-system-{ffi,hunspell,pixman} )
+	my_mozconfig_options "${cmt}" "${options[@]}"
+
+	my_mozconfig_use_enable system-cairo
 
 	# requires SECURE_DELETE, THREADSAFE, ENABLE_FTS3, ENABLE_UNLOCK_NOTIFY, ENABLE_DBSTAT_VTAB
 	my_mozconfig_use_enable	system-sqlite
@@ -466,21 +479,21 @@ my_src_configure-system_libs() {
 	my_mozconfig_use_with system-icu icu
 
 	# zlib
-	my_mozconfig_options '' --with-system-zlib
-	my_mozconfig_action 'export' '' \
+	my_mozconfig_options "${cmt} - zlib" --with-system-zlib
+	my_mozconfig_action 'export' "${cmt} - zlib" \
 		MOZ_ZLIB_CFLAGS="$(pkg-config --cflags zlib)" MOZ_ZLIB_LIBS="$(pkg-config --libs zlib)"
 
 	# bz2
-	my_mozconfig_options '' --with-system-bz2="${EROOT}usr"
+	my_mozconfig_options "${cmt} - BZIP2" --with-system-bz2="${EROOT}usr"
 
 	# jpeg
-	my_mozconfig_options '' --with-system-jpeg="${EROOT}usr"
+	my_mozconfig_options "${cmt} - JPEG" --with-system-jpeg="${EROOT}usr"
 
 	# png
-	my_mozconfig_options '' --with-system-png="${EROOT}usr"
+	my_mozconfig_options "${cmt} - PNG" --with-system-png="${EROOT}usr"
 
 	# nspr (--with-system-nspr is deprecated)
-	my_mozconfig_options 'NSPR' \
+	my_mozconfig_options "${cmt} - NSPR" \
 		--with-nspr-cflags="'$(pkg-config --cflags nspr)'" --with-nspr-libs="'$(pkg-config --libs nspr)'"
 }
 
@@ -511,15 +524,18 @@ my_src_configure-keyfiles() {
 	# --with-gcm-senderid-keyfile	# android only
 }
 
-my_default_pref() {
-	local name="$1" val="$2" cmt="$3"
-
-	if ! [[ "${val}" =~ ^(-?[0-9]+|true|false)$ ]] ; then
-		val="\""${val}\"""
+my_src_configure-fix_enable-extensions() {
+	# Resolve multiple --enable-extensions down to one
+	local exts=(
+		$(sed -n -r 's|^ac_add_options *--enable-extensions=([^ ]*).*|\1|p' -- "${MOZCONFIG}")
+	)
+	if [ ${#exts[@]} -gt 1 ] ; then
+		local joint="$(IFS=,; echo "${exts[*]}")"
+		echo "mozconfig: merging multiple extensions: '${joint}'"
+		sed -e '/^ac_add_options *--enable-extensions/d' \
+			-i -- "${MOZCONFIG}" || die
+		my_mozconfig_options "extensions" --enable-extensions="${joint}"
 	fi
-
-	printf 'pref("%s", %s); // %s' \
-		"${name}" "${val}" "${cmt}" >>"${DEFAULT_PREFS_JS}" || die
 }
 
 src_configure() {
@@ -532,12 +548,12 @@ src_configure() {
 	##
 	# mozconfig
 	##
-	export MOZCONFIG="${S}/.mozconfig"
-
-	# Setup the initial mozconfig
-	cp -v 'browser/config/mozconfig' "${MOZCONFIG}" || die
+	export MOZCONFIG="${S}/mozconfig"
+	touch "${MOZCONFIG}" || die
 
 	local options # mozconfig options array
+
+	my_mozconfig_options '' --enable-application=browser
 
 	## setup dirs
 	options=(
@@ -549,7 +565,7 @@ src_configure() {
 		--with-default-mozilla-five-home="'${MOZILLA_FIVE_HOME}'"
 	)
 	my_mozconfig_options 'paths' "${options[@]}"
-	my_mozconfig_action 'mk_add_options' '' MOZ_OBJDIR="'${BUILD_OBJ_DIR}'" # FIXME
+	my_mozconfig_action 'mk_add_options' '' MOZ_OBJDIR="'${BUILD_DIR}'"
 
 	## setup compiler
 	my_src_configure-compiler
@@ -619,7 +635,7 @@ src_configure() {
 	my_mozconfig_use_enable alsa
 	my_mozconfig_use_enable pulseaudio
 	# these are forced-on for webm support FIXME: really?
-	my_mozconfig_options 'required for webm' --enable-{ogg,wave}
+	my_mozconfig_options 'required for webm' --enable-{ogg,wave} # FIXME: requires ALSA (https://developer.mozilla.org/en-US/docs/Mozilla/Developer_guide/Build_Instructions/ALSA)
 
 	## video
 	my_mozconfig_use_enable ffmpeg
@@ -639,7 +655,7 @@ src_configure() {
 	## privacy
 	my_mozconfig_use_enable safe-browsing # privacy
 	my_mozconfig_use_enable safe-browsing url-classifier
-	my_mozconfig_action 'export' 'telemetry' MOZ_TELEMETRY_REPORTING="$(usex telemetry 0 1)"
+	my_mozconfig_action 'export' "$(my_use_cmt telemetry)" MOZ_TELEMETRY_REPORTING="$(usex telemetry 1 0)"
 
 	# positioning
 	# --enable-approximate-location
