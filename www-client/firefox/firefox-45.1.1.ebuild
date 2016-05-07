@@ -22,13 +22,14 @@ SRC_URI="https://ftp.mozilla.org/pub/firefox/releases/${MOZ_PV}/source/${MOZ_P}.
 
 KEYWORDS='~amd64 ~arm ~x86'
 IUSE_A=(
-	bindist custom-{cflags,optimization} dbus debug ffmpeg +gstreamer gtk3 +jemalloc3 jit neon pgo
-	-qt5 pulseaudio startup-notification
+	accessibility alsa bindist custom-{cflags,optimization} dbus debug ffmpeg gssapi +gstreamer
+	gtk2 +gtk3 +jemalloc3 jit libproxy neon pgo
+	-qt5 pulseaudio safe-browsing startup-notification
 	system-{cairo,harfbuzz,icu,jpeg,libevent,sqlite,libvpx}
 	test wifi )
 REQUIRED_USE_A=(
 	'system-harfbuzz? ( system-icu )'
-	'?? ( gtk3 qt5 )'
+	'^^ ( gtk2 gtk3 qt5 )'
 	'wifi? ( dbus )'
 )
 IUSE="${IUSE_A[*]}"
@@ -38,22 +39,34 @@ RESTRICT+='!bindist? ( bindist )'
 asm_depend="dev-lang/yasm:0"
 
 CDEPEND_A=(
-	'app-text/hunspell:0'
-	'dev-libs/atk:0'
+	'app-arch/bzip2:0' # system-bz2
+	'app-text/hunspell:0' # system-hunspell
+
+	# perl # needed for win32 SDK checks
+
+	'accessibility? ( dev-libs/atk:0 )' # MOZ_ACCESSIBILITY_ATK
 	'dev-libs/expat:0'
 	'dev-libs/glib:2'
+	'=dev-libs/libevent-2.0*:0=' # system-libevent
 	'>=dev-libs/nss-3.21.1:0'
 	'>=dev-libs/nspr-4.12:0'
 
-	'media-libs/libpng:0=[apng]'
-	'media-libs/mesa:0'
+	'>=media-gfx/graphite2-1.3.8' # FIXME: check necessity
+
 	'media-libs/fontconfig:0'
 	'media-libs/freetype:2'
+	'>=media-libs/harfbuzz-1.1.3:0=[graphite,icu]' # FIXME: check necessity
+	'media-libs/libjpeg-turbo:0' # system-jpeg
+	'>=media-libs/libvpx-1.5.0:0=[postproc]' # system-libvpx; this is often bumped
+	'media-libs/libpng:0=[apng]'
+	'media-libs/mesa:0'
 
 	'sys-libs/zlib:0'
-	'virtual/libffi:0'
+	'virtual/libffi:0' # system-ffi
 
-	'x11-libs/cairo:0[X]' # FIXME: is this required for `!system-cairo`?
+	'x11-libs/cairo:0[X,xcb]' # system-cairo
+	'x11-libs/pixman:0' # system-pixman
+
 	'x11-libs/gdk-pixbuf'
 	'x11-libs/libX11:0'
 	'x11-libs/libXcomposite:0'
@@ -76,8 +89,10 @@ CDEPEND_A=(
 		'media-libs/gst-plugins-good:1.0'
 		'media-plugins/gst-plugins-libav:1.0'
 	')'
+	'gtk2? ( x11-libs/gtk+:2 )'
 	'gtk3? ( x11-libs/gtk+:3 )'
-	'!gtk3? ( x11-libs/gtk+:2 )'
+	'icu? ( dev-libs/icu:= )'
+	'libproxy? ( net-libs/libproxy:0 )'
 	'qt5? ('
 		'dev-qt/qtcore:5='
 		'dev-qt/qtgui:5='
@@ -89,24 +104,9 @@ CDEPEND_A=(
 	')'
 	'startup-notification? ( x11-libs/startup-notification:0 )'
 
-	'system-cairo? ('
-		'x11-libs/cairo:0[X,xcb]'
-		'x11-libs/pixman:0'
-	')'
-	'system-icu? ( dev-libs/icu:= )'
-	'system-jpeg? ( media-libs/libjpeg-turbo:0 )'
-	'system-libevent? ( =dev-libs/libevent-2.0*:0= )'
-	'system-libvpx? ( >=media-libs/libvpx-1.5.0:0=[postproc] )' # this is often bumped
 	'system-sqlite? ( >=dev-db/sqlite-3.9.1:3[secure-delete,debug=] )'
-	'system-harfbuzz? ('
-		'>=media-libs/harfbuzz-1.1.3:0=[graphite,icu]'
-		'>=media-gfx/graphite2-1.3.8'
-	')'
-	'wifi? ('
-		'sys-apps/dbus:0'
-		'dev-libs/dbus-glib:0'
-		'net-misc/networkmanager:0'
-	')'
+
+	'wifi? ( net-misc/networkmanager:0 )'
 )
 DEPEND_A=( "${CDEPEND_A[@]}"
 	'app-arch/zip'
@@ -239,35 +239,34 @@ my_mozconfig_action() {
 	done
 }
 
-my_mozconfig_add_options() {
+my_mozconfig_options() {
 	my_mozconfig_action 'ac_add_options' "$@"
 }
 
-_my_use_cmt() {
+my_use_cmt() {
 	echo "USE=$(usex $1 '' '!')$1"
 }
 
 my_mozconfig_use_enable() {
-	my_mozconfig_add_options "$(_my_use_cmt $1)" $(use_enable "$@")
+	my_mozconfig_options "$(my_use_cmt $1)" $(use_enable "$@")
 }
 
 my_mozconfig_use_with() {
-	my_mozconfig_add_options "$(_my_use_cmt $1)" $(use_with "$@")
+	my_mozconfig_options "$(my_use_cmt $1)" $(use_with "$@")
 }
 
 my_mozconfig_use_extension() {
 	local ext="${2}"
-	my_mozconfig_add_options "$(_my_use_cmt $1)" $(usex $1 --enable-extensions={,-}${ext})
+	my_mozconfig_options "$(my_use_cmt $1)" $(usex $1 --enable-extensions={,-}${ext})
 }
 
-
-my_src_configure-fix_flags() {
+my_src_configure-compiler() {
 	# -O* compiler flags are passed only via `--enable-optimize=` option
 	local o="$(get-flag '-O*')"
 	if use custom-optimization && [ -n "${o}" ] ; then
-		my_mozconfig_add_options 'from *FLAGS' --enable-optimize="${o}"
+		my_mozconfig_options 'from *FLAGS' --enable-optimize="${o}"
 	else
-		my_mozconfig_add_options 'mozilla default' --enable-optimize
+		my_mozconfig_options 'mozilla default' --enable-optimize
 	fi
 	filter-flags '-O*'
 
@@ -276,6 +275,23 @@ my_src_configure-fix_flags() {
 
 	# We want rpath support to prevent unneeded hacks on different libc variants
 	append-ldflags -Wl,-rpath="${MOZILLA_FIVE_HOME}"
+
+	# ---------------------
+
+	my_mozconfig_options 'disable pedantic' --disable-pedantic
+	options=( --disable-{install-strip,strip,strip-libs} )
+	my_mozconfig_options 'disable stripping' "${options[@]}"
+
+	# Currently --enable-elf-dynstr-gc only works for x86,
+	# thanks to Jason Wever <weeve@gentoo.org> for the fix.
+	if use x86 && [ "$(get-flags '-O*')" != '-O0' ] ; then
+		my_mozconfig_options "${ARCH} optimized build" --enable-elf-dynstr-gc
+	fi
+
+	if use debug ; then
+		options=( --enable-{debug,profiling} --enable-{address,memory,thread}-sanitizer )
+		my_mozconfig_options 'debug' "${options[@]}"
+	fi
 }
 
 my_src_configure-fix_enable-extensions() {
@@ -287,7 +303,7 @@ my_src_configure-fix_enable-extensions() {
 		local joint="$(IFS=,; echo "${exts[*]}")"
 		echo "mozconfig: merging multiple extensions: '${joint}'"
 		sed -e '/^ac_add_options *--enable-extensions/d' -i -- "${mozconfig}" || die
-		my_mozconfig_add_options "extensions" --enable-extensions="${joint}"
+		my_mozconfig_options "extensions" --enable-extensions="${joint}"
 	fi
 }
 
@@ -315,30 +331,63 @@ my_src_configure-dump_config() {
 }
 
 my_src_configure-choose_toolkit() {
-	# default toolkit is cairo-gtk2, optional use flags can change this
-	local toolkit="cairo-gtk2"
-	local toolkit_comment=""
-	if use gtk3 ; then
+	local toolkit toolkit_comment
+
+	if use gtk2 ; then
+		toolkit="cairo-gtk2"
+		toolkit_comment="$(my_use_cmt gtk2)"
+	elif use gtk3 ; then
 		toolkit="cairo-gtk3"
-		toolkit_comment="gtk3 use flag"
-	fi
-	if use qt5 ; then
+		toolkit_comment="$(my_use_cmt gtk3)"
+	elif use qt5 ; then
 		toolkit="cairo-qt"
-		toolkit_comment="qt5 use flag"
+		toolkit_comment="$(my_use_cmt qt5)"
 		# need to specify these vars because the qt5 versions are not found otherwise,
 		# and setting --with-qtdir overrides the pkg-config include dirs
 		local t
 		for t in qmake moc rcc ; do
-			my_mozconfig_export '' HOST_${t^^}="'$(qt5_get_bindir)/${t}'"
+			my_mozconfig 'export' '' HOST_${t^^}="'$(qt5_get_bindir)/${t}'"
 		done
-		echo 'unset QTDIR' >>"${mozconfig}" || die
-		my_mozconfig_add_options '+qt5' --disable-gio
+		my_mozconfig_action 'unset' "${toolkit_comment}" 'QTDIR'
+		my_mozconfig_options "${toolkit_comment}" --disable-gio
 	fi
-	my_mozconfig_add_options "${toolkit_comment}" --enable-default-toolkit=${toolkit}
+	my_mozconfig_options "${toolkit_comment}" --enable-default-toolkit="${toolkit}"
+}
+
+my_src_configure-config_system_libs() {
+	# these are configured via pkg-config
+	options=( --with-system-{libevent,libvpx,nss} --enable-system-{cairo,ffi,hunspell,pixman} )
+	my_mozconfig_options 'system libs' "${options[@]}"
+
+	# requires SECURE_DELETE, THREADSAFE, ENABLE_FTS3, ENABLE_UNLOCK_NOTIFY, ENABLE_DBSTAT_VTAB
+	my_mozconfig_use_enable	system-sqlite
+
+	my_mozconfig_use_with icu system-icu
+	my_mozconfig_options 'ECMAScript Internationalization API' --with-intl-api
+
+	# zlib
+	my_mozconfig_options '' --with-system-zlib
+	my_mozconfig_action 'export' '' \
+		MOZ_ZLIB_CFLAGS="$(pkg-config --cflags zlib)" MOZ_ZLIB_LIBS="$(pkg-config --libs zlib)"
+
+	# bz2
+	my_mozconfig_options '' --with-system-bz2="${EROOT}usr"
+
+	# jpeg
+	my_mozconfig_options '' --with-system-jpeg="${EROOT}usr"
+
+	# png
+	my_mozconfig_options '' --with-system-png="${EROOT}usr"
+
+	# nspr (--with-system-nspr is deprecated)
+	my_mozconfig_options 'NSPR' \
+		--with-nspr-cflags="$(pkg-config --cflags nspr)" --with-nspr-libs="$(pkg-config --libs nspr)"
+
+
 }
 
 src_configure() {
-	# get_libdir() is defined only since configure phase
+	# get_libdir() is defined only since configure phase, so do not put this in global space
 	MOZILLA_FIVE_HOME="${EROOT}usr/$(get_libdir)/${PN}" # --with-default-mozilla-five-home=
 
 	##
@@ -349,116 +398,143 @@ src_configure() {
 	# Setup the initial `.mozconfig`.
 	cp -v 'browser/config/mozconfig' "${mozconfig}" || die
 
-	# disable telemetry
-	my_mozconfig_export '' MOZ_TELEMETRY_REPORTING='0'
-
-	my_src_configure-fix_flags
-
 	local options # mozconfig options array
 
-	my_mozconfig_add_options 'disable pedantic' --disable-pedantic
+	## setup dirs
+	options=(
+		--prefix="${EROOT}usr"
+		--libdir="${EROOT}usr/$(get_libdir)"
+		--x-includes="${EROOT}usr/include" --x-libraries="${EROOT}usr/$(get_libdir)"
+		--with-nspr-prefix="${EROOT}usr" --with-nss-prefix="${EROOT}usr"
+		--with-qtdir="$(qt5_get_dir)" )
+	my_mozconfig_options 'paths' "${options[@]}"
 
-	options=( --disable-{installer,updater} )
-	my_mozconfig_add_options 'disable installer/updater' "${options[@]}"
+	## setup compiler
+	my_src_configure-compiler
 
-	options=( --disable-{install-strip,strip,strip-libs} )
-	my_mozconfig_add_options 'disable stripping' "${options[@]}"
-
-	# Currently --enable-elf-dynstr-gc only works for x86,
-	# thanks to Jason Wever <weeve@gentoo.org> for the fix.
-	if use x86 && [ "$(get-flags '-O*')" != '-O0' ] ; then
-		my_mozconfig_add_options "${ARCH} optimized build" --enable-elf-dynstr-gc
-	fi
-
-	## system
-	options=( --enable-{pango,svg} --with-system-{bz2,nspr,nss,png,zlib} --enable-system-{ffi,hunspell} )
-	my_mozconfig_add_options 'system libs' "${options[@]}"
-	my_mozconfig_use_enable	system-cairo
-	my_mozconfig_use_with	system-harfbuzz
-	my_mozconfig_use_with	system-harfbuzz system-graphite2
-	my_mozconfig_use_with	system-icu
-	my_mozconfig_use_with	system-jpeg
-	my_mozconfig_use_with	system-libvpx
-	my_mozconfig_use_enable	system-sqlite
+	my_mozconfig_options '' --enable-release
 
 	## bindist
 	my_mozconfig_use_enable !bindist official-branding
 	my_mozconfig_use_with bindist branding 'browser/branding/aurora'
 
-	# '--enable-build-backend=FasterMake'
-	# '--enable-release'
-	# --enable-rust
-	# '--with-x'
-
-	if use debug ; then
-		options=( --enable-{debug,profiling} --enable-{address,memory,thread}-sanitizer )
-		my_mozconfig_add_options 'debug' "${options[@]}"
-	fi
 	# my_mozconfig_use_enable debug debug-symbols
 	my_mozconfig_use_enable test tests
 
-	# TODO: what is this?
-	my_mozconfig_use_enable startup-notification
+	options=( --disable-{installer,updater} )
+	my_mozconfig_options 'disable installer/updater' "${options[@]}"
+	my_mozconfig_options 'no crash reporter' --disable-crashreporter # FIXME: can be optional?
 
-	my_mozconfig_use_enable dbus
-	my_mozconfig_use_enable wifi necko-wifi
-
-	# these are forced-on for webm support
-	my_mozconfig_add_options 'required' --enable-{ogg,wave}
+	my_mozconfig_options 'Create a shared JavaScript library' --enable-shared-js
 
 	my_mozconfig_use_enable jit ion
 
-	# setup dirs
-	options=( --x-includes="${EPREFIX}/usr/include" --x-libraries="${EPREFIX}/usr/$(get_libdir)"
-        --with-nspr-prefix="${EPREFIX}/usr" --with-nss-prefix="${EPREFIX}/usr"
-        --prefix="${EPREFIX}/usr"
-        --libdir="${EPREFIX}/usr/$(get_libdir)" )
-	my_mozconfig_add_options '' --{build,target}=${CTARGET:-${CHOST}} # FIXME: is this necessary
-	my_mozconfig_export ''  PKG_CONFIG_LIBDIR="" # FIXME
+	## system
+	my_src_configure-config_system_libs
 
-	my_mozconfig_add_options '' "${options[@]}"
-	my_mozconfig_use_with {,}system-libevent "${EPREFIX}/usr"
-	my_mozconfig_add_options '' --disable-gnomeui
-	my_mozconfig_add_options '' --enable-gio
-	my_mozconfig_add_options 'no crash reporter' --disable-crashreporter # FIXME: can be optional?
-	my_mozconfig_add_options 'Gentoo default' --disable-skia
-	my_mozconfig_add_options '' --disable-gconf
-	my_mozconfig_add_options '' --with-intl-api
+
+	# '--enable-build-backend=FasterMake'
+	# --enable-rust
+	# --disable-startupcache
+	# --disable-mozril-geoloc
+	# --enable-xterm-updates
+	# --disable-synth-speechd
+	# --disable-websms-backend
+	# --disable-webrtc
+	# --enable-hardware-aec-ns
+	# --disable-webspeech
+	# --disable-webspeechtestbackend
+	# --enable-raw
+	# --disable-gamepad
+	# --enable-tree-freetype
+	# --disable-webapp-runtime
+	# --enable-bundled-fonts
+	# --enable-verify-mar
+	# --enable-signmar
+	# --disable-parental-controls
+
+	my_mozconfig_use_enable content-sandbox
+
+	my_mozconfig_use_enable accessibility
+
+	## audio
+	my_mozconfig_use_enable alsa
+	my_mozconfig_use_enable pulseaudio
+	# these are forced-on for webm support FIXME: really?
+	my_mozconfig_options 'required for webm' --enable-{ogg,wave}
+
+	## desktop integration
+	my_mozconfig_use_enable startup-notification # TODO: what is this?
+	my_mozconfig_use_enable dbus
+
+	## privacy
+	my_mozconfig_use_enable safe-browsing # privacy
+	my_mozconfig_use_enable safe-browsing url-classifier
+	my_mozconfig 'export' 'no telemetry' MOZ_TELEMETRY_REPORTING='0' # TODO: make it optional
+
+	# positioning
+	# --enable-approximate-location
+	my_mozconfig_use_enable wifi necko-wifi # positioning wifi scanner
+
+
+
+	my_mozconfig_options '' --{build,target}=${CTARGET:-${CHOST}} # FIXME: is this necessary
+	my_mozconfig 'export' ''  PKG_CONFIG_LIBDIR="" # FIXME
+
+	my_mozconfig_options '' --disable-gnomeui
+	my_mozconfig_options '' --enable-gio
+	my_mozconfig_options '' --disable-gconf
+
+	# my_mozconfig_options 'Gentoo default' --disable-skia # FIXME: use or not?
+	# --disable-skia-gpu
+
+	my_mozconfig_use_enable libproxy
+
+	my_mozconfig_use_enable gssapi negotiateauth
 
 	my_src_configure-choose_toolkit
 
 	if use jemalloc3 ; then
 		# We must force-enable jemalloc 3 via .mozconfig
-		echo "export MOZ_JEMALLOC3=1" >>"${mozconfig}" || die
-		my_mozconfig_add_options 'jemalloc' --enable-jemalloc --enable-replace-malloc
+		my_mozconfig 'export' '' MOZ_JEMALLOC3='1'
+		my_mozconfig_options 'jemalloc' --enable-jemalloc --enable-replace-malloc
 	fi
 
 	my_mozconfig_use_enable ffmpeg
 	if use gstreamer ; then
-		# TODO
+		# FIXME: isn't ffmpeg default now?
 		use ffmpeg && einfo "${PN} will not use ffmpeg unless gstreamer:1.0 is not available at runtime"
-		my_mozconfig_add_options '+gstreamer' --enable-gstreamer=1.0
+		my_mozconfig_options '+gstreamer' --enable-gstreamer=1.0
 	else
-		my_mozconfig_add_options '' --disable-gstreamer
+		my_mozconfig_options '' --disable-gstreamer
 	fi
 
-	my_mozconfig_use_enable pulseaudio
+	## arch specific options (keep this at the end to allow overrides)
 
 	# Modifications to better support ARM, bug 553364
 	if use neon ; then
-		my_mozconfig_add_options '' --with-fpu=neon
-		my_mozconfig_add_options '' --with-thumb=yes
-		my_mozconfig_add_options '' --with-thumb-interwork=no
+		my_mozconfig_options '' --with-fpu=neon
+		my_mozconfig_options '' --with-thumb=yes
+		my_mozconfig_options '' --with-thumb-interwork=no
 	fi
 	if [[ ${CHOST} == armv* ]] ; then
-		my_mozconfig_add_options '' --with-float-abi=hard
-		my_mozconfig_add_options '' --enable-skia
+		my_mozconfig_options '' --with-float-abi=hard
+		my_mozconfig_options '' --enable-skia
 
 		if ! use system-libvpx ; then
 			sed -e "s|softfp|hard|" \
 				-i  -- "${S}/media/libvpx/moz.build" || die
 		fi
 	fi
+
+	# --with-mozilla-api-keyfile
+	# --with-google-api-keyfile
+	# --with-google-oauth-api-keyfile
+	# --with-bing-api-keyfile
+	# --with-adjust-sdk-keyfile
+	# --with-gcm-senderid-keyfile
+
+	my_mozconfig_use_enable cups printing
 
 	my_src_configure-fix_enable-extensions
 
@@ -481,7 +557,7 @@ mozconfig_install_prefs() {
 	einfo "Adding prefs from mozconfig to ${prefs_file}"
 
 	# set dictionary path, to use system hunspell
-	echo "pref(\"spellchecker.dictionary_path\", \"${EPREFIX}/usr/share/myspell\");" \
+	echo "pref(\"spellchecker.dictionary_path\", \"${EROOT}usr/share/myspell\");" \
 		>>"${prefs_file}" || die
 
 	# force the graphite pref if system-harfbuzz is enabled, since the pref cant disable it
