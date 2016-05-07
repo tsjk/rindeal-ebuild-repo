@@ -22,11 +22,11 @@ SRC_URI="https://ftp.mozilla.org/pub/firefox/releases/${MOZ_PV}/source/${MOZ_P}.
 
 KEYWORDS='~amd64 ~arm ~x86'
 IUSE_A=(
-	accessibility alsa bindist custom-{cflags,optimization} dbus debug ffmpeg gssapi +gstreamer
+	accessibility +alsa bindist custom-{cflags,optimization} dbus debug +ffmpeg gssapi +gstreamer
 	gtk2 +gtk3 +jemalloc3 jit libproxy neon pgo
-	-qt5 pulseaudio safe-browsing startup-notification
+	-qt5 pulseaudio +safe-browsing startup-notification
 	system-{cairo,harfbuzz,icu,jpeg,libevent,sqlite,libvpx}
-	test wifi )
+	-telemetry test wifi )
 REQUIRED_USE_A=(
 	'system-harfbuzz? ( system-icu )'
 	'^^ ( gtk2 gtk3 qt5 )'
@@ -86,8 +86,8 @@ CDEPEND_A=(
 	'gstreamer? ('
 		'media-libs/gstreamer:1.0'
 		'media-libs/gst-plugins-base:1.0'
-		'media-libs/gst-plugins-good:1.0'
-		'media-plugins/gst-plugins-libav:1.0'
+		# 'media-libs/gst-plugins-good:1.0'
+		# 'media-plugins/gst-plugins-libav:1.0'
 	')'
 	'gtk2? ( x11-libs/gtk+:2 )'
 	'gtk3? ( x11-libs/gtk+:3 )'
@@ -292,6 +292,8 @@ my_src_configure-compiler() {
 		options=( --enable-{debug,profiling} --enable-{address,memory,thread}-sanitizer )
 		my_mozconfig_options 'debug' "${options[@]}"
 	fi
+
+	my_mozconfig_options '' --{build,target}=${CTARGET:-${CHOST}} # FIXME: is this necessary
 }
 
 my_src_configure-fix_enable-extensions() {
@@ -313,21 +315,27 @@ my_src_configure-fix_enable-extensions() {
 # with reasons, then clean up extensions list.
 # This should be called in src_configure at the end of all other mozconfig_* functions.
 my_src_configure-dump_config() {
-	echo
+	echo ''
 	echo "=========================================================="
 	echo "Building ${PF} with the following configuration"
 	echo "----------------------------------------------------------"
-	local ac opt hash cmt
-	while read ac opt hash cmt ; do
+
+	local format="%-10s | %-30s # %s\n"
+	printf "${format}"
+		'action' 'value' 'comment'
+	printf "${format}" \
+		'---' '---' '---'
+
+	local action val hash cmt
+	while read action val hash cmt ; do
 		if [ -n "${hash}" ] && [ "${hash}" != '#' ] ; then
-			die "error reading mozconfig: '${ac}' '${opt}' '${hash}' '${reason}'"
+			die "error reading mozconfig: '${action}' '${val}' '${hash}' '${cmt}'"
 		fi
-		printf "  %-30s | %s\n" \
-			"${opt}" "${cmt:-"mozilla.org default"}" || die
-	done < <( grep '^ac_add_options' "${mozconfig}" | sort )
+		printf "${format}" \
+			"${action}" "${val}" "${cmt:-"default"}" || die
+	done < <( grep '^[^# ]' "${mozconfig}" | sort )
 	echo "=========================================================="
-	echo
-	# TODO: also dump exports
+	echo ''
 }
 
 my_src_configure-choose_toolkit() {
@@ -340,13 +348,16 @@ my_src_configure-choose_toolkit() {
 		toolkit="cairo-gtk3"
 		toolkit_comment="$(my_use_cmt gtk3)"
 	elif use qt5 ; then
+		elog "Warning: Qt5 GUI toolkit is buggy (USE=qt5)"
+
 		toolkit="cairo-qt"
 		toolkit_comment="$(my_use_cmt qt5)"
+
 		# need to specify these vars because the qt5 versions are not found otherwise,
 		# and setting --with-qtdir overrides the pkg-config include dirs
 		local t
 		for t in qmake moc rcc ; do
-			my_mozconfig 'export' '' HOST_${t^^}="'$(qt5_get_bindir)/${t}'"
+			my_mozconfig_action 'export' '' HOST_${t^^}="'$(qt5_get_bindir)/${t}'"
 		done
 		my_mozconfig_action 'unset' "${toolkit_comment}" 'QTDIR'
 		my_mozconfig_options "${toolkit_comment}" --disable-gio
@@ -354,7 +365,7 @@ my_src_configure-choose_toolkit() {
 	my_mozconfig_options "${toolkit_comment}" --enable-default-toolkit="${toolkit}"
 }
 
-my_src_configure-config_system_libs() {
+my_src_configure-system_libs() {
 	# these are configured via pkg-config
 	options=( --with-system-{libevent,libvpx,nss} --enable-system-{cairo,ffi,hunspell,pixman} )
 	my_mozconfig_options 'system libs' "${options[@]}"
@@ -363,7 +374,6 @@ my_src_configure-config_system_libs() {
 	my_mozconfig_use_enable	system-sqlite
 
 	my_mozconfig_use_with icu system-icu
-	my_mozconfig_options 'ECMAScript Internationalization API' --with-intl-api
 
 	# zlib
 	my_mozconfig_options '' --with-system-zlib
@@ -382,8 +392,6 @@ my_src_configure-config_system_libs() {
 	# nspr (--with-system-nspr is deprecated)
 	my_mozconfig_options 'NSPR' \
 		--with-nspr-cflags="$(pkg-config --cflags nspr)" --with-nspr-libs="$(pkg-config --libs nspr)"
-
-
 }
 
 src_configure() {
@@ -408,6 +416,7 @@ src_configure() {
 		--with-nspr-prefix="${EROOT}usr" --with-nss-prefix="${EROOT}usr"
 		--with-qtdir="$(qt5_get_dir)" )
 	my_mozconfig_options 'paths' "${options[@]}"
+	my_mozconfig_action 'export' ''  PKG_CONFIG_LIBDIR="" # FIXME
 
 	## setup compiler
 	my_src_configure-compiler
@@ -427,11 +436,18 @@ src_configure() {
 
 	my_mozconfig_options 'Create a shared JavaScript library' --enable-shared-js
 
+	if use jemalloc3 ; then
+		# We must force-enable jemalloc 3 via .mozconfig
+		my_mozconfig_action 'export' '' MOZ_JEMALLOC3='1'
+		my_mozconfig_options 'jemalloc' --enable-jemalloc --enable-replace-malloc
+	fi
+
 	my_mozconfig_use_enable jit ion
 
-	## system
-	my_src_configure-config_system_libs
+	my_src_configure-choose_toolkit
 
+	## system libs
+	my_src_configure-system_libs
 
 	# '--enable-build-backend=FasterMake'
 	# --enable-rust
@@ -456,12 +472,23 @@ src_configure() {
 	my_mozconfig_use_enable content-sandbox
 
 	my_mozconfig_use_enable accessibility
+	my_mozconfig_options 'ECMAScript Internationalization API' --with-intl-api
 
 	## audio
 	my_mozconfig_use_enable alsa
 	my_mozconfig_use_enable pulseaudio
 	# these are forced-on for webm support FIXME: really?
 	my_mozconfig_options 'required for webm' --enable-{ogg,wave}
+
+	## video
+	my_mozconfig_use_enable ffmpeg
+	if use gstreamer ; then
+		# FIXME: isn't ffmpeg default now?
+		use ffmpeg && einfo "${PN} will not use ffmpeg unless gstreamer:1.0 is not available at runtime"
+		my_mozconfig_options "$(my_use_cmt gstreamer)" --enable-gstreamer=1.0
+	else
+		my_mozconfig_options "$(my_use_cmt gstreamer)" --disable-gstreamer
+	fi
 
 	## desktop integration
 	my_mozconfig_use_enable startup-notification # TODO: what is this?
@@ -470,17 +497,13 @@ src_configure() {
 	## privacy
 	my_mozconfig_use_enable safe-browsing # privacy
 	my_mozconfig_use_enable safe-browsing url-classifier
-	my_mozconfig 'export' 'no telemetry' MOZ_TELEMETRY_REPORTING='0' # TODO: make it optional
+	my_mozconfig_action 'export' 'telemetry' MOZ_TELEMETRY_REPORTING="$(usex telemetry 0 1)"
 
 	# positioning
 	# --enable-approximate-location
 	my_mozconfig_use_enable wifi necko-wifi # positioning wifi scanner
 
-
-
-	my_mozconfig_options '' --{build,target}=${CTARGET:-${CHOST}} # FIXME: is this necessary
-	my_mozconfig 'export' ''  PKG_CONFIG_LIBDIR="" # FIXME
-
+	## Gnome
 	my_mozconfig_options '' --disable-gnomeui
 	my_mozconfig_options '' --enable-gio
 	my_mozconfig_options '' --disable-gconf
@@ -488,26 +511,11 @@ src_configure() {
 	# my_mozconfig_options 'Gentoo default' --disable-skia # FIXME: use or not?
 	# --disable-skia-gpu
 
+	## networking
 	my_mozconfig_use_enable libproxy
-
 	my_mozconfig_use_enable gssapi negotiateauth
 
-	my_src_configure-choose_toolkit
-
-	if use jemalloc3 ; then
-		# We must force-enable jemalloc 3 via .mozconfig
-		my_mozconfig 'export' '' MOZ_JEMALLOC3='1'
-		my_mozconfig_options 'jemalloc' --enable-jemalloc --enable-replace-malloc
-	fi
-
-	my_mozconfig_use_enable ffmpeg
-	if use gstreamer ; then
-		# FIXME: isn't ffmpeg default now?
-		use ffmpeg && einfo "${PN} will not use ffmpeg unless gstreamer:1.0 is not available at runtime"
-		my_mozconfig_options '+gstreamer' --enable-gstreamer=1.0
-	else
-		my_mozconfig_options '' --disable-gstreamer
-	fi
+	my_mozconfig_use_enable cups printing
 
 	## arch specific options (keep this at the end to allow overrides)
 
@@ -534,9 +542,7 @@ src_configure() {
 	# --with-adjust-sdk-keyfile
 	# --with-gcm-senderid-keyfile
 
-	my_mozconfig_use_enable cups printing
-
-	my_src_configure-fix_enable-extensions
+	my_src_configure-fix_enable-extensions # FIXME: make this unnecessary
 
 	my_src_configure-dump_config
 
