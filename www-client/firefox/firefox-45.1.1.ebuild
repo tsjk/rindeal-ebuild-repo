@@ -133,7 +133,7 @@ S="${WORKDIR}/${MOZ_P}"
 
 # override flaky upstream function
 get-flag() {
-	local var findflag="-${1#-}" findflag_orig="${1}"
+	local var findflag="${1}"
 
 	# this code looks a little flaky but seems to work for
 	# everything we want ...
@@ -146,8 +146,8 @@ get-flag() {
 		local i=$#
 		while [ $i -gt 0 ] ; do
 			local f="${!i}"
-			if [ "${f#${findflag}}" != "${f}" ] ; then
-				printf "%s\n" "${f#-${findflag_orig}=}"
+			if [ "${f#-${findflag#-}}" != "${f}" ] ; then
+				printf "%s\n" "${f#-${findflag}=}"
 				return 0
 			fi
 			((i--))
@@ -245,10 +245,10 @@ my_mozconfig_add_options() {
 }
 
 my_src_configure-fix_flags() {
-	ewarn $(get-flag '-O*'), $(get-flag 'O*'), $(get-flag 'flto*'), $(get-flag 'march')
 	# -O* compiler flags are passed only via `--enable-optimize=` option
-	if use custom-optimization ; then
-		my_mozconfig_add_options 'from *FLAGS' --enable-optimize="$(get-flag '-O*')"
+	local o="$(get-flag '-O*')"
+	if use custom-optimization && [ -n "${o}" ] ; then
+		my_mozconfig_add_options 'from *FLAGS' --enable-optimize="${o}"
 	else
 		my_mozconfig_add_options 'mozilla default' --enable-optimize
 	fi
@@ -277,11 +277,11 @@ my_src_configure-fix_enable-extensions() {
 # with reasons, then clean up extensions list.
 # This should be called in src_configure at the end of all other mozconfig_* functions.
 my_src_configure-dump_config() {
-	local ac opt hash cmt
 	echo
 	echo "=========================================================="
 	echo "Building ${PF} with the following configuration"
 	echo "----------------------------------------------------------"
+	local ac opt hash cmt
 	while read ac opt hash cmt ; do
 		if [ -n "${hash}" ] && [ "${hash}" != '#' ] ; then
 			die "error reading mozconfig: '${ac}' '${opt}' '${hash}' '${reason}'"
@@ -313,7 +313,7 @@ src_configure() {
 
 	# Currently --enable-elf-dynstr-gc only works for x86,
 	# thanks to Jason Wever <weeve@gentoo.org> for the fix.
-	if use x86 && [ "$(get-flags '-O*')" != -O0 ] ; then
+	if use x86 && [ "$(get-flags '-O*')" != '-O0' ] ; then
 		my_mozconfig_add_options "${ARCH} optimized build" --enable-elf-dynstr-gc
 	fi
 
@@ -328,5 +328,13 @@ src_configure() {
 }
 
 src_compile() {
+	:
+}
+
+src_test() {
+	:
+}
+
+src_install() {
 	:
 }
