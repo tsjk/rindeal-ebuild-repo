@@ -21,18 +21,19 @@ SLOT='0'
 SRC_URI="https://ftp.mozilla.org/pub/firefox/releases/${MOZ_PV}/source/${MOZ_P}.source.tar.xz"
 
 KEYWORDS='~amd64 ~arm ~x86'
-RESTRICT+=''
 IUSE_A=(
-	bindist custom-{cflags,optimization} dbus debug ffmpeg +gstreamer gtk3 +jemalloc3 jit neon pgo -qt5 pulseaudio
-	startup-notification
+	bindist custom-{cflags,optimization} dbus debug ffmpeg +gstreamer gtk3 +jemalloc3 jit neon pgo
+	-qt5 pulseaudio startup-notification
 	system-{cairo,harfbuzz,icu,jpeg,libevent,sqlite,libvpx}
 	test wifi )
 REQUIRED_USE_A=(
 	'system-harfbuzz? ( system-icu )'
 	'?? ( gtk3 qt5 )'
+	'wifi? ( dbus )'
 )
 IUSE="${IUSE_A[*]}"
 REQUIRED_USE="${REQUIRED_USE_A[*]}"
+RESTRICT+='!bindist? ( bindist )'
 
 asm_depend="dev-lang/yasm:0"
 
@@ -225,13 +226,7 @@ src_prepare() {
 	eapply_user
 }
 
-# @FUNCTION: mozconfig_annotate
-# @DESCRIPTION:
-# add an annotated line to .mozconfig
-#
-# Example:
-# mozconfig_annotate "building on ultrasparc" --enable-js-ultrasparc
-# => ac_add_options --enable-js-ultrasparc # building on ultrasparc
+
 my_mozconfig_add_options() {
 	local cmt="$1"
 	shift
@@ -243,6 +238,20 @@ my_mozconfig_add_options() {
 			"${o}" "${cmt}" >>"${mozconfig}" || die
 	done
 }
+
+my_mozconfig_use_enable() {
+	my_mozconfig_add_options "USE=$(usex $1 '' '!')$1" $(use_enable "$@")
+}
+
+my_mozconfig_use_with() {
+	my_mozconfig_add_options "USE=$(usex $1 '' '!')$1" $(use_with "$@")
+}
+
+my_mozconfig_use_extension() {
+	local ext="${2}"
+	my_mozconfig_add_options "USE=$(usex $1 '' '!')$1" $(usex $1 --enable-extensions={,-}${ext})
+}
+
 
 my_src_configure-fix_flags() {
 	# -O* compiler flags are passed only via `--enable-optimize=` option
@@ -256,6 +265,9 @@ my_src_configure-fix_flags() {
 
 	# Strip over-aggressive CFLAGS
 	use custom-cflags || strip-flags
+
+	# We want rpath support to prevent unneeded hacks on different libc variants
+	append-ldflags -Wl,-rpath="${MOZILLA_FIVE_HOME}"
 }
 
 my_src_configure-fix_enable-extensions() {
@@ -294,6 +306,12 @@ my_src_configure-dump_config() {
 }
 
 src_configure() {
+	# get_libdir() is defined only since configure phase
+	MOZILLA_FIVE_HOME="${EROOT}usr/$(get_libdir)/${PN}" # --with-default-mozilla-five-home=
+
+	##
+	# mozconfig
+	##
 	local mozconfig="${S}/.mozconfig"
 
 	# Setup the initial `.mozconfig`. See http://www.mozilla.org/build/configure-build.html
@@ -301,7 +319,7 @@ src_configure() {
 
 	my_src_configure-fix_flags
 
-	local options
+	local options # mozconfig options array
 
 	my_mozconfig_add_options 'disable pedantic' --disable-pedantic
 
@@ -317,14 +335,123 @@ src_configure() {
 		my_mozconfig_add_options "${ARCH} optimized build" --enable-elf-dynstr-gc
 	fi
 
-# 	'--enable-build-backend=FasterMake'
-# 	'--enable-release'
-# 	# --enable-rust
-# 	'--with-x'
+	## system
+	options=( --enable-{pango,svg} --with-system-{bz2,nspr,nss,png,zlib} --enable-system-{ffi,hunspell} )
+	my_mozconfig_add_options 'system libs' "${options[@]}"
+	my_mozconfig_use_enable	system-cairo
+	my_mozconfig_use_with	system-harfbuzz
+	my_mozconfig_use_with	system-harfbuzz system-graphite2
+	my_mozconfig_use_with	system-icu
+	my_mozconfig_use_with	system-jpeg
+	my_mozconfig_use_with	system-libvpx
+	my_mozconfig_use_enable	system-sqlite
+
+	## bindist
+	my_mozconfig_use_enable !bindist official-branding
+	my_mozconfig_use_with bindist branding 'browser/branding/aurora'
+
+	# '--enable-build-backend=FasterMake'
+	# '--enable-release'
+	# --enable-rust
+	# '--with-x'
+
+	if use debug ; then
+		options=( --enable-{debug,profiling} --enable-{address,memory,thread}-sanitizer )
+		my_mozconfig_add_options 'debug' "${options[@]}"
+	fi
+	# my_mozconfig_use_enable debug debug-symbols
+	my_mozconfig_use_enable test tests
+
+	# TODO: what is this?
+	my_mozconfig_use_enable startup-notification
+
+	my_mozconfig_use_enable dbus
+	my_mozconfig_use_enable wifi necko-wifi
+
+	# these are forced-on for webm support
+	my_mozconfig_add_options 'required' --enable-{ogg,wave}
+
+	my_mozconfig_use_enable jit ion
+
+	# setup dirs
+	options=( --x-includes="${EPREFIX}/usr/include" --x-libraries="${EPREFIX}/usr/$(get_libdir)"
+        --with-nspr-prefix="${EPREFIX}/usr" --with-nss-prefix="${EPREFIX}/usr"
+        --prefix="${EPREFIX}/usr"
+        --libdir="${EPREFIX}/usr/$(get_libdir)" )
+	my_mozconfig_add_options '' --{build,target}=${CTARGET:-${CHOST}} # FIXME: is this necessary
+
+	my_mozconfig_add_options '' "${options[@]}"
+	my_mozconfig_use_with {,}system-libevent "${EPREFIX}/usr"
+	my_mozconfig_add_options '' --disable-gnomeui
+	my_mozconfig_add_options '' --enable-gio
+	my_mozconfig_add_options 'no crash reporter' --disable-crashreporter # FIXME: can be optional?
+	my_mozconfig_add_options 'Gentoo default to honor system linker' --disable-gold
+	my_mozconfig_add_options 'Gentoo default' --disable-skia
+	my_mozconfig_add_options '' --disable-gconf
+	my_mozconfig_add_options '' --with-intl-api
+
+		# default toolkit is cairo-gtk2, optional use flags can change this
+	local toolkit="cairo-gtk2"
+	local toolkit_comment=""
+	if use gtk3 ; then
+		toolkit="cairo-gtk3"
+		toolkit_comment="gtk3 use flag"
+	fi
+	if use qt5 ; then
+		toolkit="cairo-qt"
+		toolkit_comment="qt5 use flag"
+		# need to specify these vars because the qt5 versions are not found otherwise,
+		# and setting --with-qtdir overrides the pkg-config include dirs
+		local i
+		for i in qmake moc rcc ; do
+			echo "export HOST_${i^^}=\"$(qt5_get_bindir)/${i}\"" \
+				>>"${mozconfig}" || die
+		done
+		echo 'unset QTDIR' >>"${mozconfig}" || die
+		my_mozconfig_add_options '+qt5' --disable-gio
+	fi
+	my_mozconfig_add_options "${toolkit_comment}" --enable-default-toolkit=${toolkit}
+
+	if use jemalloc3 ; then
+		# We must force-enable jemalloc 3 via .mozconfig
+		echo "export MOZ_JEMALLOC3=1" >>"${mozconfig}" || die
+		my_mozconfig_add_options 'jemalloc' --enable-jemalloc --enable-replace-malloc
+	fi
+
+	my_mozconfig_use_enable ffmpeg
+	if use gstreamer ; then
+		use ffmpeg && einfo "${PN} will not use ffmpeg unless gstreamer:1.0 is not available at runtime"
+		my_mozconfig_add_options '+gstreamer' --enable-gstreamer=1.0
+	elif use gstreamer-0 ; then
+		use ffmpeg && einfo "${PN} will not use ffmpeg unless gstreamer:0.10 is not available at runtime"
+		my_mozconfig_add_options '+gstreamer-0' --enable-gstreamer=0.10
+	else
+		my_mozconfig_add_options '' --disable-gstreamer
+	fi
+
+	my_mozconfig_use_enable pulseaudio
+
+	# Modifications to better support ARM, bug 553364
+	if use neon ; then
+		my_mozconfig_add_options '' --with-fpu=neon
+		my_mozconfig_add_options '' --with-thumb=yes
+		my_mozconfig_add_options '' --with-thumb-interwork=no
+	fi
+	if [[ ${CHOST} == armv* ]] ; then
+		my_mozconfig_add_options '' --with-float-abi=hard
+		my_mozconfig_add_options '' --enable-skia
+
+		if ! use system-libvpx ; then
+			sed -e "s|softfp|hard|" \
+				-i  -- "${S}/media/libvpx/moz.build" || die
+		fi
+	fi
 
 	my_src_configure-fix_enable-extensions
 
 	my_src_configure-dump_config
+
+	## ---
 }
 
 src_compile() {
@@ -333,6 +460,22 @@ src_compile() {
 
 src_test() {
 	:
+}
+
+mozconfig_install_prefs() {
+	local prefs_file="${1}"
+
+	einfo "Adding prefs from mozconfig to ${prefs_file}"
+
+	# set dictionary path, to use system hunspell
+	echo "pref(\"spellchecker.dictionary_path\", \"${EPREFIX}/usr/share/myspell\");" \
+		>>"${prefs_file}" || die
+
+	# force the graphite pref if system-harfbuzz is enabled, since the pref cant disable it
+	if use system-harfbuzz ; then
+		echo "sticky_pref(\"gfx.font_rendering.graphite.enabled\",true);" \
+			>>"${prefs_file}" || die
+	fi
 }
 
 src_install() {
