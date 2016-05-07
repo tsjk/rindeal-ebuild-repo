@@ -227,29 +227,37 @@ src_prepare() {
 }
 
 
-my_mozconfig_add_options() {
-	local cmt="$1"
-	shift
+my_mozconfig_action() {
+	local action="$1" cmt="$2"
+	shift 2
 	[[ $# -gt 0 ]] || die "${FUNCNAME} called with no flags. Comment: '${cmt}'"
 
-	local o
-	for o in "${@}" ; do
-		printf "ac_add_options %s # %s\n" \
-			"${o}" "${cmt}" >>"${mozconfig}" || die
+	local x
+	for x in "${@}" ; do
+		printf "%s %s # %s\n" \
+			"${action}" "${x}" "${cmt}" >>"${mozconfig}" || die
 	done
 }
 
+my_mozconfig_add_options() {
+	my_mozconfig_action 'ac_add_options' "$@"
+}
+
+_my_use_cmt() {
+	echo "USE=$(usex $1 '' '!')$1"
+}
+
 my_mozconfig_use_enable() {
-	my_mozconfig_add_options "USE=$(usex $1 '' '!')$1" $(use_enable "$@")
+	my_mozconfig_add_options "$(_my_use_cmt $1)" $(use_enable "$@")
 }
 
 my_mozconfig_use_with() {
-	my_mozconfig_add_options "USE=$(usex $1 '' '!')$1" $(use_with "$@")
+	my_mozconfig_add_options "$(_my_use_cmt $1)" $(use_with "$@")
 }
 
 my_mozconfig_use_extension() {
 	local ext="${2}"
-	my_mozconfig_add_options "USE=$(usex $1 '' '!')$1" $(usex $1 --enable-extensions={,-}${ext})
+	my_mozconfig_add_options "$(_my_use_cmt $1)" $(usex $1 --enable-extensions={,-}${ext})
 }
 
 
@@ -300,9 +308,33 @@ my_src_configure-dump_config() {
 		fi
 		printf "  %-30s | %s\n" \
 			"${opt}" "${cmt:-"mozilla.org default"}" || die
-	done < <( grep '^ac_add_options' "${mozconfig}" )
+	done < <( grep '^ac_add_options' "${mozconfig}" | sort )
 	echo "=========================================================="
 	echo
+	# TODO: also dump exports
+}
+
+my_src_configure-choose_toolkit() {
+	# default toolkit is cairo-gtk2, optional use flags can change this
+	local toolkit="cairo-gtk2"
+	local toolkit_comment=""
+	if use gtk3 ; then
+		toolkit="cairo-gtk3"
+		toolkit_comment="gtk3 use flag"
+	fi
+	if use qt5 ; then
+		toolkit="cairo-qt"
+		toolkit_comment="qt5 use flag"
+		# need to specify these vars because the qt5 versions are not found otherwise,
+		# and setting --with-qtdir overrides the pkg-config include dirs
+		local t
+		for t in qmake moc rcc ; do
+			my_mozconfig_export '' HOST_${t^^}="'$(qt5_get_bindir)/${t}'"
+		done
+		echo 'unset QTDIR' >>"${mozconfig}" || die
+		my_mozconfig_add_options '+qt5' --disable-gio
+	fi
+	my_mozconfig_add_options "${toolkit_comment}" --enable-default-toolkit=${toolkit}
 }
 
 src_configure() {
@@ -314,8 +346,11 @@ src_configure() {
 	##
 	local mozconfig="${S}/.mozconfig"
 
-	# Setup the initial `.mozconfig`. See http://www.mozilla.org/build/configure-build.html
+	# Setup the initial `.mozconfig`.
 	cp -v 'browser/config/mozconfig' "${mozconfig}" || die
+
+	# disable telemetry
+	my_mozconfig_export '' MOZ_TELEMETRY_REPORTING='0'
 
 	my_src_configure-fix_flags
 
@@ -379,38 +414,18 @@ src_configure() {
         --prefix="${EPREFIX}/usr"
         --libdir="${EPREFIX}/usr/$(get_libdir)" )
 	my_mozconfig_add_options '' --{build,target}=${CTARGET:-${CHOST}} # FIXME: is this necessary
+	my_mozconfig_export ''  PKG_CONFIG_LIBDIR="" # FIXME
 
 	my_mozconfig_add_options '' "${options[@]}"
 	my_mozconfig_use_with {,}system-libevent "${EPREFIX}/usr"
 	my_mozconfig_add_options '' --disable-gnomeui
 	my_mozconfig_add_options '' --enable-gio
 	my_mozconfig_add_options 'no crash reporter' --disable-crashreporter # FIXME: can be optional?
-	my_mozconfig_add_options 'Gentoo default to honor system linker' --disable-gold
 	my_mozconfig_add_options 'Gentoo default' --disable-skia
 	my_mozconfig_add_options '' --disable-gconf
 	my_mozconfig_add_options '' --with-intl-api
 
-		# default toolkit is cairo-gtk2, optional use flags can change this
-	local toolkit="cairo-gtk2"
-	local toolkit_comment=""
-	if use gtk3 ; then
-		toolkit="cairo-gtk3"
-		toolkit_comment="gtk3 use flag"
-	fi
-	if use qt5 ; then
-		toolkit="cairo-qt"
-		toolkit_comment="qt5 use flag"
-		# need to specify these vars because the qt5 versions are not found otherwise,
-		# and setting --with-qtdir overrides the pkg-config include dirs
-		local i
-		for i in qmake moc rcc ; do
-			echo "export HOST_${i^^}=\"$(qt5_get_bindir)/${i}\"" \
-				>>"${mozconfig}" || die
-		done
-		echo 'unset QTDIR' >>"${mozconfig}" || die
-		my_mozconfig_add_options '+qt5' --disable-gio
-	fi
-	my_mozconfig_add_options "${toolkit_comment}" --enable-default-toolkit=${toolkit}
+	my_src_configure-choose_toolkit
 
 	if use jemalloc3 ; then
 		# We must force-enable jemalloc 3 via .mozconfig
@@ -420,11 +435,9 @@ src_configure() {
 
 	my_mozconfig_use_enable ffmpeg
 	if use gstreamer ; then
+		# TODO
 		use ffmpeg && einfo "${PN} will not use ffmpeg unless gstreamer:1.0 is not available at runtime"
 		my_mozconfig_add_options '+gstreamer' --enable-gstreamer=1.0
-	elif use gstreamer-0 ; then
-		use ffmpeg && einfo "${PN} will not use ffmpeg unless gstreamer:0.10 is not available at runtime"
-		my_mozconfig_add_options '+gstreamer-0' --enable-gstreamer=0.10
 	else
 		my_mozconfig_add_options '' --disable-gstreamer
 	fi
