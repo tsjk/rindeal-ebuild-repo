@@ -37,7 +37,7 @@ IUSE_A=(
 	ccache custom-{cflags,optimization}  hardened pgo rust
 
 	## privacy
-	-crashreporter -safe-browsing -telemetry -wifi
+	-crashreporter -healthreport -safe-browsing -telemetry -wifi
 
 	accessibility +alsa bindist +content-sandbox  cups dbus debug
 	gnome +gssapi +jemalloc +jit libproxy neon pulseaudio
@@ -109,8 +109,8 @@ CDEPEND_A=(
 	'gstreamer? ('
 		'media-libs/gstreamer:1.0'
 		'media-libs/gst-plugins-base:1.0'
-		# 'media-libs/gst-plugins-good:1.0'
-		# 'media-plugins/gst-plugins-libav:1.0'
+		# 'media-libs/gst-plugins-good:1.0' # TODO: check necessity
+		# 'media-plugins/gst-plugins-libav:1.0' # TODO: check necessity
 	')'
 	'gtk2? ( x11-libs/gtk+:2 )'
 	'gtk3? ( x11-libs/gtk+:3 )'
@@ -162,6 +162,9 @@ DEPEND="${DEPEND_A[*]}"
 RDEPEND="${RDEPEND_A[*]}"
 
 QA_PRESTRIPPED="usr/lib*/${PN}/firefox" # FIXME
+# nested configure scripts in mozilla products generate unrecognized options
+# false positives when toplevel configure passes downwards.
+QA_CONFIGURE_OPTIONS=".*"
 
 S="${WORKDIR}/${MOZ_P}"
 
@@ -197,8 +200,8 @@ get-flag() {
 # should be called in both pkg_pretend() and pkg_setup()
 # https://developer.mozilla.org/en-US/docs/Mozilla/Developer_guide/Build_Instructions/Linux_Prerequisites#Hardware
 my_check_reqs() {
-	CHECKREQS_MEMORY="2G"
-	CHECKREQS_DISK_BUILD="5G"
+	: CHECKREQS_MEMORY="2G"
+	: CHECKREQS_DISK_BUILD="5G"
 
 	if is-flagq '-flto*' && ! is-flagq '-fno-lto' ; then
 		local lto=$(get-flag flto)
@@ -231,17 +234,12 @@ pkg_setup() {
 	export+=( LANG='C' LC_ALL='C' LC_MESSAGES='C' LC_CTYPE='C' )
 
 	# Ensure that we have a sane build enviroment
-	export+=( MOZILLA_CLIENT='1' BUILD_OPT='1' NO_STATIC_LIB='1' USE_PTHREADS='1'
-		ALDFLAGS="${LDFLAGS}" )
+	export+=( MOZILLA_CLIENT='1' BUILD_OPT='1' NO_STATIC_LIB='1' USE_PTHREADS='1' )
 
 	# Avoid PGO profiling problems due to enviroment leakage
 	# These should *always* be cleaned up anyway
 	unset+=( DBUS_SESSION_BUS_ADDRESS DISPLAY ORBIT_SOCKETDIR SESSION_MANAGER XDG_SESSION_COOKIE
 		XAUTHORITY )
-
-	# nested configure scripts in mozilla products generate unrecognized options
-	# false positives when toplevel configure passes downwards.
-	export+=( QA_CONFIGURE_OPTIONS=".*" )
 
 	echo "Unsetting: $(printf "'%s', " "${unset[@]}")"
 	unset "${unset[@]}" || die
@@ -307,9 +305,12 @@ src_prepare() {
 	cd "${S}"/js/src || die
 	eautoconf
 
+	if use jemalloc ; then
 	# Need to update jemalloc's configure FIXME
 	cd "${S}"/memory/jemalloc/src || die
+	# FIXME
 	WANT_AUTOCONF= eautoconf
+	fi
 }
 
 # --------------------------------------------------------------------------------------------------
@@ -344,8 +345,16 @@ my_mozconfig_use_with() {
 
 # TODO: remove this func
 my_mozconfig_use_extension() {
-	local ext="${2}"
-	my_mozconfig_options "$(my_use_cmt $1)" $(usex $1 --enable-extensions={,-}${ext})
+	my_mozconfig_options "$(my_use_cmt $1)" $(usex $1 --enable-extensions={,-}${2})
+}
+
+my_mozconfig_use_set() {
+	local use="$1"
+	local var="${2:-"MOZ_${use^^}"}"
+	my_mozconfig_action \
+		"$(usex ${use} 'export' 'unset')" \
+		"$(my_use_cmt ${use})" \
+		"${var}$(usex ${use} '=1' '')"
 }
 
 # Display a table describing all configuration options paired with reasons.
@@ -420,7 +429,7 @@ my_src_configure-compiler() {
 	my_mozconfig_use_with ccache
 
 	# https://developer.mozilla.org/en-US/docs/Mozilla/Developer_guide/Build_Instructions/Building_with_Profile-Guided_Optimization
-	my_mozconfig_action 'export' "$(my_use_cmt pgo)" MOZ_PGO=$(usex pgo 1 0)
+	my_mozconfig_use_set pgo
 	# mk_add_options PROFILE_GEN_SCRIPT='xvfb-run -a @MOZ_PYTHON@ @TOPSRCDIR@/@MOZ_OBJDIR@/_profile/pgo/profileserver.py 10'
 
 	# Currently --enable-elf-dynstr-gc only works for x86,
@@ -440,11 +449,11 @@ my_src_configure-compiler() {
 		my_mozconfig_options 'debug' "${options[@]}"
 	else
 		my_mozconfig_options '' --enable-release
-		my_mozconfig_action 'export' '' BUILDING_RELEASE=1
 	fi
+	my_mozconfig_use_set !debug BUILDING_RELEASE
 }
 
-my_src_configure-choose_toolkit() {
+my_src_configure-gui() {
 	local toolkit toolkit_comment
 
 	if use gtk2 ; then
@@ -469,17 +478,25 @@ my_src_configure-choose_toolkit() {
 		my_mozconfig_options "${toolkit_comment}" --disable-gio
 	fi
 
+	# TODO: egl
+	# Only available on mozilla-overlay for experimentation -- Removed in Gentoo repo per bug 571180
+	#use egl && mozconfig_annotate 'Enable EGL as GL provider' --with-gl-provider=EGL
+
 	my_mozconfig_options "${toolkit_comment}" --enable-default-toolkit="${toolkit}"
+
+	my_mozconfig_use_enable system-cairo
+
+	my_mozconfig_options '' --enable-system-pixman
 }
 
 my_src_configure-system_libs() {
-	local cmt='system libs'
+	local cmt='system libs' options
 
 	# these are configured via pkg-config
-	options=( --with-system-{libevent,libvpx,nss} --enable-system-{ffi,hunspell,pixman} )
+	options=(
+        --with-system-{libevent,libvpx,nss}
+        --enable-system-{ffi,hunspell} )
 	my_mozconfig_options "${cmt}" "${options[@]}"
-
-	my_mozconfig_use_enable system-cairo
 
 	# requires SECURE_DELETE, THREADSAFE, ENABLE_FTS3, ENABLE_UNLOCK_NOTIFY, ENABLE_DBSTAT_VTAB
 	my_mozconfig_use_enable	system-sqlite
@@ -489,16 +506,16 @@ my_src_configure-system_libs() {
 	# zlib
 	my_mozconfig_options "${cmt} - zlib" --with-system-zlib
 	my_mozconfig_action 'export' "${cmt} - zlib" \
-		MOZ_ZLIB_CFLAGS="$(pkg-config --cflags zlib)" MOZ_ZLIB_LIBS="$(pkg-config --libs zlib)"
+		MOZ_ZLIB_CFLAGS="'$(pkg-config --cflags zlib)'" MOZ_ZLIB_LIBS="'$(pkg-config --libs zlib)'"
 
 	# bz2
-	my_mozconfig_options "${cmt} - BZIP2" --with-system-bz2="${EROOT}usr"
+	my_mozconfig_options "${cmt} - BZIP2" --with-system-bz2="'${EROOT}usr'"
 
 	# jpeg
-	my_mozconfig_options "${cmt} - JPEG" --with-system-jpeg="${EROOT}usr"
+	my_mozconfig_options "${cmt} - JPEG" --with-system-jpeg="'${EROOT}usr'"
 
 	# png
-	my_mozconfig_options "${cmt} - PNG" --with-system-png="${EROOT}usr"
+	my_mozconfig_options "${cmt} - PNG" --with-system-png="'${EROOT}usr'"
 
 	# nspr (--with-system-nspr is deprecated)
 	my_mozconfig_options "${cmt} - NSPR" \
@@ -548,7 +565,7 @@ my_src_configure-fix_enable-extensions() {
 
 src_configure() {
 	# get_libdir() is defined only since configure phase, so do not put this in global space
-	export MOZILLA_FIVE_HOME="${EROOT}usr/$(get_libdir)/${PN}" # --with-default-mozilla-five-home=
+	export MOZILLA_FIVE_HOME="${EROOT}usr/$(get_libdir)/${PN}" || die
 
 	DEFAULT_PREFS_JS="${T}/default-prefs.js"
 	cp -v "${FILESDIR}/default-prefs.js" "${DEFAULT_PREFS_JS}" || die
@@ -556,7 +573,7 @@ src_configure() {
 	##
 	# mozconfig
 	##
-	export MOZCONFIG="${S}/mozconfig"
+	export MOZCONFIG="${S}/mozconfig" || die
 	touch "${MOZCONFIG}" || die
 
 	local options # mozconfig options array
@@ -592,21 +609,19 @@ src_configure() {
 	options=( --disable-{installer,updater} )
 	my_mozconfig_options 'disable installer/updater' "${options[@]}"
 	my_mozconfig_use_enable crashreporter
+	my_mozconfig_use_set healthreport MOZ_SERVICES_HEALTHREPORT
 
 	my_mozconfig_options 'Create a shared JavaScript library' --enable-shared-js
 
-	use jemalloc && my_mozconfig_action 'export' "$(my_use_cmt jemalloc)" MOZ_JEMALLOC3="1"
-	my_mozconfig_use_enable jemalloc
-	my_mozconfig_use_enable jemalloc replace-malloc
+	my_mozconfig_use_set	jemalloc MOZ_JEMALLOC3
+	my_mozconfig_use_enable	jemalloc
+	my_mozconfig_use_enable	jemalloc replace-malloc
 
 	my_mozconfig_use_enable jit ion
 
 	my_mozconfig_use_enable rust # TODO: what excatly does this enable?
 
-	my_src_configure-choose_toolkit
-
-	# Only available on mozilla-overlay for experimentation -- Removed in Gentoo repo per bug 571180
-	#use egl && mozconfig_annotate 'Enable EGL as GL provider' --with-gl-provider=EGL
+	my_src_configure-gui
 
 	## system libs
 	my_src_configure-system_libs
@@ -661,9 +676,9 @@ src_configure() {
 	my_mozconfig_use_enable dbus
 
 	## privacy
-	my_mozconfig_use_enable safe-browsing # privacy
+	my_mozconfig_use_enable safe-browsing
 	my_mozconfig_use_enable safe-browsing url-classifier
-	my_mozconfig_action 'export' "$(my_use_cmt telemetry)" MOZ_TELEMETRY_REPORTING="$(usex telemetry 1 0)"
+	my_mozconfig_use_set	telemetry MOZ_TELEMETRY_REPORTING
 
 	# positioning
 	# --enable-approximate-location
@@ -685,6 +700,9 @@ src_configure() {
 	my_mozconfig_use_enable cups printing
 
 	my_src_configure-keyfiles
+
+	my_mozconfig_action 'export' '' MOZ_MAKE_FLAGS="'${MAKEOPTS}'"
+	my_mozconfig_action 'export' '' SHELL="'${SHELL:-${EROOT}/bin/bash}'"
 
 	## arch specific options (keep this at the end to allow overrides)
 
@@ -710,7 +728,7 @@ src_configure() {
 
 	## ---
 
-	return 0
+	#return 0
 
 	emake -f client.mk configure
 }
@@ -720,7 +738,32 @@ src_configure() {
 src_compile() {
 	return 0
 
-	emake -f client.mk
+	if use pgo ; then
+		# FIXME
+# 		addpredict /root
+# 		addpredict /etc/gconf
+
+		gnome2_environment_reset
+
+		# FIXME
+# 		# Firefox tries to use dri stuff when it's run, see bug 380283
+# 		shopt -s nullglob
+# 		cards=$(echo -n /dev/dri/card* | sed 's/ /:/g')
+# 		if test -z "${cards}"; then
+# 			cards=$(echo -n /dev/ati/card* /dev/nvidiactl* | sed 's/ /:/g')
+# 			if test -n "${cards}"; then
+# 				# Binary drivers seem to cause access violations anyway, so
+# 				# let's use indirect rendering so that the device files aren't
+# 				# touched at all. See bug 394715.
+# 				export LIBGL_ALWAYS_INDIRECT=1
+# 			fi
+# 		fi
+# 		shopt -u nullglob
+# 		addpredict "${cards}"
+	fi
+
+	# xvfb-run -a -s "-extension GLX -screen 0 1280x1024x24"
+	emake -f client.mk build
 }
 
 # --------------------------------------------------------------------------------------------------
@@ -748,7 +791,111 @@ mozconfig_install_prefs() {
 src_install() {
 	return 0
 
-	emake -f client.mk install
+	cd -v "${BUILD_OBJ_DIR}" || die
+
+	# FIXME: Add our default prefs for firefox
+# 	cp "${FILESDIR}"/gentoo-default-prefs.js-1 \
+# 		"${BUILD_OBJ_DIR}/dist/bin/browser/defaults/preferences/all-gentoo.js" \
+# 		|| die
+# 	mozconfig_install_prefs \
+# 		"${BUILD_OBJ_DIR}/dist/bin/browser/defaults/preferences/all-gentoo.js"
+
+	# FIXME: Augment this with hwaccel prefs
+# 	if use hwaccel ; then
+# 		cat "${FILESDIR}"/gentoo-hwaccel-prefs.js-1 >> \
+# 		"${BUILD_OBJ_DIR}/dist/bin/browser/defaults/preferences/all-gentoo.js" \
+# 		|| die
+# 	fi
+
+	# FIXME
+# 	echo "pref(\"extensions.autoDisableScopes\", 3);" >> \
+# 		"${BUILD_OBJ_DIR}/dist/bin/browser/defaults/preferences/all-gentoo.js" \
+# 		|| die
+
+	# FIXME
+# 	local plugin
+# 	use gmp-autoupdate || for plugin in \
+# 	gmp-gmpopenh264 ; do
+# 		echo "pref(\"media.${plugin}.autoupdate\", false);" >> \
+# 			"${BUILD_OBJ_DIR}/dist/bin/browser/defaults/preferences/all-gentoo.js" \
+# 			|| die
+# 	done
+
+	# FIXME
+# 	local size sizes icon_path icon name
+# 	if use bindist; then
+# 		sizes="16 32 48"
+# 		icon_path="${S}/browser/branding/aurora"
+# 		# Firefox's new rapid release cycle means no more codenames
+# 		# Let's just stick with this one...
+# 		icon="aurora"
+# 		name="Aurora"
+#
+# 		# Override preferences to set the MOZ_DEV_EDITION defaults, since we
+# 		# don't define MOZ_DEV_EDITION to avoid profile debaucles.
+# 		# (source: browser/app/profile/firefox.js)
+# 		cat >>"${BUILD_OBJ_DIR}/dist/bin/browser/defaults/preferences/all-gentoo.js" <<PROFILE_EOF
+# pref("app.feedback.baseURL", "https://input.mozilla.org/%LOCALE%/feedback/firefoxdev/%VERSION%/");
+# sticky_pref("lightweightThemes.selectedThemeID", "firefox-devedition@mozilla.org");
+# sticky_pref("browser.devedition.theme.enabled", true);
+# sticky_pref("devtools.theme", "dark");
+# PROFILE_EOF
+#
+# 	else
+# 		sizes="16 22 24 32 256"
+# 		icon_path="${S}/browser/branding/official"
+# 		icon="${PN}"
+# 		name="Mozilla Firefox"
+# 	fi
+#
+# 	# Install icons and .desktop for menu entry
+# 	for size in ${sizes}; do
+# 		insinto "/usr/share/icons/hicolor/${size}x${size}/apps"
+# 		newins "${icon_path}/default${size}.png" "${icon}.png"
+# 	done
+# 	# The 128x128 icon has a different name
+# 	insinto "/usr/share/icons/hicolor/128x128/apps"
+# 	newins "${icon_path}/mozicon128.png" "${icon}.png"
+# 	newmenu "${FILESDIR}/icon/${PN}.desktop" "${PN}.desktop"
+# 	sed -i -e "s:@NAME@:${name}:" -e "s:@ICON@:${icon}:" \
+# 		"${ED}/usr/share/applications/${PN}.desktop" || die
+
+	# FIXME
+	# Add StartupNotify=true bug 237317
+# 	if use startup-notification ; then
+# 		echo "StartupNotify=true"\
+# 			 >> "${ED}/usr/share/applications/${PN}.desktop" \
+# 			|| die
+# 	fi
+
+	emake DESTDIR="${ED}" install
+
+	pax-mark m "${ED}${MOZILLA_FIVE_HOME}"/plugin-container
+	# Required in order to use plugins and even run firefox on hardened, with jit useflag.
+	use jit && pax-mark m "${ED}${MOZILLA_FIVE_HOME}"/{firefox,firefox-bin}
+
+	# Add StartupNotify=true bug 237317
+	if use startup-notification ; then
+		echo "StartupNotify=true"\
+			 >> "${ED}/usr/share/applications/${PN}.desktop" \
+			|| die
+	fi
 
 	doman "${T}/${PN}.1"
+}
+
+# --------------------------------------------------------------------------------------------------
+
+pkg_preinst() {
+	gnome2_icon_savelist
+}
+
+pkg_postinst() {
+	# Update mimedb for the new .desktop file
+	fdo-mime_desktop_database_update
+	gnome2_icon_cache_update
+}
+
+pkg_postrm() {
+	gnome2_icon_cache_update
 }
