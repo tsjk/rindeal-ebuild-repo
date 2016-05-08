@@ -53,12 +53,10 @@ REQUIRED_USE_A=(
 	'^^ ( gtk2 gtk3 qt5 )'
 	'wifi? ( dbus )'
 	'crashreporter? ( !bindist )'
-	'yasm? ( ^^ ( amd64 x86 arm64 ) )'
 )
 IUSE="${IUSE_A[*]}"
 REQUIRED_USE="${REQUIRED_USE_A[*]}"
 RESTRICT+='!bindist? ( bindist )'
-
 
 # deps guide: https://developer.mozilla.org/en-US/docs/Mozilla/Developer_guide/Build_Instructions/Linux_Prerequisites#Other_distros_and_other_Unix-based_systems
 
@@ -494,8 +492,8 @@ my_src_configure-system_libs() {
 
 	# these are configured via pkg-config
 	options=(
-        --with-system-{libevent,libvpx,nss}
-        --enable-system-{ffi,hunspell} )
+		--with-system-{libevent,libvpx,nss}
+		--enable-system-{ffi,hunspell} )
 	my_mozconfig_options "${cmt}" "${options[@]}"
 
 	# requires SECURE_DELETE, THREADSAFE, ENABLE_FTS3, ENABLE_UNLOCK_NOTIFY, ENABLE_DBSTAT_VTAB
@@ -688,7 +686,6 @@ src_configure() {
 	my_mozconfig_use_enable gnome gnomeui
 	my_mozconfig_use_enable gnome gconf
 	my_mozconfig_options '' --enable-gio
-
 
 	# my_mozconfig_options 'Gentoo default' --disable-skia # FIXME: use or not?
 	# --disable-skia-gpu
