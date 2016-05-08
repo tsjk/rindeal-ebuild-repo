@@ -1,0 +1,2 @@
+# yasm doesn't support arm
+www-client/firefox yasm

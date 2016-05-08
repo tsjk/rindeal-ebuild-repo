@@ -313,98 +313,6 @@ src_prepare() {
 
 # --------------------------------------------------------------------------------------------------
 
-my_mozconfig_action() {
-	local action="$1" cmt="$2"
-	shift 2
-	[[ $# -gt 0 ]] || die "${FUNCNAME} called with no flags. Comment: '${cmt}'"
-
-	local x
-	for x in "${@}" ; do
-		printf "%s %s # %s\n" \
-			"${action}" "${x}" "${cmt}" >>"${MOZCONFIG}" || die
-	done
-}
-
-my_mozconfig_options() {
-	my_mozconfig_action 'ac_add_options' "$@"
-}
-
-my_use_cmt() {
-	echo "USE=$(usex $1 '' '!')$1"
-}
-
-my_mozconfig_use_enable() {
-	my_mozconfig_options "$(my_use_cmt $1)" $(use_enable "$@")
-}
-
-my_mozconfig_use_with() {
-	my_mozconfig_options "$(my_use_cmt $1)" $(use_with "$@")
-}
-
-# TODO: remove this func
-my_mozconfig_use_extension() {
-	my_mozconfig_options "$(my_use_cmt $1)" $(usex $1 --enable-extensions={,-}${2})
-}
-
-my_mozconfig_use_set() {
-	local use="$1"
-	local var="${2:-"MOZ_${use^^}"}"
-	my_mozconfig_action \
-		"$(usex ${use} 'export' 'unset')" \
-		"$(my_use_cmt ${use})" \
-		"${var}$(usex ${use} '=1' '')"
-}
-
-# Display a table describing all configuration options paired with reasons.
-# It also serves as a dumb config checker.
-my_mozconfig_pretty_print() {
-	eshopts_push -s extglob
-
-	echo
-	printf -- '=%.0s' {1..100}	; echo
-	printf -- ' %.0s' {1..20}	; echo "Building ${PF} with the following configuration"
-	printf -- '-%.0s' {1..100}	; echo
-
-	local format="%-20s | %-50s # %s\n"
-	printf "${format}" \
-		' action' ' value' ' comment'
-	printf "${format}" \
-		"$(printf -- '-%.0s' {1..20})" "$(printf -- '-%.0s' {1..50})" "$(printf -- '-%.0s' {1..20})"
-
-	local line
-	while read line ; do
-		eval set -- "${line/\#/@}"
-		local action="$1" val="$2" at="$3"
-		local cmt=
-		[[ "${line}" == *\#* ]] && cmt="${line##*#*( )}"
-		: ${cmt:="default"}
-
-		if [ -n "${at}" ] && [ "${at}" != '@' ] ; then
-			die "error reading mozconfig: '${action}' '${val}' '${at}' '${cmt}'"
-		fi
-
-		printf "${format}" \
-			"${action}" "${val}" "${cmt}" || die
-	done < <( grep '^[^# ]' "${MOZCONFIG}" | sort )
-	printf -- '=%.0s' {1..100} ; echo
-	echo
-
-	eshopts_pop
-}
-
-my_default_pref() {
-	local name="$1" val="$2" cmt="$3"
-
-	if ! [[ "${val}" =~ ^(-?[0-9]+|true|false)$ ]] ; then
-		val="\""${val}\"""
-	fi
-
-	printf 'pref("%s", %s); // %s' \
-		"${name}" "${val}" "${cmt}" >>"${DEFAULT_PREFS_JS}" || die
-}
-
-# --------------------------------------------------------------------------------------------------
-
 my_src_configure-compiler() {
 	# -O* compiler flags are passed only via `--enable-optimize=` option
 	local o="$(get-flag '-O*')"
@@ -485,6 +393,9 @@ my_src_configure-gui() {
 	my_mozconfig_use_enable system-cairo
 
 	my_mozconfig_options '' --enable-system-pixman
+
+	# my_mozconfig_options 'Gentoo default' --disable-skia # FIXME: use or not?
+	# --disable-skia-gpu
 }
 
 my_src_configure-system_libs() {
@@ -518,33 +429,6 @@ my_src_configure-system_libs() {
 	# nspr (--with-system-nspr is deprecated)
 	my_mozconfig_options "${cmt} - NSPR" \
 		--with-nspr-cflags="'$(pkg-config --cflags nspr)'" --with-nspr-libs="'$(pkg-config --libs nspr)'"
-}
-
-my_src_configure-keyfiles() {
-	my_keyfile() {
-		local name="$1" ; shift
-		local file="${T}/.${name}"
-		echo -n "$@" >"${file}" || die
-		my_mozconfig_options "${name}" --with-${name}-keyfile="'${file}'"
-	}
-
-	# Google API keys (see http://www.chromium.org/developers/how-tos/api-keys)
-	# Note: These are for Gentoo Linux use ONLY. For your own distribution, please
-	# get your own set of keys.
-	my_keyfile 'google-api'			'AIzaSyDEAOvatFo0eTgsV_ZlEzx0ObmepsMzfAc'
-
-	# FIXME: these are from Arch
-
-	# for Loop/Hello service (https://wiki.mozilla.org/Loop/OAuth_Setup)
-	my_keyfile 'google-oauth-api'	'413772536636.apps.googleusercontent.com 0ZChLK6AxeA3Isu96MkwqDR4'
-
-	# for geolocation
-	# pref("geo.wifi.uri", "https://location.services.mozilla.com/v1/geolocate?key=%MOZILLA_API_KEY%");
-	my_keyfile 'mozilla-api'		'16674381-f021-49de-8622-3021c5942aff'
-
-	# --with-bing-api-keyfile		# windows only
-	# --with-adjust-sdk-keyfile		# mozilla tracking
-	# --with-gcm-senderid-keyfile	# android only
 }
 
 my_src_configure-fix_enable-extensions() {
@@ -617,7 +501,7 @@ src_configure() {
 
 	my_mozconfig_use_enable jit ion
 
-	my_mozconfig_use_enable rust # TODO: what excatly does this enable?
+	my_mozconfig_use_enable rust
 
 	my_src_configure-gui
 
@@ -686,9 +570,6 @@ src_configure() {
 	my_mozconfig_use_enable gnome gnomeui
 	my_mozconfig_use_enable gnome gconf
 	my_mozconfig_options '' --enable-gio
-
-	# my_mozconfig_options 'Gentoo default' --disable-skia # FIXME: use or not?
-	# --disable-skia-gpu
 
 	## networking
 	my_mozconfig_use_enable libproxy
