@@ -20,6 +20,7 @@ branches:
         - master
         - dev
         - /^ci\//
+        - firefox # TODO remove before merging to master
 
 ## env config and env-based matrix
 env:
