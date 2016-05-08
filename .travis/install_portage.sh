@@ -50,6 +50,10 @@ fold_start portage.install "Install Portage"
             "https://github.com/gentoo/portage/archive/v${PORTAGE_VER}.tar.gz" \
             "${tmp_dir}/portage-src"
         cd "${tmp_dir}/portage-src"
+
+        # allow to have arbitrary copyright holder name
+        grep -r --files-with-matches 'gentoo_copyright.*Gentoo Foundation' pym/repoman | \
+            xargs sed -r 's|(gentoo_copyright.*)Gentoo Foundation|\1.*|' -i --
     }
     fold_end portage.install.pre
 
