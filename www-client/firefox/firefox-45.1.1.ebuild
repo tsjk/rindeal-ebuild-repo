@@ -25,7 +25,7 @@ MOZ_P="${PN}-${MOZ_PV}"
 SLOT='0'
 SRC_URI="https://archive.mozilla.org/pub/firefox/releases/${MOZ_PV}/source/${MOZ_P}.source.tar.xz"
 
-KEYWORDS='~amd64 ~arm ~x86'
+KEYWORDS='~amd64 ~arm ~arm64 ~x86'
 IUSE_A=(
 	## since v46 gtk3 is default
 	gtk2 +gtk3 -qt5
@@ -34,7 +34,7 @@ IUSE_A=(
 	+ffmpeg +gstreamer
 
 	## compiler options
-	custom-{cflags,optimization}  hardened pgo rust
+	ccache custom-{cflags,optimization}  hardened pgo rust
 
 	## privacy
 	-crashreporter -safe-browsing -telemetry -wifi
@@ -47,12 +47,13 @@ IUSE_A=(
 	-system-cairo	# buggy, rather use the bundled and patched version
 	-system-sqlite	# requires non-standard USE flags
 
-	test
+	test +yasm
 )
 REQUIRED_USE_A=(
 	'^^ ( gtk2 gtk3 qt5 )'
 	'wifi? ( dbus )'
 	'crashreporter? ( !bindist )'
+	'yasm? ( ^^ ( amd64 x86 arm64 ) )'
 )
 IUSE="${IUSE_A[*]}"
 REQUIRED_USE="${REQUIRED_USE_A[*]}"
@@ -60,8 +61,6 @@ RESTRICT+='!bindist? ( bindist )'
 
 
 # deps guide: https://developer.mozilla.org/en-US/docs/Mozilla/Developer_guide/Build_Instructions/Linux_Prerequisites#Other_distros_and_other_Unix-based_systems
-
-asm_depend="dev-lang/yasm:0"
 
 CDEPEND_A=(
 	'app-arch/bzip2:0' # system-bz2
@@ -78,7 +77,7 @@ CDEPEND_A=(
 
 	'>=media-gfx/graphite2-1.3.8' # TODO: check necessity
 
-	'media-libs/fontconfig:0'
+	'media-libs/fontconfig:1.0'
 	'media-libs/freetype:2'
 	'>=media-libs/harfbuzz-1.1.3:0=[graphite,icu]' # TODO: check necessity
 	'media-libs/libjpeg-turbo:0' # system-jpeg
@@ -91,7 +90,7 @@ CDEPEND_A=(
 
 	'x11-libs/pixman:0' # system-pixman
 
-	'x11-libs/gdk-pixbuf:0'
+	'x11-libs/gdk-pixbuf:2'
 	# 'x11-libs/libnotify:0' # we're using a patch to get rid of this
 	'x11-libs/libX11:0'
 	'x11-libs/libXcomposite:0'
@@ -125,6 +124,8 @@ CDEPEND_A=(
 		'dev-qt/qtxml:5='
 		'dev-qt/qtdeclarative:5='
 	')'
+	# https://bugzilla.mozilla.org/show_bug.cgi?id=1135640
+	# https://developer.mozilla.org/en-US/Firefox/Building_Firefox_with_Rust_code
 	'rust? ( dev-lang/rust )'
 	'startup-notification? ( x11-libs/startup-notification:0 )'
 
@@ -137,14 +138,18 @@ CDEPEND_A=(
 DEPEND_A=( "${CDEPEND_A[@]}"
 	'app-arch/zip'
 	'app-arch/unzip'
+
 	'sys-devel/binutils:*'
 	'>=sys-devel/gcc-4.8'
 	'virtual/pkgconfig'
 
-	"amd64? ( ${asm_depend}"
+	# yasm is required for webm, jpeg (https://developer.mozilla.org/en-US/docs/Mozilla/Developer_guide/Build_Instructions/Yasm)
+	'yasm? ( dev-lang/yasm:0 )'
+
+	"amd64? ("
 		'virtual/opengl' # TODO: why this?
 	")"
-	"x86? ( ${asm_depend}"
+	"x86? ("
 		'virtual/opengl' # TODO: why this?
 	")"
 )
@@ -412,6 +417,9 @@ my_src_configure-compiler() {
 
 	my_mozconfig_options '' --disable-elf-hack
 
+	my_mozconfig_use_with ccache
+
+	# https://developer.mozilla.org/en-US/docs/Mozilla/Developer_guide/Build_Instructions/Building_with_Profile-Guided_Optimization
 	my_mozconfig_action 'export' "$(my_use_cmt pgo)" MOZ_PGO=$(usex pgo 1 0)
 	# mk_add_options PROFILE_GEN_SCRIPT='xvfb-run -a @MOZ_PYTHON@ @TOPSRCDIR@/@MOZ_OBJDIR@/_profile/pgo/profileserver.py 10'
 
