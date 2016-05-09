@@ -229,7 +229,7 @@ pkg_setup() {
 	local export=() unset=()
 
 	# Ensure we use C locale when building
-	export+=( LANG='C' LC_ALL='C' LC_MESSAGES='C' LC_CTYPE='C' )
+	export+=( LANG='C' LC_ALL='C' )
 
 	# Ensure that we have a sane build enviroment
 	export+=( MOZILLA_CLIENT='1' BUILD_OPT='1' NO_STATIC_LIB='1' USE_PTHREADS='1' )
@@ -317,7 +317,7 @@ my_src_configure::compiler() {
 	# -O* compiler flags are passed only via `--enable-optimize=` option
 	local o="$(get-flag '-O*')"
 	if use custom-optimization && [ -n "${o}" ] ; then
-		$mozconfig::options 'from *FLAGS' --enable-optimize="${o}"
+		$mozconfig::add_options 'from *FLAGS' --enable-optimize="${o}"
 	fi
 	filter-flags '-O*'
 
@@ -330,7 +330,7 @@ my_src_configure::compiler() {
 	# Add full relro support for hardened
 	use hardened && append-ldflags "-Wl,-z,relro,-z,now"
 
-	$mozconfig::options '' --disable-elf-hack
+	$mozconfig::add_options '' --disable-elf-hack
 
 	$mozconfig::use_with ccache
 
@@ -341,20 +341,20 @@ my_src_configure::compiler() {
 	# Currently --enable-elf-dynstr-gc only works for x86,
 	# thanks to Jason Wever <weeve@gentoo.org> for the fix.
 	if use x86 && [ "$(get-flags '-O*')" != '-O0' ] ; then
-		$mozconfig::options "${ARCH} optimized build" --enable-elf-dynstr-gc
+		$mozconfig::add_options "${ARCH} optimized build" --enable-elf-dynstr-gc
 	fi
 
 	# --- --- ---
 
-	$mozconfig::options 'disable pedantic' --disable-pedantic
+	$mozconfig::add_options 'disable pedantic' --disable-pedantic
 	options=( --disable-{install-strip,strip,strip-libs} )
-	$mozconfig::options 'disable stripping' "${options[@]}"
+	$mozconfig::add_options 'disable stripping' "${options[@]}"
 
 	if use debug ; then
 		options=( --enable-{debug,profiling} --enable-{address,memory,thread}-sanitizer )
-		$mozconfig::options 'debug' "${options[@]}"
+		$mozconfig::add_options 'debug' "${options[@]}"
 	else
-		$mozconfig::options '' --enable-release
+		$mozconfig::add_options '' --enable-release
 	fi
 	$mozconfig::use_set !debug BUILDING_RELEASE
 }
@@ -378,23 +378,23 @@ my_src_configure::gui() {
 		# and setting --with-qtdir overrides the pkg-config include dirs
 		local t
 		for t in qmake moc rcc ; do
-			$mozconfig::action 'export' '' HOST_${t^^}="$(qt5_get_bindir)/${t}"
+			$mozconfig::stmt 'export' '' HOST_${t^^}="$(qt5_get_bindir)/${t}"
 		done
-		$mozconfig::action 'unset' "${toolkit_comment}" 'QTDIR'
-		$mozconfig::options "${toolkit_comment}" --disable-gio
+		$mozconfig::stmt 'unset' "${toolkit_comment}" 'QTDIR'
+		$mozconfig::add_options "${toolkit_comment}" --disable-gio
 	fi
 
 	# TODO: egl
 	# Only available on mozilla-overlay for experimentation -- Removed in Gentoo repo per bug 571180
 	#use egl && mozconfig_annotate 'Enable EGL as GL provider' --with-gl-provider=EGL
 
-	$mozconfig::options "${toolkit_comment}" --enable-default-toolkit="${toolkit}"
+	$mozconfig::add_options "${toolkit_comment}" --enable-default-toolkit="${toolkit}"
 
 	$mozconfig::use_enable system-cairo
 
-	$mozconfig::options '' --enable-system-pixman
+	$mozconfig::add_options '' --enable-system-pixman
 
-	# $mozconfig::options 'Gentoo default' --disable-skia # FIXME: use or not?
+	# $mozconfig::add_options 'Gentoo default' --disable-skia # FIXME: use or not?
 	# --disable-skia-gpu
 }
 
@@ -405,7 +405,7 @@ my_src_configure::system_libs() {
 	options=(
 		--with-system-{libevent,libvpx,nss}
 		--enable-system-{ffi,hunspell} )
-	$mozconfig::options "${cmt}" "${options[@]}"
+	$mozconfig::add_options "${cmt}" "${options[@]}"
 
 	# requires SECURE_DELETE, THREADSAFE, ENABLE_FTS3, ENABLE_UNLOCK_NOTIFY, ENABLE_DBSTAT_VTAB
 	$mozconfig::use_enable	system-sqlite
@@ -413,21 +413,21 @@ my_src_configure::system_libs() {
 	$mozconfig::use_with system-icu icu
 
 	# zlib
-	$mozconfig::options "${cmt} - zlib" --with-system-zlib
-	$mozconfig::action 'export' "${cmt} - zlib" \
+	$mozconfig::add_options "${cmt} - zlib" --with-system-zlib
+	$mozconfig::stmt 'export' "${cmt} - zlib" \
 		MOZ_ZLIB_CFLAGS="$(pkg-config --cflags zlib)" MOZ_ZLIB_LIBS="$(pkg-config --libs zlib)"
 
 	# bz2
-	$mozconfig::options "${cmt} - BZIP2" --with-system-bz2="${EPREFIX}/usr"
+	$mozconfig::add_options "${cmt} - BZIP2" --with-system-bz2="${EPREFIX}/usr"
 
 	# jpeg
-	$mozconfig::options "${cmt} - JPEG" --with-system-jpeg="${EPREFIX}/usr"
+	$mozconfig::add_options "${cmt} - JPEG" --with-system-jpeg="${EPREFIX}/usr"
 
 	# png
-	$mozconfig::options "${cmt} - PNG" --with-system-png="${EPREFIX}/usr"
+	$mozconfig::add_options "${cmt} - PNG" --with-system-png="${EPREFIX}/usr"
 
 	# nspr (--with-system-nspr is deprecated)
-	$mozconfig::options "${cmt} - NSPR" \
+	$mozconfig::add_options "${cmt} - NSPR" \
 		--with-nspr-cflags="$(pkg-config --cflags nspr)" --with-nspr-libs="$(pkg-config --libs nspr)"
 }
 
@@ -441,7 +441,7 @@ my_src_configure::fix_enable-extensions() {
 		echo "mozconfig: merging multiple extensions: '${joint}"
 		sed -e '/^ac_add_options *--enable-extensions/d' \
 			-i -- "${MOZCONFIG}" || die
-		$mozconfig::options "extensions" --enable-extensions="${joint}"
+		$mozconfig::add_options "extensions" --enable-extensions="${joint}"
 	fi
 }
 
@@ -456,7 +456,7 @@ src_configure() {
 	# mozconfig
 	##
 	export MOZCONFIG="${S}/mozconfig" || die
-	touch "${MOZCONFIG}" || die
+	echo >"${MOZCONFIG}" || die
 
 	local mozconfig=firefox::mozconfig # "class"
 	$mozconfig::init
@@ -470,29 +470,29 @@ src_configure() {
 		# --with-qtdir="$(qt5_get_dir)"
 		--with-default-mozilla-five-home="${MOZILLA_FIVE_HOME}"
 	)
-	$mozconfig::options 'paths' "${options[@]}"
-	$mozconfig::action 'mk_add_options' '' MOZ_OBJDIR="${BUILD_DIR}"
+	$mozconfig::add_options 'paths' "${options[@]}"
+	$mozconfig::stmt 'mk_add_options' '' MOZ_OBJDIR="${BUILD_DIR}"
 
 	## setup compiler
 	my_src_configure::compiler
 
-	$mozconfig::options '' --with-pthreads
+	$mozconfig::add_options '' --with-pthreads
 
 	## distribution
 	$mozconfig::use_enable !bindist official-branding
 	# available brandings: aurora/nightly/official/unofficial
-	$mozconfig::use_with bindist branding 'browser/branding/aurora'
-	$mozconfig::options 'id' --with-distribution-id='eu.rindeal'
+	use bindist && $mozconfig::add_options "$(firefox::use_cmt bindist)" --with-branding='browser/branding/aurora'
+	$mozconfig::add_options 'id' --with-distribution-id='eu.rindeal'
 
 	# $mozconfig::use_enable debug debug-symbols # FIXME
 	$mozconfig::use_enable test tests
 
 	options=( --disable-{installer,updater} )
-	$mozconfig::options 'disable installer/updater' "${options[@]}"
+	$mozconfig::add_options 'disable installer/updater' "${options[@]}"
 	$mozconfig::use_enable crashreporter
 	$mozconfig::use_set healthreport MOZ_SERVICES_HEALTHREPORT
 
-	$mozconfig::options 'Create a shared JavaScript library' --enable-shared-js
+	$mozconfig::add_options 'Create a shared JavaScript library' --enable-shared-js
 
 	$mozconfig::use_set	jemalloc MOZ_JEMALLOC3
 	$mozconfig::use_enable	jemalloc
@@ -533,23 +533,23 @@ src_configure() {
 	$mozconfig::use_enable content-sandbox
 
 	$mozconfig::use_enable accessibility
-	$mozconfig::options 'ECMAScript Internationalization API' --with-intl-api
+	$mozconfig::add_options 'ECMAScript Internationalization API' --with-intl-api
 
 	## audio
 	$mozconfig::use_enable alsa
 	$mozconfig::use_enable pulseaudio
 	# these are forced-on for webm support FIXME: really?
-	$mozconfig::options 'required for webm' --enable-{ogg,wave} # FIXME: requires ALSA (https://developer.mozilla.org/en-US/docs/Mozilla/Developer_guide/Build_Instructions/ALSA)
+	$mozconfig::add_options 'required for webm' --enable-{ogg,wave} # FIXME: requires ALSA (https://developer.mozilla.org/en-US/docs/Mozilla/Developer_guide/Build_Instructions/ALSA)
 
 	## video
 	$mozconfig::use_enable ffmpeg
-	$mozconfig::options '' --enable-webm # html5 video
+	$mozconfig::add_options '' --enable-webm # html5 video
 	if use gstreamer ; then
 		# FIXME: isn't ffmpeg default now?
 		use ffmpeg && einfo "${PN} will not use ffmpeg unless gstreamer:1.0 is not available at runtime"
-		$mozconfig::options "$(firefox::use_cmt gstreamer)" --enable-gstreamer=1.0
+		$mozconfig::add_options "$(firefox::use_cmt gstreamer)" --enable-gstreamer=1.0
 	else
-		$mozconfig::options "$(firefox::use_cmt gstreamer)" --disable-gstreamer
+		$mozconfig::add_options "$(firefox::use_cmt gstreamer)" --disable-gstreamer
 	fi
 
 	## desktop integration
@@ -568,7 +568,7 @@ src_configure() {
 	## Gnome
 	$mozconfig::use_enable gnome gnomeui
 	$mozconfig::use_enable gnome gconf
-	$mozconfig::options '' --enable-gio
+	$mozconfig::add_options '' --enable-gio
 
 	## networking
 	$mozconfig::use_enable libproxy
@@ -576,22 +576,22 @@ src_configure() {
 
 	$mozconfig::use_enable cups printing
 
-	my_src_configure::keyfiles
+	firefox::src_configure::keyfiles
 
-	$mozconfig::action 'export' '' MOZ_MAKE_FLAGS="${MAKEOPTS}"
-	$mozconfig::action 'export' '' SHELL="${SHELL:-${EPREFIX}//bin/bash}"
+	$mozconfig::stmt 'export' '' MOZ_MAKE_FLAGS="${MAKEOPTS}"
+	#$mozconfig::stmt 'export' '' SHELL="${SHELL:-${EPREFIX}//bin/bash}"
 
 	## arch specific options (keep this at the end to allow overrides)
 
 	# Modifications to better support ARM, bug 553364
 	if use neon ; then
-		$mozconfig::options '' --with-fpu=neon
-		$mozconfig::options '' --with-thumb=yes
-		$mozconfig::options '' --with-thumb-interwork=no
+		$mozconfig::add_options '' --with-fpu=neon
+		$mozconfig::add_options '' --with-thumb=yes
+		$mozconfig::add_options '' --with-thumb-interwork=no
 	fi
 	if [[ ${CHOST} == armv* ]] ; then
-		$mozconfig::options '' --with-float-abi=hard
-		$mozconfig::options '' --enable-skia
+		$mozconfig::add_options '' --with-float-abi=hard
+		$mozconfig::add_options '' --enable-skia
 
 		if ! use system-libvpx ; then
 			sed -e "s|softfp|hard|" \
