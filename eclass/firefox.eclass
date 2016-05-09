@@ -2,13 +2,13 @@
 # Distributed under the terms of the GNU General Public License v2
 # $Id$
 
-# @ECLASS: firefox-v45.eclass
+# @ECLASS: firefox.eclass
 # @MAINTAINER:
 # Jan Chren (rindeal) <dev.rindeal+gentoo-overlay@gmail.com>
 # @BLURB: Support eclass for Firefox
 # @DESCRIPTION:
 
-if [ -z "${_FIREFOX_V45_ECLASS}" ] ; then
+if [ -z "${_FIREFOX_ECLASS}" ] ; then
 
 case "${EAPI:-0}" in
 	6) ;;
@@ -55,6 +55,23 @@ my_mozconfig_use_set() {
 		"$(usex ${use} 'export' 'unset')" \
 		"$(my_use_cmt ${use})" \
 		"${var}$(usex ${use} '=1' '')"
+}
+
+firefox_mozconfig_init() {
+	local econf=(
+		"${CBUILD:+"--build=${CBUILD}"}"
+		--datadir="${EPREFIX}"/usr/share
+		--host=${CHOST}
+		--infodir="${EPREFIX}"/usr/share/info
+		--localstatedir="${EPREFIX}"/var/lib
+		--prefix="${EPREFIX}"/usr
+		--mandir="${EPREFIX}"/usr/share/man
+		--sysconfdir="${EPREFIX}"/etc
+		${CTARGET:+"--target=${CTARGET}"}
+
+		--disable-dependency-tracking
+	)
+	my_mozconfig_options 'econf' "${econf[@]}"
 }
 
 # Display a table describing all configuration options paired with reasons.
@@ -132,5 +149,5 @@ my_src_configure-keyfiles() {
 	# --with-gcm-senderid-keyfile	# android only
 }
 
-_FIREFOX_V45_ECLASS=1
+_FIREFOX_ECLASS=1
 fi
