@@ -15,6 +15,16 @@ case "${EAPI:-0}" in
 	*) die "Unsupported EAPI='${EAPI}' for '${ECLASS}'" ;;
 esac
 
+namespace=firefox
+
+firefox::use_cmt() {
+	echo "USE=$(usex $1 '' '!')$1"
+}
+
+# BEGIN $namespace::mozconfig
+# --------------------------------------------------------------------------------------------------
+self=$namespace::mozconfig
+
 firefox::mozconfig::stmt() {
 	local stmt="$1" cmt="$2"
 	shift 2
@@ -23,42 +33,46 @@ firefox::mozconfig::stmt() {
 
 	local x
 	for x in "${@}" ; do
+		# fix payloads with spaces
+		if [ "${x}" == *'='* ] ; then
+			local key="${x%%=*}" val="${x#*=}"
+			if [ ! "${val:0:1}" ~= "('|\")" ] ; then
+				x="${key}='${val}'"
+			fi
+		fi
+
 		printf "%s %s # %s\n" \
 			"${stmt}" "${x}" "${cmt}" >>"${MOZCONFIG}" || die
 	done
 }
 
-firefox::mozconfig_options() {
-	firefox::mozconfig::stmt 'ac_add_options' "$@"
+firefox::mozconfig::add_options() {
+	$self::stmt 'ac_add_options' "$@"
 }
 
-firefox::use_cmt() {
-	echo "USE=$(usex $1 '' '!')$1"
+firefox::mozconfig::use_enable() {
+	$self::add_options "$($namespace::use_cmt $1)" $(use_enable "$@")
 }
 
-firefox::mozconfig_use_enable() {
-	firefox::mozconfig_options "$(firefox::use_cmt $1)" $(use_enable "$@")
-}
-
-firefox::mozconfig_use_with() {
-	firefox::mozconfig_options "$(firefox::use_cmt $1)" $(use_with "$@")
+firefox::mozconfig::use_with() {
+	$self::add_options "$($namespace::use_cmt $1)" $(use_with "$@")
 }
 
 # TODO: remove this func
-firefox::mozconfig_use_extension() {
-	firefox::mozconfig_options "$(firefox::use_cmt $1)" $(usex $1 --enable-extensions={,-}${2})
+firefox::mozconfig::use_extension() {
+	$self::add_options "$($namespace::use_cmt $1)" $(usex $1 --enable-extensions={,-}${2})
 }
 
-firefox::mozconfig_use_set() {
+firefox::mozconfig::use_set() {
 	local use="$1"
 	local var="${2:-"MOZ_${use^^}"}"
-	firefox::mozconfig::stmt \
+	$self::stmt \
 		"$(usex ${use} 'export' 'unset')" \
-		"$(firefox::use_cmt ${use})" \
+		"$($namespace::use_cmt ${use})" \
 		"${var}$(usex ${use} '=1' '')"
 }
 
-firefox::mozconfig_init() {
+firefox::mozconfig::init() {
 	local econf=(
 		"${CBUILD:+"--build=${CBUILD}"}"
 		--datadir="${EPREFIX}"/usr/share
@@ -69,15 +83,19 @@ firefox::mozconfig_init() {
 		--mandir="${EPREFIX}"/usr/share/man
 		--sysconfdir="${EPREFIX}"/etc
 		${CTARGET:+"--target=${CTARGET}"}
-
 		--disable-dependency-tracking
+
+		## extensions
+		--libdir="${EPREFIX}/usr/$(get_libdir)"
 	)
-	firefox::mozconfig_options 'econf' "${econf[@]}"
+	$self::add_options 'econf' "${econf[@]}"
+
+	$mozconfig::options '' --enable-application=browser
 }
 
 # Display a table describing all configuration options paired with reasons.
 # It also serves as a dumb config checker.
-firefox::mozconfig_pretty_print() {
+firefox::mozconfig::pretty_print() {
 	eshopts_push -s extglob
 
 	echo
@@ -112,7 +130,15 @@ firefox::mozconfig_pretty_print() {
 	eshopts_pop
 }
 
-firefox::default_pref() {
+unset self
+# END $namespace::mozconfig
+# --------------------------------------------------------------------------------------------------
+
+# BEGIN $namespace::prefs
+# --------------------------------------------------------------------------------------------------
+self=$namespace::prefs
+
+firefox::prefs::add() {
 	local name="$1" val="$2" cmt="$3"
 
 	if ! [[ "${val}" =~ ^(-?[0-9]+|true|false)$ ]] ; then
@@ -123,32 +149,48 @@ firefox::default_pref() {
 		"${name}" "${val}" "${cmt}" >>"${DEFAULT_PREFS_JS}" || die
 }
 
-firefox::src_configure-keyfiles() {
-	firefox::keyfile() {
+unset self
+# END $namespace::prefs
+# --------------------------------------------------------------------------------------------------
+
+# BEGIN $namespace::src_configure
+# --------------------------------------------------------------------------------------------------
+self=$namespace::src_configure
+
+firefox::src_configure::keyfiles() {
+	$namespace::_keyfile() {
 		local name="$1" ; shift
 		local file="${T}/.${name}"
 		echo -n "$@" >"${file}" || die
-		firefox::mozconfig_options "${name}" --with-${name}-keyfile="'${file}'"
+		$self::add_options "${name}" --with-${name}-keyfile="'${file}'"
 	}
 
 	# Google API keys (see http://www.chromium.org/developers/how-tos/api-keys)
 	# Note: These are for Gentoo Linux use ONLY. For your own distribution, please
 	# get your own set of keys.
-	firefox::keyfile 'google-api'			'AIzaSyDEAOvatFo0eTgsV_ZlEzx0ObmepsMzfAc'
+	$namespace::_keyfile 'google-api'			'AIzaSyDEAOvatFo0eTgsV_ZlEzx0ObmepsMzfAc'
 
 	# FIXME: these are from Arch
 
 	# for Loop/Hello service (https://wiki.mozilla.org/Loop/OAuth_Setup)
-	firefox::keyfile 'google-oauth-api'	'413772536636.apps.googleusercontent.com 0ZChLK6AxeA3Isu96MkwqDR4'
+	$namespace::_keyfile 'google-oauth-api'	'413772536636.apps.googleusercontent.com 0ZChLK6AxeA3Isu96MkwqDR4'
 
 	# for geolocation
 	# pref("geo.wifi.uri", "https://location.services.mozilla.com/v1/geolocate?key=%MOZILLA_API_KEY%");
-	firefox::keyfile 'mozilla-api'		'16674381-f021-49de-8622-3021c5942aff'
+	$namespace::_keyfile 'mozilla-api'		'16674381-f021-49de-8622-3021c5942aff'
 
 	# --with-bing-api-keyfile		# windows only
 	# --with-adjust-sdk-keyfile		# mozilla tracking
 	# --with-gcm-senderid-keyfile	# android only
+
+	unset -f $namespace::_keyfile
 }
+
+unset self
+# END $namespace::src_configure
+# --------------------------------------------------------------------------------------------------
+
+unset namespace
 
 _FIREFOX_ECLASS=1
 fi
