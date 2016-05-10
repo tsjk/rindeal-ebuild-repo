@@ -12,7 +12,7 @@ PYTHON_REQ_USE='ncurses,sqlite,ssl,threads'
 # will resolve to 2.13, newer don't work (https://bugzilla.mozilla.org/show_bug.cgi?id=104642)
 WANT_AUTOCONF="2.1"
 
-inherit firefox autotools check-reqs flag-o-matic python-any-r1
+inherit gnome2-utils check-reqs flag-o-matic python-any-r1 autotools rindeal firefox
 
 DESCRIPTION="Firefox Web Browser (rindeal's edition)"
 HOMEPAGE='https://www.mozilla.com/firefox'
@@ -28,7 +28,7 @@ SRC_URI="https://archive.mozilla.org/pub/firefox/releases/${MOZ_PV}/source/${MOZ
 KEYWORDS='~amd64 ~arm ~arm64 ~x86'
 IUSE_A=(
 	## since v46 gtk3 is default
-	gtk2 +gtk3 -qt5
+	+X gtk2 +gtk3 -qt5
 
 	## ffmpeg is becoming default, TODO
 	+ffmpeg
@@ -41,7 +41,7 @@ IUSE_A=(
 	-crashreporter -healthreport -safe-browsing -telemetry -wifi
 
 	accessibility +alsa bindist cups dbus debug # +content-sandbox
-	gio gnome +gssapi +jemalloc +jit libproxy neon pulseaudio
+	gio gnome +gssapi +jemalloc +jit +libproxy neon pulseaudio
 	+startup-notification
 
 	+system-{icu,jpeg,libevent,libvpx}
@@ -50,9 +50,10 @@ IUSE_A=(
 
 	test +yasm
 
-
+	-gnomeui
 	+speech-dispatcher -ipdl-tests +webrtc +webspeech +webm +ffmpeg -eme +media-navigator gamepad
 )
+IUSE="${IUSE_A[*]}"
 
 # deps guide: https://developer.mozilla.org/en-US/docs/Mozilla/Developer_guide/Build_Instructions/Linux_Prerequisites#Other_distros_and_other_Unix-based_systems
 
@@ -64,24 +65,20 @@ gtk_deps=(
 CDEPEND_A=(
 	'app-arch/bzip2:0'		# system-bz2
 	'app-text/hunspell:0'	# system-hunspell
-
 	'dev-lang/perl:0'		# needed for win32 SDK checks
-
 	'dev-libs/expat:0'
-
-	'=dev-libs/libevent-2.0*:0='	# system-libevent
-	'>=dev-libs/nss-3.21.1:0'
-	'>=dev-libs/nspr-4.12:0'
-
+	'=dev-libs/libevent-2.0*:0'	# system-libevent
+	'>=dev-libs/nss-3.21.1:0'	# system-nss
+	'>=dev-libs/nspr-4.12:0'	# with-nspr-*
 	'>=media-gfx/graphite2-1.3.8'	# TODO: check necessity
 
 	'media-libs/fontconfig:1.0'
 	'media-libs/freetype:2'
-	'>=media-libs/harfbuzz-1.1.3:0=[graphite,icu]'	# TODO: check necessity
+	'>=media-libs/harfbuzz-1.1.3:0[graphite,icu]'	# TODO: check necessity
 	'media-libs/libjpeg-turbo:0'	# system-jpeg
-	'>=media-libs/libvpx-1.5.0:0=[postproc]'	# system-libvpx; this is often bumped
-	'media-libs/libpng:0=[apng]'
-	'media-libs/mesa:0'
+	'>=media-libs/libvpx-1.5.0:0[postproc]'	# system-libvpx; this is often bumped
+	'media-libs/libpng:0[apng]'		# system-png
+	'media-libs/mesa:0' # TODO: review
 
 	'sys-libs/zlib:0'
 	'virtual/libffi:0'	# system-ffi
@@ -92,23 +89,17 @@ CDEPEND_A=(
 	# 'x11-libs/libnotify:0' # we're using a patch to get rid of this
 
 	'x11-libs/libXrender:0'
-	'X? ('
-		'x11-libs/libX11:0'
-		'x11-libs/libXt:0'	# X11/Intrinsic.h, X11/Shell.h
-	')'
-
-	'accessibility?	( dev-libs/atk:0 )'	# MOZ_ACCESSIBILITY_ATK
+	'accessibility? ( dev-libs/atk:0 )'	# MOZ_ACCESSIBILITY_ATK
 	'dbus? ('
 		'sys-apps/dbus:0'
 		'dev-libs/dbus-glib:0'
 	')'
-	'gio? ( dev-libs/glib:2 )'
 	# Many automated tests will fail with --disable-gconf. See bug 1167201.
 	'gconf? ('
 		'dev-libs/glib:2'
 		'gnome-base/gconf:2'
 	')'
-	# Enable libgnomeui instead of GIO & GTK for icon theme support
+	'gio? ( dev-libs/glib:2 )'
 	'gnomeui? ( gnome-base/libgnomeui:0 )'
 	'gstreamer? ('
 		'media-libs/gstreamer:1.0'
@@ -124,11 +115,10 @@ CDEPEND_A=(
 		'dev-libs/glib:2'
 	')'
 	'libproxy?	( net-libs/libproxy:0 )'
-	'pango? ('
-		'x11-libs/pango:0'
-	')'
+	'pango? ( x11-libs/pango:0 )'
 	'pulseaudio?	( media-sound/pulseaudio )'
 	'qt5? ('
+		# TODO: review
 		'dev-qt/qtcore:5='
 		'dev-qt/qtgui:5='
 		'dev-qt/qtnetwork:5='
@@ -142,7 +132,7 @@ CDEPEND_A=(
 	'rust? ( || ( dev-lang/rust dev-lang/rust-bin ) )'
 	'startup-notification? ( x11-libs/startup-notification:0 )'
 
-	'system-cairo? ( x11-libs/cairo:0[X,xcb] )'
+	'system-cairo? ( x11-libs/cairo:0[X=,xcb] )'
 	'system-icu? ( dev-libs/icu:0 )'
 	# requires SECURE_DELETE, THREADSAFE, ENABLE_FTS3, ENABLE_UNLOCK_NOTIFY, ENABLE_DBSTAT_VTAB
 	# reference: configure.in
@@ -155,20 +145,17 @@ CDEPEND_A=(
 		'x11-libs/libXcomposite:0'
 	')'
 	'wifi? ( net-misc/networkmanager:0 )'	# TODO: check when is NM needed
+	'X? ('
+		'x11-libs/libX11:0'
+		'x11-libs/libXt:0'	# X11/Intrinsic.h, X11/Shell.h
+	')'
 )
 DEPEND_A=( "${CDEPEND_A[@]}"
 	'>=sys-devel/gcc-4.8'
 	'virtual/pkgconfig'
-
 	# yasm is required for webm, jpeg (https://developer.mozilla.org/en-US/docs/Mozilla/Developer_guide/Build_Instructions/Yasm)
-	'yasm? ( dev-lang/yasm:0 )' # jpeg, libav, libvpx, ...
-
-	"amd64? ("
-		'virtual/opengl' # TODO: why this?
-	")"
-	"x86? ("
-		'virtual/opengl' # TODO: why this?
-	")"
+	'yasm? ( dev-lang/yasm:0 )'
+	"$(rindeal::dsf::or 'amd64 x86'	'virtual/opengl')" # TODO: why this?
 )
 RDEPEND_A=( "${CDEPEND_A[@]}"
 	'virtual/freedesktop-icon-theme'
@@ -185,20 +172,15 @@ REQUIRED_USE_A=(
 	'gio? ( gtk2 )'
 	'startup-notification? ( || ( gtk2 gtk3 ) )'
 
-	'gtk2? ( X )'
-	'gtk3? ( X )'
-	'qt5? ( X )'
-
-	'gtk2? ( gio gconf )'
-	'gtk3? ( gio gconf )'
+	"$(rindeal::dsf::or 'eme ffmpeg'	fmp4)"
+	"$(rindeal::dsf::or 'gtk2 gtk3 qt5'	X)"
+	"$(rindeal::dsf::or 'gtk2 gtk3'		gio gconf)"
 
 	'gnomeui? ( || ( gtk2 gtk3 ) )'
-	'ffmpeg? ( fmp4 )'
-	'eme? ( fmp4 )'
+	'ipdl-tests? ( test )'
 )
-IUSE="${IUSE_A[*]}"
 REQUIRED_USE="${REQUIRED_USE_A[*]}"
-RESTRICT+='!bindist? ( bindist )'
+RESTRICT+='!bindist? ( bindist )' # FIXME: what is this?
 
 # QA_PRESTRIPPED="usr/lib*/${PN}/firefox" # FIXME
 # nested configure scripts in mozilla products generate unrecognized options
@@ -236,6 +218,8 @@ get-flag() {
 	return 1
 }
 
+# --------------------------------------------------------------------------------------------------
+
 # should be called in both pkg_pretend() and pkg_setup()
 # https://developer.mozilla.org/en-US/docs/Mozilla/Developer_guide/Build_Instructions/Linux_Prerequisites#Hardware
 my_check_reqs() {
@@ -257,8 +241,6 @@ my_check_reqs() {
 
 	check-reqs_pkg_setup
 }
-
-# --------------------------------------------------------------------------------------------------
 
 pkg_pretend() {
 	my_check_reqs
@@ -330,7 +312,7 @@ src_prepare() {
 	# Don't exit with error when some libs are missing which we have in
 	# system.
 # 	sed '/^MOZ_PKG_FATAL_WARNINGS/s@= 1@= 0@' \
-# 		-i "${S}"/browser/installer/Makefile.in || die
+# 		-i -- "${S}"/browser/installer/Makefile.in || die
 
 	# Keep codebase the same even if not using official branding
 	sed -r '/^MOZ_DEV_EDITION=1/d' \
@@ -447,7 +429,7 @@ my::src_configure::system_libs() {
 
 	# these are configured via pkg-config
 	options=(
-		--with-system-{libevent,libvpx,nss}
+		--with-system-{libvpx,nss}
 		--enable-system-{ffi,hunspell} )
 	$mozconfig::add_options "${cmt}" "${options[@]}"
 
@@ -464,6 +446,9 @@ my::src_configure::system_libs() {
 
 	# bz2
 	$mozconfig::add_options "${cmt} - BZIP2" --with-system-bz2="${EPREFIX}/usr"
+
+	# libevent
+	$mozconfig::add_options "${cmt} - libevent" --with-system-libevent="${EPREFIX}/usr"
 
 	# jpeg
 	$mozconfig::add_options "${cmt} - JPEG" --with-system-jpeg="${EPREFIX}/usr"

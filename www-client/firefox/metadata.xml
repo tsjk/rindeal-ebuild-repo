@@ -9,29 +9,38 @@
     <flag name="bindist">Disable official Firefox branding (icons, name) which are not
         binary-redistributable according to upstream</flag>
     <flag name="ccache">Enables ccache support</flag>
+    <flag name="crashreporter">Mozilla Crash Reporter
+        (https://support.mozilla.org/en-US/kb/mozillacrashreporter)</flag>
     <flag name="custom-optimization">Enables to use custom compiler optimization
         level (-Os, -O0, -O1, -O2, -O3)</flag>
     <flag name="egl">EGL provider</flag>
     <flag name="eme">Encrypted Media Extensions</flag>
     <flag name="ffmpeg">Use FFmpeg for fragmented H264/AAC decoding</flag>
-    <flag name="fmp4">In-built Fragmented MP4 parsing</flag>
+    <flag name="fmp4">Built-in Fragmented MP4 parsing</flag>
     <flag name="gamepad">Gamepad DOM HTML5 API support</flag>
+    <flag name="gio">Gnome GIO
+        (https://en.wikipedia.org/wiki/GIO_%28software%29)</flag>
     <flag name="gmp-autoupdate">Allow Gecko Media Plugins (binary blobs) to be automatically
         downloaded and kept up-to-date in user profiles</flag>
-
+    <flag name="gnomeui">Enable <pkg>gnome-base/libgnomeui</pkg> instead of GIO + GTK for icon theme
+        support</flag>
     <flag name="gssapi">GSS-API negotiation</flag>
-    <flag name="gtk2">Use the cairo-gtk2 rendering engine</flag>
-    <flag name="gtk3">Use the cairo-gtk3 rendering engine</flag>
-    <flag name="hardware-aec-ns">Enable support for hardware AEC and noise suppression</flag>
+    <flag name="gtk2">cairo-gtk2 rendering engine</flag>
+    <flag name="gtk3">cairo-gtk3 rendering engine</flag>
+    <flag name="hardware-aec-ns">Prefer hardware AEC and noise suppression over WebRTC AEC</flag>
+    <flag name="healthreport">Collects information about your browser’s performance and stability
+        over time and sends it to Mozilla (https://support.mozilla.org/en-US/kb/firefox-health-report-understand-your-browser-perf)</flag>
     <flag name="hwaccel">Use hardware-accelerated rendering</flag>
     <flag name="ipdl-tests">Enable expensive IPDL tests (https://wiki.mozilla.org/IPDL)</flag>
     <flag name="jemalloc">Use <pkg>dev-libs/jemalloc</pkg> for allocations</flag>
+    <flag name="libproxy">Use <pkg>net-libs/libproxy</pkg> for proxy support</flag>
     <flag name="media-navigator">Enable support for getUserMedia (https://wiki.mozilla.org/Media/getUserMedia)</flag>
     <flag name="minimal">Prevent sdk and headers from being installed</flag>
     <flag name="pgo">Add support for profile-guided optimization using gcc>=4.5, for more optimized
             binaries. This option will double the compile time</flag>
+    <flag name="qt5">cairo-qt5 rendering engine (experimental)</flag>
     <flag name="rust">Include Rust language sources</flag>
-    <flag name="safe-browsing">Enables Safe Browsing/Phishing Protection
+    <flag name="safe-browsing">Safe Browsing/Phishing Protection
         (https://wiki.mozilla.org/Security/Safe_Browsing)</flag>
     <flag name="speech-dispatcher">Speech-dispatcher support</flag>
     <flag name="system-cairo">Use the system-wide <pkg>x11-libs/cairo</pkg>
@@ -48,9 +57,14 @@
         instead of bundled</flag>
     <flag name="system-sqlite">Use the system-wide <pkg>dev-db/sqlite</pkg>
         installation with secure-delete enabled</flag>
-    <flag name="webm">Support for WebM media (VP8 video and Vorbis audio)</flag>
-    <flag name="webrtc">Support for WebRTC (https://wiki.mozilla.org/Media/WebRTC)</flag>
-    <flag name="webspeech">Support for HTML Speech API</flag>
+    <flag name="telemetry">Various stats and experiments, which are sent to Mozilla on a daily
+        basis (https://wiki.mozilla.org/Telemetry)</flag>
+    <flag name="webm">WebM media (VP8 video and Vorbis audio)</flag>
+    <flag name="webrtc">WebRTC (https://wiki.mozilla.org/Media/WebRTC)</flag>
+    <flag name="webspeech">HTML Speech API</flag>
     <flag name="wifi">Enable wireless network functions, mostly used for geolocation</flag>
+    <flag name="yasm">Some bundled libraries (libjpeg-turbo, libav, libvpx, ...) can use
+        hand-written assembly to improve their performance, this requires <pkg>dev-lang/yasm</pkg>
+        which is available only for a limited set of platforms</flag>
   </use>
 </pkgmetadata>
