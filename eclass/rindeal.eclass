@@ -15,6 +15,8 @@ case "${EAPI:-0}" in
     *) die "Unsupported EAPI='${EAPI}' for '${ECLASS}'" ;;
 esac
 
+# DESCRIPTION:
+#	Dependency Specification Format is missing "or"ing of USE flags, so this function works around it
 # USAGE:
 # 	'a b c'		x y z
 # 	'a | b | c'	x y z
