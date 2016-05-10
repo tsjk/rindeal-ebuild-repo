@@ -90,13 +90,12 @@ CDEPEND_A=(
 
 	'x11-libs/gdk-pixbuf:2'
 	# 'x11-libs/libnotify:0' # we're using a patch to get rid of this
-	'x11-libs/libX11:0'
-	'x11-libs/libXcomposite:0'
-	'x11-libs/libXdamage:0'
-	'x11-libs/libXext:0'
-	'x11-libs/libXfixes:0'
+
 	'x11-libs/libXrender:0'
-	'x11-libs/libXt:0'	# X11/Intrinsic.h, X11/Shell.h
+	'X? ('
+		'x11-libs/libX11:0'
+		'x11-libs/libXt:0'	# X11/Intrinsic.h, X11/Shell.h
+	')'
 
 	'accessibility?	( dev-libs/atk:0 )'	# MOZ_ACCESSIBILITY_ATK
 	'dbus? ('
@@ -155,7 +154,6 @@ CDEPEND_A=(
 		'x11-libs/libXfixes:0'
 		'x11-libs/libXcomposite:0'
 	')'
-	# wifi is for geolocation only
 	'wifi? ( net-misc/networkmanager:0 )'	# TODO: check when is NM needed
 )
 DEPEND_A=( "${CDEPEND_A[@]}"
@@ -184,11 +182,17 @@ REQUIRED_USE_A=(
 	'^^ ( gtk2 gtk3 qt5 )'
 	'wifi? ( dbus )' # FF communicates with NM via dbus
 	'crashreporter? ( !bindist )' # contains binary components
-	'gio? ( gtk )'
-	'startup-notification? ( || ( gtk gtk3 ) )'
-	'gtk? ( gio gconf )'
+	'gio? ( gtk2 )'
+	'startup-notification? ( || ( gtk2 gtk3 ) )'
+
+	'gtk2? ( X )'
+	'gtk3? ( X )'
+	'qt5? ( X )'
+
+	'gtk2? ( gio gconf )'
 	'gtk3? ( gio gconf )'
-	'gnomeui? ( || ( gtk gtk3 ) )'
+
+	'gnomeui? ( || ( gtk2 gtk3 ) )'
 	'ffmpeg? ( fmp4 )'
 	'eme? ( fmp4 )'
 )
