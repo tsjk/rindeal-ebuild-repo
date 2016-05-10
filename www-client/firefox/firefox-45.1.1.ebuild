@@ -22,36 +22,41 @@ ESR=true # comment out to disable
 MOZ_PV="${PV}${ESR:+"esr"}"
 MOZ_P="${PN}-${MOZ_PV}"
 
-SLOT='0'
+SLOT='0/esr'
 SRC_URI="https://archive.mozilla.org/pub/firefox/releases/${MOZ_PV}/source/${MOZ_P}.source.tar.xz"
 
 KEYWORDS='~amd64 ~arm ~arm64 ~x86'
 IUSE_A=(
 	## since v46 gtk3 is default
-	+X gtk2 +gtk3 -qt5
-
-	## ffmpeg is becoming default, TODO
-	+ffmpeg
-	-gstreamer # https://anonscm.debian.org/cgit/pkg-mozilla/iceweasel.git/commit/?id=383ee20acf5eab160b4ab0be2b83fb4e4eab9803
+	+X +gtk2 gtk3 -qt5 +pango
 
 	## compiler options
-	ccache custom-{cflags,optimization} hardened pgo rust
+	ccache custom-{cflags,optimization} debug hardened pgo rust +yasm
 
 	## privacy
 	-crashreporter -healthreport -safe-browsing -telemetry -wifi
 
-	accessibility +alsa bindist cups dbus debug # +content-sandbox
-	gio gnome +gssapi +jemalloc +jit +libproxy neon pulseaudio
+	accessibility bindist cups dbus
+	+gssapi +jemalloc +jit +libproxy neon system-jemalloc
 	+startup-notification
+
+	## media
+	+alsa pulseaudio
+	+ffmpeg +fmp4
+	-gstreamer # https://anonscm.debian.org/cgit/pkg-mozilla/iceweasel.git/commit/?id=383ee20acf5eab160b4ab0be2b83fb4e4eab9803
+	+webspeech +webm -eme +media-navigator +speech-dispatcher
 
 	+system-{icu,jpeg,libevent,libvpx}
 	-system-cairo	# buggy, rather use the bundled and patched version
 	-system-sqlite	# requires non-standard USE flags
+	-system-js
 
-	test +yasm
+	test -ipdl-tests
 
-	-gnomeui
-	+speech-dispatcher -ipdl-tests +webrtc +webspeech +webm +ffmpeg -eme +media-navigator gamepad
+	# Gnome
+	-gnomeui +gio +gconf
+
+	+webrtc gamepad
 )
 IUSE="${IUSE_A[*]}"
 
@@ -100,7 +105,6 @@ CDEPEND_A=(
 		'gnome-base/gconf:2'
 	')'
 	'gio? ( dev-libs/glib:2 )'
-	'gnomeui? ( gnome-base/libgnomeui:0 )'
 	'gstreamer? ('
 		'media-libs/gstreamer:1.0'
 		'media-libs/gst-plugins-base:1.0'
@@ -134,6 +138,7 @@ CDEPEND_A=(
 
 	'system-cairo? ( x11-libs/cairo:0[X=,xcb] )'
 	'system-icu? ( dev-libs/icu:0 )'
+	'system-jemalloc? ( >=dev-libs/jemalloc-4:0/2 )'
 	# requires SECURE_DELETE, THREADSAFE, ENABLE_FTS3, ENABLE_UNLOCK_NOTIFY, ENABLE_DBSTAT_VTAB
 	# reference: configure.in
 	'system-sqlite? ( >=dev-db/sqlite-3.9.1:3[secure-delete,debug=] )'
@@ -144,10 +149,10 @@ CDEPEND_A=(
 		'x11-libs/libXfixes:0'
 		'x11-libs/libXcomposite:0'
 	')'
-	'wifi? ( net-misc/networkmanager:0 )'	# TODO: check when is NM needed
 	'X? ('
 		'x11-libs/libX11:0'
 		'x11-libs/libXt:0'	# X11/Intrinsic.h, X11/Shell.h
+		'x11-libs/libXinerama:0'
 	')'
 )
 DEPEND_A=( "${CDEPEND_A[@]}"
@@ -160,6 +165,8 @@ DEPEND_A=( "${CDEPEND_A[@]}"
 RDEPEND_A=( "${CDEPEND_A[@]}"
 	'virtual/freedesktop-icon-theme'
 	'ffmpeg? ( virtual/ffmpeg )'
+	'gnomeui? ( gnome-base/libgnomeui:0 )'
+	'wifi? ( net-misc/networkmanager:0 )'	# TODO: check when is NM needed
 )
 
 DEPEND="${DEPEND_A[*]}"
@@ -169,15 +176,17 @@ REQUIRED_USE_A=(
 	'^^ ( gtk2 gtk3 qt5 )'
 	'wifi? ( dbus )' # FF communicates with NM via dbus
 	'crashreporter? ( !bindist )' # contains binary components
-	'gio? ( gtk2 )'
 	'startup-notification? ( || ( gtk2 gtk3 ) )'
 
 	"$(rindeal::dsf::or 'eme ffmpeg'	fmp4)"
 	"$(rindeal::dsf::or 'gtk2 gtk3 qt5'	X)"
 	"$(rindeal::dsf::or 'gtk2 gtk3'		gio gconf)"
 
+	"$(rindeal::dsf::or 'gio gconf'	X)"
+
 	'gnomeui? ( || ( gtk2 gtk3 ) )'
 	'ipdl-tests? ( test )'
+	'system-jemalloc? ( jemalloc )'
 )
 REQUIRED_USE="${REQUIRED_USE_A[*]}"
 RESTRICT+='!bindist? ( bindist )' # FIXME: what is this?
@@ -185,7 +194,7 @@ RESTRICT+='!bindist? ( bindist )' # FIXME: what is this?
 # QA_PRESTRIPPED="usr/lib*/${PN}/firefox" # FIXME
 # nested configure scripts in mozilla products generate unrecognized options
 # false positives when toplevel configure passes downwards.
-#QA_CONFIGURE_OPTIONS=".*" # FIXME
+QA_CONFIGURE_OPTIONS="*"
 
 S="${WORKDIR}/${MOZ_P}"
 
@@ -228,7 +237,7 @@ pkg_setup() {
 	export+=( LANG='C' LC_ALL='C' )
 
 	# Ensure that we have a sane build enviroment
-	export+=( MOZILLA_CLIENT='1' BUILD_OPT='1' NO_STATIC_LIB='1' USE_PTHREADS='1'
+	export+=( MOZILLA_CLIENT='1' BUILD_OPT='1' USE_PTHREADS='1' VERBOSE='1'
 		MOZ_MAKE_FLAGS="${MAKEOPTS}" SHELL="${EPREFIX}/bin/bash" )
 
 	# Avoid PGO profiling problems due to enviroment leakage
@@ -242,7 +251,7 @@ pkg_setup() {
 	export "${export[@]}" || die
 
 	if ! use bindist ; then
-		elog ""
+		echo
 		elog "You are enabling official branding. You may not redistribute this build"
 		elog "to any users on your network or the internet. Doing so puts yourself into"
 		elog "a legal problem with Mozilla Foundation"
@@ -250,7 +259,7 @@ pkg_setup() {
 	fi
 
 	if use pgo ; then
-		elog ""
+		echo
 		elog "You will do a double build for profile guided optimization (PGO)."
 		elog "This will result in your build taking at least twice as long as before."
 		elog "You can disable it by emerging ${PN} **without** the 'pgo' USE-flag"
@@ -260,6 +269,39 @@ pkg_setup() {
 }
 
 # --------------------------------------------------------------------------------------------------
+
+jemalloc_dir='memory/jemalloc/src'
+
+src_unpack() {
+	local arch="${DISTDIR}"/${MOZ_P}.source.tar.xz
+
+	my_usexclude() { usex $1 --exclude="$2" "$3" ; }
+
+	mkdir -p "${S}" || die
+
+	local tar=(
+		tar
+		--extract
+		--no-same-owner --no-same-permissions
+		--file "${arch}"
+		--strip-components=1 # otherwise we'd have to specify excludes as `${MOZ_P}/path`
+		--directory="${S}"
+
+		"$(my_usexclude system-icu 'intl/icu/source/data')"
+		"$(my_usexclude system-jemalloc "${jemalloc_dir}")"
+		--exclude='nsprpub/src'
+	)
+	if ! use test ; then
+		tar+=(
+			--exclude='testing/web-platform'/{meta,tests}
+			--exclude='testing/talos/talos'
+			#--exclude='*/tests'
+		)
+	fi
+
+	einfo "Running: '${tar[@]}'"
+	"${tar[@]}" || die
+}
 
 src_prepare() {
 	eapply "${FILESDIR}"/patches/
@@ -279,7 +321,7 @@ src_prepare() {
 
 	# Fix sandbox violations during make clean, bug 372817
 	sed -r -e "s|(/no-such-file)|${T}\1|g" \
-		-i -- "${S}"/config/rules.mk "${S}"/nsprpub/configure{.in,} || die
+		-i -- "${S}"/config/rules.mk  || die # "${S}"/nsprpub/configure{.in,}
 
 	# FIXME: test this
 	# Don't exit with error when some libs are missing which we have in
@@ -296,14 +338,16 @@ src_prepare() {
 
 	eautoreconf
 
-	# Must run autoconf in js/src FIXME
-	cd "${S}"/js/src || die
-	eautoconf
+	# FIXME: make spidermonkey optional
+	# spidermonkey
+	# Must run autoconf in js/src
+# 	cd "${S}"/js/src || die
+# 	eautoconf
 
 	if use jemalloc ; then
 		# Need to update jemalloc's configure FIXME
-		cd "${S}"/memory/jemalloc/src || die
-		# FIXME
+		cd "${S}/${jemalloc_dir}" || die
+		# jemalloc uses "newest" autoconf
 		WANT_AUTOCONF= eautoconf
 	fi
 }
@@ -410,7 +454,7 @@ my::src_configure::system_libs() {
 	$mozconfig::use_enable system-sqlite
 
 	# ICU
-	$mozconfig::use_with system-icu icu
+	$mozconfig::use_with system-icu
 
 	# zlib
 	$mozconfig::add_options "${cmt} - zlib" --with-system-zlib
@@ -429,9 +473,10 @@ my::src_configure::system_libs() {
 	# png
 	$mozconfig::add_options "${cmt} - PNG" --with-system-png="${EPREFIX}/usr"
 
-	# nspr (--with-system-nspr is deprecated)
+	# NSPR
 	$mozconfig::add_options "${cmt} - NSPR" \
-		--with-nspr-cflags="$(pkg-config --cflags nspr)" --with-nspr-libs="$(pkg-config --libs nspr)"
+		--with-system-nspr \
+		--with-nspr-exec-prefix="${EPREFIX}/usr"
 }
 
 src_configure() {
@@ -455,7 +500,7 @@ src_configure() {
 	## setup dirs
 	options=(
 		--x-includes="${EPREFIX}/usr/include" --x-libraries="${EPREFIX}/usr/$(get_libdir)"
-		--with-nspr-prefix="${EPREFIX}/usr" --with-nss-prefix="${EPREFIX}/usr"
+		--with-nss-prefix="${EPREFIX}/usr"
 		# --with-qtdir="$(qt5_get_dir)"
 		--with-default-mozilla-five-home="${MOZILLA_FIVE_HOME}"
 	)
@@ -479,12 +524,14 @@ src_configure() {
 	$mozconfig::add_options 'disable installer/updater' "${options[@]}"
 	# pref("browser.pocket.enabled", true);
 
-	$mozconfig::add_options 'Create a shared JavaScript library' --enable-shared-js
+	# $mozconfig::add_options 'build static SpiderMonkey' --disable-shared-js
+	$mozconfig::stmt 'export' 'disable JS' JS_STANDALONE=  BUILDING_JS=
+
 
 	# jemalloc
 	$mozconfig::use_enable	jemalloc
 	$mozconfig::use_enable	jemalloc replace-malloc
-	$mozconfig::use_set		jemalloc MOZ_JEMALLOC3
+	$mozconfig::use_set		system-jemalloc MOZ_JEMALLOC4
 
 	$mozconfig::use_enable jit ion
 
@@ -561,8 +608,8 @@ src_configure() {
 	$mozconfig::use_enable	wifi	necko-wifi # positioning wifi scanner
 
 	## Gnome
-	$mozconfig::use_enable	gnome	gnomeui
-	$mozconfig::use_enable	gnome	gconf
+	$mozconfig::use_enable	gnomeui
+	$mozconfig::use_enable	gconf
 	$mozconfig::use_enable	gio  # MOZ_ENABLE_GIO
 
 	## networking
@@ -629,6 +676,7 @@ src_compile() {
 	fi
 
 	# xvfb-run -a -s "-extension GLX -screen 0 1280x1024x24"
+
 	emake -f client.mk build
 }
 
