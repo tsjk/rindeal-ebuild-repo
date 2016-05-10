@@ -103,6 +103,49 @@ firefox::mozconfig::init() {
 	$self::add_options '' --enable-application=browser
 }
 
+firefox::mozconfig::keyfiles() {
+	firefox::mozconfig::_keyfile() {
+		local name="$1" ; shift
+		local file="${T}/.${name}"
+		echo -n "$@" >"${file}" || die
+		$self::add_options "${name}" --with-${name}-keyfile="${file}"
+	}
+
+	# Google API keys (see http://www.chromium.org/developers/how-tos/api-keys)
+	# Note: These are for Gentoo Linux use ONLY. For your own distribution, please
+	# get your own set of keys.
+	# safebrowsing/geolocation
+	$self::_keyfile 'google-api'		'AIzaSyDEAOvatFo0eTgsV_ZlEzx0ObmepsMzfAc'
+
+	# FIXME: these are from Arch
+
+	# for Loop/Hello service (https://wiki.mozilla.org/Loop/OAuth_Setup)
+	$self::_keyfile 'google-oauth-api'	'413772536636.apps.googleusercontent.com 0ZChLK6AxeA3Isu96MkwqDR4'
+
+	# for geolocation/geoip
+	# pref("geo.wifi.uri", "https://location.services.mozilla.com/v1/geolocate?key=%MOZILLA_API_KEY%");
+	$self::_keyfile 'mozilla-api'		'16674381-f021-49de-8622-3021c5942aff'
+
+	# --with-bing-api-keyfile		# windows only
+	# --with-adjust-sdk-keyfile		# mozilla tracking
+	# --with-gcm-senderid-keyfile	# android only
+}
+
+# FIXME: make this unnecessary
+firefox::mozconfig::fix_enable-extensions() {
+	# Resolve multiple --enable-extensions down to one
+	local exts=(
+		$(sed -n -r 's|^ac_add_options *--enable-extensions=([^ ]*).*|\1|p' -- "${MOZCONFIG}")
+	)
+	if [ ${#exts[@]} -gt 1 ] ; then
+		local joint="$(IFS=,; echo "${exts[*]}")"
+		echo "mozconfig: merging multiple extensions: '${joint}"
+		sed -e '/^ac_add_options *--enable-extensions/d' \
+			-i -- "${MOZCONFIG}" || die
+		$mozconfig::add_options "extensions" --enable-extensions="${joint}"
+	fi
+}
+
 # Display a table describing all configuration options paired with reasons.
 # It also serves as a dumb config checker.
 firefox::mozconfig::pretty_print() {
@@ -140,6 +183,12 @@ firefox::mozconfig::pretty_print() {
 	eshopts_pop
 }
 
+firefox::mozconfig::final() {
+	firefox::src_configure::keyfiles
+	$self::fix_enable-extensions
+	$self::pretty_print
+}
+
 __class_end
 # END firefox::mozconfig
 # --------------------------------------------------------------------------------------------------
@@ -149,10 +198,10 @@ __class_end
 self=firefox::prefs
 
 firefox::prefs::add() {
-	local name="$1" val="$2" cmt="$3"
+	local cmt="$1" name="$2" val="$3"
 
 	if ! [[ "${val}" =~ ^(-?[0-9]+|true|false)$ ]] ; then
-		val="\""${val}\"""
+		val="\"${val}\""
 	fi
 
 	printf 'pref("%s", %s); // %s' \
@@ -166,35 +215,6 @@ __class_end
 # BEGIN firefox::src_configure
 # --------------------------------------------------------------------------------------------------
 self=firefox::src_configure
-
-firefox::src_configure::keyfiles() {
-	firefox::_keyfile() {
-		local name="$1" ; shift
-		local file="${T}/.${name}"
-		echo -n "$@" >"${file}" || die
-		firefox::mozconfig::add_options "${name}" --with-${name}-keyfile="${file}"
-	}
-
-	# Google API keys (see http://www.chromium.org/developers/how-tos/api-keys)
-	# Note: These are for Gentoo Linux use ONLY. For your own distribution, please
-	# get your own set of keys.
-	firefox::_keyfile 'google-api'			'AIzaSyDEAOvatFo0eTgsV_ZlEzx0ObmepsMzfAc'
-
-	# FIXME: these are from Arch
-
-	# for Loop/Hello service (https://wiki.mozilla.org/Loop/OAuth_Setup)
-	firefox::_keyfile 'google-oauth-api'	'413772536636.apps.googleusercontent.com 0ZChLK6AxeA3Isu96MkwqDR4'
-
-	# for geolocation
-	# pref("geo.wifi.uri", "https://location.services.mozilla.com/v1/geolocate?key=%MOZILLA_API_KEY%");
-	firefox::_keyfile 'mozilla-api'			'16674381-f021-49de-8622-3021c5942aff'
-
-	# --with-bing-api-keyfile		# windows only
-	# --with-adjust-sdk-keyfile		# mozilla tracking
-	# --with-gcm-senderid-keyfile	# android only
-
-	unset -f firefox::_keyfile
-}
 
 __class_end
 # END firefox::src_configure

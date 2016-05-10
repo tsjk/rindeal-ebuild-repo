@@ -31,16 +31,17 @@ IUSE_A=(
 	gtk2 +gtk3 -qt5
 
 	## ffmpeg is becoming default, TODO
-	+ffmpeg +gstreamer
+	+ffmpeg
+	-gstreamer # https://anonscm.debian.org/cgit/pkg-mozilla/iceweasel.git/commit/?id=383ee20acf5eab160b4ab0be2b83fb4e4eab9803
 
 	## compiler options
-	ccache custom-{cflags,optimization}  hardened pgo rust
+	ccache custom-{cflags,optimization} hardened pgo rust
 
 	## privacy
 	-crashreporter -healthreport -safe-browsing -telemetry -wifi
 
-	accessibility +alsa bindist +content-sandbox  cups dbus debug
-	gnome +gssapi +jemalloc +jit libproxy neon pulseaudio
+	accessibility +alsa bindist cups dbus debug # +content-sandbox
+	gio gnome +gssapi +jemalloc +jit libproxy neon pulseaudio
 	+startup-notification
 
 	+system-{icu,jpeg,libevent,libvpx}
@@ -48,45 +49,44 @@ IUSE_A=(
 	-system-sqlite	# requires non-standard USE flags
 
 	test +yasm
+
+
+	+speech-dispatcher -ipdl-tests +webrtc +webspeech +webm +ffmpeg -eme +media-navigator gamepad
 )
-REQUIRED_USE_A=(
-	'^^ ( gtk2 gtk3 qt5 )'
-	'wifi? ( dbus )'
-	'crashreporter? ( !bindist )'
-)
-IUSE="${IUSE_A[*]}"
-REQUIRED_USE="${REQUIRED_USE_A[*]}"
-RESTRICT+='!bindist? ( bindist )'
 
 # deps guide: https://developer.mozilla.org/en-US/docs/Mozilla/Developer_guide/Build_Instructions/Linux_Prerequisites#Other_distros_and_other_Unix-based_systems
 
-CDEPEND_A=(
-	'app-arch/bzip2:0' # system-bz2
-	'app-text/hunspell:0' # system-hunspell
-
-	'dev-lang/perl:0' # needed for win32 SDK checks
-
-	'accessibility? ( dev-libs/atk:0 )' # MOZ_ACCESSIBILITY_ATK
-	'dev-libs/expat:0'
+gtk_deps=(
 	'dev-libs/glib:2'
-	'=dev-libs/libevent-2.0*:0=' # system-libevent
+	'x11-libs/gtk+:2' # gdk-x11-2.0
+)
+
+CDEPEND_A=(
+	'app-arch/bzip2:0'		# system-bz2
+	'app-text/hunspell:0'	# system-hunspell
+
+	'dev-lang/perl:0'		# needed for win32 SDK checks
+
+	'dev-libs/expat:0'
+
+	'=dev-libs/libevent-2.0*:0='	# system-libevent
 	'>=dev-libs/nss-3.21.1:0'
 	'>=dev-libs/nspr-4.12:0'
 
-	'>=media-gfx/graphite2-1.3.8' # TODO: check necessity
+	'>=media-gfx/graphite2-1.3.8'	# TODO: check necessity
 
 	'media-libs/fontconfig:1.0'
 	'media-libs/freetype:2'
-	'>=media-libs/harfbuzz-1.1.3:0=[graphite,icu]' # TODO: check necessity
-	'media-libs/libjpeg-turbo:0' # system-jpeg
-	'>=media-libs/libvpx-1.5.0:0=[postproc]' # system-libvpx; this is often bumped
+	'>=media-libs/harfbuzz-1.1.3:0=[graphite,icu]'	# TODO: check necessity
+	'media-libs/libjpeg-turbo:0'	# system-jpeg
+	'>=media-libs/libvpx-1.5.0:0=[postproc]'	# system-libvpx; this is often bumped
 	'media-libs/libpng:0=[apng]'
 	'media-libs/mesa:0'
 
 	'sys-libs/zlib:0'
-	'virtual/libffi:0' # system-ffi
+	'virtual/libffi:0'	# system-ffi
 
-	'x11-libs/pixman:0' # system-pixman
+	'x11-libs/pixman:0'	# system-pixman
 
 	'x11-libs/gdk-pixbuf:2'
 	# 'x11-libs/libnotify:0' # we're using a patch to get rid of this
@@ -96,23 +96,39 @@ CDEPEND_A=(
 	'x11-libs/libXext:0'
 	'x11-libs/libXfixes:0'
 	'x11-libs/libXrender:0'
-	'x11-libs/libXt:0' # X11/Intrinsic.h, X11/Shell.h
-	'x11-libs/pango:0'
+	'x11-libs/libXt:0'	# X11/Intrinsic.h, X11/Shell.h
 
-	'pulseaudio? ( media-sound/pulseaudio )'
+	'accessibility?	( dev-libs/atk:0 )'	# MOZ_ACCESSIBILITY_ATK
 	'dbus? ('
 		'sys-apps/dbus:0'
 		'dev-libs/dbus-glib:0'
 	')'
+	'gio? ( dev-libs/glib:2 )'
+	# Many automated tests will fail with --disable-gconf. See bug 1167201.
+	'gconf? ('
+		'dev-libs/glib:2'
+		'gnome-base/gconf:2'
+	')'
+	# Enable libgnomeui instead of GIO & GTK for icon theme support
+	'gnomeui? ( gnome-base/libgnomeui:0 )'
 	'gstreamer? ('
 		'media-libs/gstreamer:1.0'
 		'media-libs/gst-plugins-base:1.0'
-		# 'media-libs/gst-plugins-good:1.0' # TODO: check necessity
-		# 'media-plugins/gst-plugins-libav:1.0' # TODO: check necessity
+		# 'media-libs/gst-plugins-good:1.0'		# TODO: check necessity
+		# 'media-plugins/gst-plugins-libav:1.0'	# TODO: check necessity
 	')'
-	'gtk2? ( x11-libs/gtk+:2 )'
-	'gtk3? ( x11-libs/gtk+:3 )'
-	'libproxy? ( net-libs/libproxy:0 )'
+	'gtk2? (' "${gtk_deps[@]}"
+			'x11-libs/gtk+:2'
+	')'
+	'gtk3? (' "${gtk_deps[@]}"
+		'x11-libs/gtk+:3'
+		'dev-libs/glib:2'
+	')'
+	'libproxy?	( net-libs/libproxy:0 )'
+	'pango? ('
+		'x11-libs/pango:0'
+	')'
+	'pulseaudio?	( media-sound/pulseaudio )'
 	'qt5? ('
 		'dev-qt/qtcore:5='
 		'dev-qt/qtgui:5='
@@ -124,25 +140,30 @@ CDEPEND_A=(
 	')'
 	# https://bugzilla.mozilla.org/show_bug.cgi?id=1135640
 	# https://developer.mozilla.org/en-US/Firefox/Building_Firefox_with_Rust_code
-	'rust? ( dev-lang/rust )'
+	'rust? ( || ( dev-lang/rust dev-lang/rust-bin ) )'
 	'startup-notification? ( x11-libs/startup-notification:0 )'
 
 	'system-cairo? ( x11-libs/cairo:0[X,xcb] )'
 	'system-icu? ( dev-libs/icu:0 )'
+	# requires SECURE_DELETE, THREADSAFE, ENABLE_FTS3, ENABLE_UNLOCK_NOTIFY, ENABLE_DBSTAT_VTAB
+	# reference: configure.in
 	'system-sqlite? ( >=dev-db/sqlite-3.9.1:3[secure-delete,debug=] )'
 
-	'wifi? ( net-misc/networkmanager:0 )' # TODO: check when is NM needed
+	'webrtc? ('
+		'x11-libs/libXext:0'
+		'x11-libs/libXdamage:0'
+		'x11-libs/libXfixes:0'
+		'x11-libs/libXcomposite:0'
+	')'
+	# wifi is for geolocation only
+	'wifi? ( net-misc/networkmanager:0 )'	# TODO: check when is NM needed
 )
 DEPEND_A=( "${CDEPEND_A[@]}"
-	'app-arch/zip'
-	'app-arch/unzip'
-
-	'sys-devel/binutils:*'
 	'>=sys-devel/gcc-4.8'
 	'virtual/pkgconfig'
 
 	# yasm is required for webm, jpeg (https://developer.mozilla.org/en-US/docs/Mozilla/Developer_guide/Build_Instructions/Yasm)
-	'yasm? ( dev-lang/yasm:0 )'
+	'yasm? ( dev-lang/yasm:0 )' # jpeg, libav, libvpx, ...
 
 	"amd64? ("
 		'virtual/opengl' # TODO: why this?
@@ -159,10 +180,26 @@ RDEPEND_A=( "${CDEPEND_A[@]}"
 DEPEND="${DEPEND_A[*]}"
 RDEPEND="${RDEPEND_A[*]}"
 
-QA_PRESTRIPPED="usr/lib*/${PN}/firefox" # FIXME
+REQUIRED_USE_A=(
+	'^^ ( gtk2 gtk3 qt5 )'
+	'wifi? ( dbus )' # FF communicates with NM via dbus
+	'crashreporter? ( !bindist )' # contains binary components
+	'gio? ( gtk )'
+	'startup-notification? ( || ( gtk gtk3 ) )'
+	'gtk? ( gio gconf )'
+	'gtk3? ( gio gconf )'
+	'gnomeui? ( || ( gtk gtk3 ) )'
+	'ffmpeg? ( fmp4 )'
+	'eme? ( fmp4 )'
+)
+IUSE="${IUSE_A[*]}"
+REQUIRED_USE="${REQUIRED_USE_A[*]}"
+RESTRICT+='!bindist? ( bindist )'
+
+# QA_PRESTRIPPED="usr/lib*/${PN}/firefox" # FIXME
 # nested configure scripts in mozilla products generate unrecognized options
 # false positives when toplevel configure passes downwards.
-QA_CONFIGURE_OPTIONS=".*"
+#QA_CONFIGURE_OPTIONS=".*" # FIXME
 
 S="${WORKDIR}/${MOZ_P}"
 
@@ -232,7 +269,8 @@ pkg_setup() {
 	export+=( LANG='C' LC_ALL='C' )
 
 	# Ensure that we have a sane build enviroment
-	export+=( MOZILLA_CLIENT='1' BUILD_OPT='1' NO_STATIC_LIB='1' USE_PTHREADS='1' )
+	export+=( MOZILLA_CLIENT='1' BUILD_OPT='1' NO_STATIC_LIB='1' USE_PTHREADS='1'
+		MOZ_MAKE_FLAGS="${MAKEOPTS}" SHELL="${EPREFIX}/bin/bash" )
 
 	# Avoid PGO profiling problems due to enviroment leakage
 	# These should *always* be cleaned up anyway
@@ -265,7 +303,7 @@ pkg_setup() {
 # --------------------------------------------------------------------------------------------------
 
 src_prepare() {
-	eapply "${FILESDIR}/patches/"
+	eapply "${FILESDIR}"/patches/
 
 	eapply_user
 
@@ -304,16 +342,16 @@ src_prepare() {
 	eautoconf
 
 	if use jemalloc ; then
-	# Need to update jemalloc's configure FIXME
-	cd "${S}"/memory/jemalloc/src || die
-	# FIXME
-	WANT_AUTOCONF= eautoconf
+		# Need to update jemalloc's configure FIXME
+		cd "${S}"/memory/jemalloc/src || die
+		# FIXME
+		WANT_AUTOCONF= eautoconf
 	fi
 }
 
 # --------------------------------------------------------------------------------------------------
 
-my_src_configure::compiler() {
+my::src_configure::compiler() {
 	# -O* compiler flags are passed only via `--enable-optimize=` option
 	local o="$(get-flag '-O*')"
 	if use custom-optimization && [ -n "${o}" ] ; then
@@ -328,9 +366,11 @@ my_src_configure::compiler() {
 	append-ldflags -Wl,-rpath="${MOZILLA_FIVE_HOME}"
 
 	# Add full relro support for hardened
-	use hardened && append-ldflags "-Wl,-z,relro,-z,now"
+	use hardened && append-ldflags '-Wl,-z,relro,-z,now'
 
-	$mozconfig::add_options '' --disable-elf-hack
+	# ----------
+
+	$mozconfig::add_options '' --disable-elf-hack # FIXME
 
 	$mozconfig::use_with ccache
 
@@ -346,20 +386,20 @@ my_src_configure::compiler() {
 
 	# --- --- ---
 
-	$mozconfig::add_options 'disable pedantic' --disable-pedantic
 	options=( --disable-{install-strip,strip,strip-libs} )
 	$mozconfig::add_options 'disable stripping' "${options[@]}"
 
 	if use debug ; then
 		options=( --enable-{debug,profiling} --enable-{address,memory,thread}-sanitizer )
-		$mozconfig::add_options 'debug' "${options[@]}"
+		$mozconfig::add_options "$(firefox::use_cmt debug)" "${options[@]}"
 	else
-		$mozconfig::add_options '' --enable-release
+		$mozconfig::add_options "$(firefox::use_cmt debug)" --enable-release
 	fi
-	$mozconfig::use_set !debug BUILDING_RELEASE
+	$mozconfig::use_enable	debug	debug-symbols
+	$mozconfig::use_set		!debug	BUILDING_RELEASE
 }
 
-my_src_configure::gui() {
+my::src_configure::gui() {
 	local toolkit toolkit_comment
 
 	if use gtk2 ; then
@@ -378,10 +418,10 @@ my_src_configure::gui() {
 		# and setting --with-qtdir overrides the pkg-config include dirs
 		local t
 		for t in qmake moc rcc ; do
-			$mozconfig::stmt 'export' '' HOST_${t^^}="$(qt5_get_bindir)/${t}"
+			$mozconfig::stmt 'export'	"${toolkit_comment}" HOST_${t^^}="$(qt5_get_bindir)/${t}"
 		done
-		$mozconfig::stmt 'unset' "${toolkit_comment}" 'QTDIR'
-		$mozconfig::add_options "${toolkit_comment}" --disable-gio
+		$mozconfig::stmt 'unset'	"${toolkit_comment}" 'QTDIR'
+		$mozconfig::add_options		"${toolkit_comment}" --disable-gio
 	fi
 
 	# TODO: egl
@@ -398,7 +438,7 @@ my_src_configure::gui() {
 	# --disable-skia-gpu
 }
 
-my_src_configure::system_libs() {
+my::src_configure::system_libs() {
 	local cmt='system libs' options
 
 	# these are configured via pkg-config
@@ -407,9 +447,10 @@ my_src_configure::system_libs() {
 		--enable-system-{ffi,hunspell} )
 	$mozconfig::add_options "${cmt}" "${options[@]}"
 
-	# requires SECURE_DELETE, THREADSAFE, ENABLE_FTS3, ENABLE_UNLOCK_NOTIFY, ENABLE_DBSTAT_VTAB
-	$mozconfig::use_enable	system-sqlite
+	# SQLite
+	$mozconfig::use_enable system-sqlite
 
+	# ICU
 	$mozconfig::use_with system-icu icu
 
 	# zlib
@@ -429,20 +470,6 @@ my_src_configure::system_libs() {
 	# nspr (--with-system-nspr is deprecated)
 	$mozconfig::add_options "${cmt} - NSPR" \
 		--with-nspr-cflags="$(pkg-config --cflags nspr)" --with-nspr-libs="$(pkg-config --libs nspr)"
-}
-
-my_src_configure::fix_enable-extensions() {
-	# Resolve multiple --enable-extensions down to one
-	local exts=(
-		$(sed -n -r 's|^ac_add_options *--enable-extensions=([^ ]*).*|\1|p' -- "${MOZCONFIG}")
-	)
-	if [ ${#exts[@]} -gt 1 ] ; then
-		local joint="$(IFS=,; echo "${exts[*]}")"
-		echo "mozconfig: merging multiple extensions: '${joint}"
-		sed -e '/^ac_add_options *--enable-extensions/d' \
-			-i -- "${MOZCONFIG}" || die
-		$mozconfig::add_options "extensions" --enable-extensions="${joint}"
-	fi
 }
 
 src_configure() {
@@ -474,7 +501,7 @@ src_configure() {
 	$mozconfig::stmt 'mk_add_options' '' MOZ_OBJDIR="${BUILD_DIR}"
 
 	## setup compiler
-	my_src_configure::compiler
+	my::src_configure::compiler
 
 	$mozconfig::add_options '' --with-pthreads
 
@@ -482,42 +509,42 @@ src_configure() {
 	$mozconfig::use_enable !bindist official-branding
 	# available brandings: aurora/nightly/official/unofficial
 	use bindist && $mozconfig::add_options "$(firefox::use_cmt bindist)" --with-branding='browser/branding/aurora'
-	$mozconfig::add_options 'id' --with-distribution-id='eu.rindeal'
+	$mozconfig::add_options 'id' --with-distribution-id='org.gentoo'
 
-	# $mozconfig::use_enable debug debug-symbols # FIXME
 	$mozconfig::use_enable test tests
 
 	options=( --disable-{installer,updater} )
 	$mozconfig::add_options 'disable installer/updater' "${options[@]}"
-	$mozconfig::use_enable crashreporter
-	$mozconfig::use_set healthreport MOZ_SERVICES_HEALTHREPORT
+	# pref("browser.pocket.enabled", true);
 
 	$mozconfig::add_options 'Create a shared JavaScript library' --enable-shared-js
 
-	$mozconfig::use_set	jemalloc MOZ_JEMALLOC3
+	# jemalloc
 	$mozconfig::use_enable	jemalloc
 	$mozconfig::use_enable	jemalloc replace-malloc
+	$mozconfig::use_set		jemalloc MOZ_JEMALLOC3
 
 	$mozconfig::use_enable jit ion
 
 	$mozconfig::use_enable rust
 
-	my_src_configure::gui
+	my::src_configure::gui
 
 	## system libs
-	my_src_configure::system_libs
+	my::src_configure::system_libs
 
 	# '--enable-build-backend=FasterMake'
-	# --enable-rust
 	# --disable-startupcache
 	# --disable-mozril-geoloc
 	# --enable-xterm-updates
 	# --disable-synth-speechd
+
+	$mozconfig::use_enable speech-dispatcher
 	# --disable-websms-backend
 	# use x86 || use amd64 || --disable-webrtc
 	# --enable-hardware-aec-ns
-	# --disable-webspeech
-	# --disable-webspeechtestbackend
+	# --disable-webspeech # nightly
+	# --disable-webspeechtestbackend # nightly
 	# --enable-raw
 	# --disable-gamepad
 	# --enable-tree-freetype
@@ -530,7 +557,8 @@ src_configure() {
 # 	ac_add_options --enable-system-ffi
 # 	%%endif
 
-	$mozconfig::use_enable content-sandbox
+	# e10s
+	# $mozconfig::use_enable content-sandbox
 
 	$mozconfig::use_enable accessibility
 	$mozconfig::add_options 'ECMAScript Internationalization API' --with-intl-api
@@ -553,22 +581,27 @@ src_configure() {
 	fi
 
 	## desktop integration
-	$mozconfig::use_enable startup-notification # TODO: what is this?
-	$mozconfig::use_enable dbus
+	$mozconfig::use_enable	startup-notification # TODO: what is this?
+	$mozconfig::use_enable	dbus	# MOZ_ENABLE_DBUS
 
 	## privacy
-	$mozconfig::use_enable safe-browsing
-	$mozconfig::use_enable safe-browsing url-classifier
-	$mozconfig::use_set	telemetry MOZ_TELEMETRY_REPORTING
+	$mozconfig::use_enable	crashreporter
+	$mozconfig::use_set		healthreport	MOZ_SERVICES_HEALTHREPORT
+	$mozconfig::use_enable	safe-browsing
+	$mozconfig::use_enable	safe-browsing	url-classifier
+	$mozconfig::use_set		telemetry		MOZ_TELEMETRY_REPORTING
+	# add_pref pref("experiments.enabled", $(usex telemetry true false));
+	# pref("toolkit.telemetry.archive.enabled", true);
+	$mozconfig::add_options 'popup and cookie blocking' --enable-permissions
 
 	# positioning
 	# --enable-approximate-location
-	$mozconfig::use_enable wifi necko-wifi # positioning wifi scanner
+	$mozconfig::use_enable	wifi	necko-wifi # positioning wifi scanner
 
 	## Gnome
-	$mozconfig::use_enable gnome gnomeui
-	$mozconfig::use_enable gnome gconf
-	$mozconfig::add_options '' --enable-gio
+	$mozconfig::use_enable	gnome	gnomeui
+	$mozconfig::use_enable	gnome	gconf
+	$mozconfig::use_enable	gio  # MOZ_ENABLE_GIO
 
 	## networking
 	$mozconfig::use_enable libproxy
@@ -576,32 +609,26 @@ src_configure() {
 
 	$mozconfig::use_enable cups printing
 
-	firefox::src_configure::keyfiles
-
-	$mozconfig::stmt 'export' '' MOZ_MAKE_FLAGS="${MAKEOPTS}"
-	#$mozconfig::stmt 'export' '' SHELL="${SHELL:-${EPREFIX}//bin/bash}"
-
-	## arch specific options (keep this at the end to allow overrides)
+	## BEGIN: arch specific stuff (keep this at the end to allow overrides)
 
 	# Modifications to better support ARM, bug 553364
 	if use neon ; then
-		$mozconfig::add_options '' --with-fpu=neon
-		$mozconfig::add_options '' --with-thumb=yes
-		$mozconfig::add_options '' --with-thumb-interwork=no
+		options=( --with-fpu=neon --with-thumb=yes --with-thumb-interwork=no )
+		$mozconfig::add_options "$(firefox::use_cmt neon)" "${options[@]}"
 	fi
 	if [[ ${CHOST} == armv* ]] ; then
-		$mozconfig::add_options '' --with-float-abi=hard
-		$mozconfig::add_options '' --enable-skia
+		options=( --with-float-abi=hard --enable-skia )
+		$mozconfig::add_options "CHOST=armv*" "${options[@]}"
 
 		if ! use system-libvpx ; then
 			sed -e "s|softfp|hard|" \
-				-i  -- "${S}/media/libvpx/moz.build" || die
+				-i -- "${S}/media/libvpx/moz.build" || die
 		fi
 	fi
 
-	my_src_configure::fix_enable-extensions # FIXME: make this unnecessary
+	## END: arch specific stuff (keep this at the end to allow overrides)
 
-	$mozconfig::pretty_print
+	$mozconfig::final
 
 	## ---
 
@@ -613,7 +640,7 @@ src_configure() {
 # --------------------------------------------------------------------------------------------------
 
 src_compile() {
-	return 0
+	# return 0
 
 	if use pgo ; then
 		# FIXME

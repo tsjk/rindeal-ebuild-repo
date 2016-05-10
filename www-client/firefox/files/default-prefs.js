@@ -46,3 +46,20 @@ pref("intl.locale.matchOS", true);
 
 /* Enable extensions in the application directory */
 pref("extensions.enabledScopes", 5);
+
+pref("extensions.webservice.discoverURL", "");
+pref("extensions.getAddons.recommended.url", "");
+
+pref("browser.uitour.enabled", false);
+
+// Market-specific search defaults
+// This is disabled globally, and then enabled for individual locales
+// in firefox-l10n.js (eg. it's enabled for en-US).
+pref("browser.search.geoSpecificDefaults", false);
+pref("browser.search.geoSpecificDefaults.url", "https://search.services.mozilla.com/1/%APP%/%VERSION%/%CHANNEL%/%LOCALE%/%REGION%/%DISTRIBUTION%/%DISTRIBUTION_VERSION%");
+
+// US specific default (used as a fallback if the geoSpecificDefaults request fails).
+pref("browser.search.defaultenginename.US",      "data:text/plain,browser.search.defaultenginename.US=Yahoo");
+pref("browser.search.order.US.1",                "data:text/plain,browser.search.order.US.1=Yahoo");
+pref("browser.search.order.US.2",                "data:text/plain,browser.search.order.US.2=Google");
+pref("browser.search.order.US.3",                "data:text/plain,browser.search.order.US.3=Bing");

@@ -6,34 +6,51 @@
     <name>Jan Chren (rindeal)</name>
   </maintainer>
   <use>
-    <flag name="bindist">Disable official Firefox branding (icons, name) which 
-		are not binary-redistributable according to upstream.</flag>
-    <flag name="custom-optimization">Fine-tune custom compiler
-		optimizations (-Os, -O0, -O1, -O2, -O3)</flag>
-    <flag name="force-gtk2">Use the cairo-gtk2 rendering engine</flag>
+    <flag name="bindist">Disable official Firefox branding (icons, name) which are not
+        binary-redistributable according to upstream</flag>
+    <flag name="ccache">Enables ccache support</flag>
+    <flag name="custom-optimization">Enables to use custom compiler optimization
+        level (-Os, -O0, -O1, -O2, -O3)</flag>
+    <flag name="egl">EGL provider</flag>
+    <flag name="eme">Encrypted Media Extensions</flag>
+    <flag name="ffmpeg">Use FFmpeg for fragmented H264/AAC decoding</flag>
+    <flag name="fmp4">In-built Fragmented MP4 parsing</flag>
+    <flag name="gamepad">Gamepad DOM HTML5 API support</flag>
     <flag name="gmp-autoupdate">Allow Gecko Media Plugins (binary blobs) to be automatically
-		downloaded and kept up-to-date in user profiles</flag>
-    <flag name="gstreamer-0">Use gstreamer:0.10 instead of gstreamer:1 for media support</flag>
+        downloaded and kept up-to-date in user profiles</flag>
+
+    <flag name="gssapi">GSS-API negotiation</flag>
+    <flag name="gtk2">Use the cairo-gtk2 rendering engine</flag>
     <flag name="gtk3">Use the cairo-gtk3 rendering engine</flag>
+    <flag name="hardware-aec-ns">Enable support for hardware AEC and noise suppression</flag>
     <flag name="hwaccel">Use hardware-accelerated rendering</flag>
-    <flag name="jemalloc3">Enable or disable jemalloc3 (forced-on when supported prior to 38.0)</flag>
+    <flag name="ipdl-tests">Enable expensive IPDL tests (https://wiki.mozilla.org/IPDL)</flag>
+    <flag name="jemalloc">Use <pkg>dev-libs/jemalloc</pkg> for allocations</flag>
+    <flag name="media-navigator">Enable support for getUserMedia (https://wiki.mozilla.org/Media/getUserMedia)</flag>
     <flag name="minimal">Prevent sdk and headers from being installed</flag>
-    <flag name="pgo">Add support for profile-guided optimization using gcc-4.5,
-		for faster binaries. This option will double the compile time.</flag>
+    <flag name="pgo">Add support for profile-guided optimization using gcc>=4.5, for more optimized
+            binaries. This option will double the compile time</flag>
+    <flag name="rust">Include Rust language sources</flag>
+    <flag name="safe-browsing">Enables Safe Browsing/Phishing Protection
+        (https://wiki.mozilla.org/Security/Safe_Browsing)</flag>
+    <flag name="speech-dispatcher">Speech-dispatcher support</flag>
     <flag name="system-cairo">Use the system-wide <pkg>x11-libs/cairo</pkg>
-		instead of bundled.</flag>
+        instead of bundled</flag>
     <flag name="system-harfbuzz">Use the system-wide <pkg>media-libs/harfbuzz</pkg>
-		and <pkg>media-gfx/graphite2</pkg> instead of bundled.</flag>
+        and <pkg>media-gfx/graphite2</pkg> instead of bundled</flag>
     <flag name="system-icu">Use the system-wide <pkg>dev-libs/icu</pkg>
-		instead of bundled.</flag>
+        instead of bundled</flag>
     <flag name="system-jpeg">Use the system-wide <pkg>media-libs/libjpeg-turbo</pkg>
-		instead of bundled.</flag>
+        instead of bundled</flag>
     <flag name="system-libevent">Use the system-wide <pkg>dev-libs/libevent</pkg>
-		instead of bundled.</flag>
+        instead of bundled</flag>
     <flag name="system-libvpx">Use the system-wide <pkg>media-libs/libvpx</pkg>
-		instead of bundled.</flag>
+        instead of bundled</flag>
     <flag name="system-sqlite">Use the system-wide <pkg>dev-db/sqlite</pkg>
-		installation with secure-delete enabled</flag>
-    <flag name="egl">Enable EGL provider</flag>
+        installation with secure-delete enabled</flag>
+    <flag name="webm">Support for WebM media (VP8 video and Vorbis audio)</flag>
+    <flag name="webrtc">Support for WebRTC (https://wiki.mozilla.org/Media/WebRTC)</flag>
+    <flag name="webspeech">Support for HTML Speech API</flag>
+    <flag name="wifi">Enable wireless network functions, mostly used for geolocation</flag>
   </use>
 </pkgmetadata>
