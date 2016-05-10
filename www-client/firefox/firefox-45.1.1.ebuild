@@ -12,9 +12,9 @@ PYTHON_REQ_USE='ncurses,sqlite,ssl,threads'
 # will resolve to 2.13, newer don't work (https://bugzilla.mozilla.org/show_bug.cgi?id=104642)
 WANT_AUTOCONF="2.1"
 
-inherit gnome2-utils check-reqs flag-o-matic python-any-r1 autotools rindeal firefox
+inherit gnome2-utils check-reqs flag-o-matic python-any-r1 autotools rindeal firefox eclass-patches
 
-DESCRIPTION="Firefox Web Browser (rindeal's edition)"
+DESCRIPTION="Firefox Web Browser"
 HOMEPAGE='https://www.mozilla.com/firefox'
 LICENSE='MPL-2.0 GPL-2 LGPL-2.1'
 
@@ -190,33 +190,6 @@ RESTRICT+='!bindist? ( bindist )' # FIXME: what is this?
 S="${WORKDIR}/${MOZ_P}"
 
 BUILD_DIR="${S}/ff"
-
-# --------------------------------------------------------------------------------------------------
-
-# override flaky upstream function
-get-flag() {
-	local var findflag="${1}"
-
-	# this code looks a little flaky but seems to work for
-	# everything we want ...
-	# for example, if CFLAGS="-march=i686":
-	# `get-flag -march` == "-march=i686"
-	# `get-flag march` == "i686"
-	for var in $(all-flag-vars) ; do
-		# reverse loop
-		set -- ${!var}
-		local i=$#
-		while [ $i -gt 0 ] ; do
-			local f="${!i}"
-			if [ "${f#-${findflag#-}}" != "${f}" ] ; then
-				printf "%s\n" "${f#-${findflag}=}"
-				return 0
-			fi
-			((i--))
-		done
-	done
-	return 1
-}
 
 # --------------------------------------------------------------------------------------------------
 
