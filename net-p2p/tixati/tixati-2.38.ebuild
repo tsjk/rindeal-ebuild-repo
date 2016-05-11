@@ -25,7 +25,7 @@ RDEPEND="
 	dev-libs/dbus-glib:0
 	dev-libs/glib:2
 	x11-libs/gtk+:2
-	x11-libs/pango.0
+	x11-libs/pango:0
 	sys-libs/zlib:0
 "
 
@@ -33,9 +33,14 @@ RESTRICT="mirror strip"
 
 S="${WORKDIR}/${A%.tar.gz}"
 
+QA_EXECSTACK="usr/bin/${PN}"
+
 src_install() {
 	dobin	"$PN"
 	doicon	"$PN.png"
+
+	# fix invalid `Categories` value
+	sed 's|Internet;||' -i -- "$PN.desktop" || die
 	domenu	"$PN.desktop"
 }
 
