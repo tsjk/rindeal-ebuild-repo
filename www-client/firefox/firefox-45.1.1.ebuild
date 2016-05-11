@@ -139,6 +139,7 @@ CDEPEND_A=(
 	'system-cairo? ( x11-libs/cairo:0[X=,xcb] )'
 	'system-icu? ( dev-libs/icu:0 )'
 	'system-jemalloc? ( >=dev-libs/jemalloc-4:0/2 )'
+	'system-js? ( dev-lang/spidermonkey )' # FIXME
 	# requires SECURE_DELETE, THREADSAFE, ENABLE_FTS3, ENABLE_UNLOCK_NOTIFY, ENABLE_DBSTAT_VTAB
 	# reference: configure.in
 	'system-sqlite? ( >=dev-db/sqlite-3.9.1:3[secure-delete,debug=] )'

@@ -131,9 +131,10 @@ firefox::mozconfig::keyfiles() {
 	# --with-gcm-senderid-keyfile	# android only
 }
 
-# FIXME: make this unnecessary
+# FIXME: make this func unnecessary
+# Resolve multiple --enable-extensions down to one
 firefox::mozconfig::fix_enable-extensions() {
-	# Resolve multiple --enable-extensions down to one
+	[ ! -f "${MOZCONFIG}" ] && die
 	local exts=(
 		$(sed -n -r 's|^ac_add_options *--enable-extensions=([^ ]*).*|\1|p' -- "${MOZCONFIG}")
 	)
@@ -204,7 +205,7 @@ firefox::prefs::add() {
 		val="\"${val}\""
 	fi
 
-	printf 'pref("%s", %s); // %s' \
+	printf 'pref("%s", %s); // %s\n' \
 		"${name}" "${val}" "${cmt}" >>"${DEFAULT_PREFS_JS}" || die
 }
 
