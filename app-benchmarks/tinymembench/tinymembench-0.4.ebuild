@@ -13,7 +13,8 @@ DESCRIPTION="Simple benchmark for memory throughput and latency"
 LICENSE="MIT"
 
 SLOT="0"
-KEYWORDS="~amd64 ~arm ~mips"
+
+KEYWORDS="~amd64 ~arm ~mips ~x86"
 
 src_prepare() {
 	# https://wiki.gentoo.org/wiki/Hardened/GNU_stack_quickstart
