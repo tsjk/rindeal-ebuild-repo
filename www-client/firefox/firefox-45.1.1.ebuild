@@ -281,11 +281,12 @@ src_unpack() {
 	mkdir -p "${S}" || die
 
 	local tar=(
-		tar
-		--extract
+		tar --extract
+
 		--no-same-owner --no-same-permissions
-		--file "${arch}"
 		--strip-components=1 # otherwise we'd have to specify excludes as `${MOZ_P}/path`
+
+		--file "${arch}"
 		--directory="${S}"
 
 		"$(my_usexclude system-icu 'intl/icu/source/data')"
