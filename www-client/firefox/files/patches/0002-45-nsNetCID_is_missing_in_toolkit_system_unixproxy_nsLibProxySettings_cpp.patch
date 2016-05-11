@@ -1,0 +1,30 @@
+
+# HG changeset patch
+# User Dragana Damjanovic dd.mozilla@gmail.com
+# Date 1453855620 -3600
+# Node ID 23226470bb9478cfb1ed5abcdbb8d2a6fc365bb8
+# Parent  3f74294e5797f319dc44e5b12b212cc3a82b03a8
+Bug 1243312 - nsNetCID is missing in toolkit/system/unixproxy/nsLibProxySettings.cpp. r=jduell
+
+diff --git a/toolkit/system/unixproxy/nsLibProxySettings.cpp b/toolkit/system/unixproxy/nsLibProxySettings.cpp
+--- a/toolkit/system/unixproxy/nsLibProxySettings.cpp
++++ b/toolkit/system/unixproxy/nsLibProxySettings.cpp
+@@ -4,16 +4,17 @@
+  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+ 
+ #include "nsISystemProxySettings.h"
+ #include "mozilla/ModuleUtils.h"
+ #include "nsIServiceManager.h"
+ #include "nsIURI.h"
+ #include "nsString.h"
+ #include "nsCOMPtr.h"
++#include "nsNetCID.h"
+ #include "nspr.h"
+ 
+ extern "C" {
+ #include <proxy.h>
+ }
+ 
+ class nsUnixSystemProxySettings : public nsISystemProxySettings {
+ public:
+
