@@ -11,12 +11,13 @@ MY_PN="${PN//-bin/}"
 DESCRIPTION="Universal markup converter"
 HOMEPAGE="http://pandoc.org"
 LICENSE="GPL-2"
-SRC_URI="https://github.com/jgm/pandoc/releases/download/${PV}/${MY_PN}-${PV}-1-amd64.deb"
 
 SLOT="0"
-RESTRICT="mirror strip"
+SRC_URI="amd64? ( https://github.com/jgm/pandoc/releases/download/${PV}/${MY_PN}-${PV}-1-amd64.deb )"
+
 KEYWORDS="-* ~amd64"
 IUSE="citeproc"
+RESTRICT="mirror"
 
 DEPEND="
 	dev-libs/gmp:*
@@ -36,11 +37,11 @@ src_prepare() {
 }
 
 src_install() {
-	cd "${S}/usr/bin" || die
+	cd "${S}"/usr/bin || die
 	dobin "${MY_PN}"
 	use citeproc && dobin 'pandoc-citeproc'
 
-	cd "${S}/usr/share/man/man1" || die
+	cd "${S}"/usr/share/man/man1 || die
 	doman "${MY_PN}.1"
 	use citeproc && doman 'pandoc-citeproc.1'
 }
