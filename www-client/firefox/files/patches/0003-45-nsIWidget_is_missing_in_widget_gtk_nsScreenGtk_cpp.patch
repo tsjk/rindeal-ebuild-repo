@@ -1,5 +1,5 @@
---- widget/gtk/nsScreenGtk.cpp	2016-05-03 01:12:14.000000000 +0200
-+++ /tmp/nsScreenGtk.cpp	2016-05-11 00:50:29.975175033 +0200
+--- a/widget/gtk/nsScreenGtk.cpp	2016-05-03 01:12:14.000000000 +0200
++++ b/widget/gtk/nsScreenGtk.cpp	2016-05-11 00:50:29.975175033 +0200
 @@ -13,6 +13,7 @@
  #include <gtk/gtk.h>
  #include <dlfcn.h>

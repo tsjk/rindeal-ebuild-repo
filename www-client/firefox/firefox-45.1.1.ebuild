@@ -22,7 +22,7 @@ ESR=true # comment out to disable
 MOZ_PV="${PV}${ESR:+"esr"}"
 MOZ_P="${PN}-${MOZ_PV}"
 
-SLOT='0/esr'
+SLOT="0${ESR:+"/esr"}"
 SRC_URI="https://archive.mozilla.org/pub/firefox/releases/${MOZ_PV}/source/${MOZ_P}.source.tar.xz"
 
 KEYWORDS='~amd64 ~arm ~arm64 ~x86'
@@ -404,20 +404,11 @@ my::src_configure::compiler() {
 }
 
 my::src_configure::gui() {
-	local toolkit toolkit_comment
+	local uset=$(usex gtk2{,} $(usex gtk3{,} $(usex qt5{,} 'die')))
+	local toolkit="cairo-${uset}"
+	local toolkit_comment="$(firefox::use_cmt ${uset})"
 
-	if use gtk2 ; then
-		toolkit="cairo-gtk2"
-		toolkit_comment="$(firefox::use_cmt gtk2)"
-	elif use gtk3 ; then
-		toolkit="cairo-gtk3"
-		toolkit_comment="$(firefox::use_cmt gtk3)"
-	elif use qt5 ; then
-		elog "Warning: Qt5 GUI toolkit is buggy (USE=qt5)"
-
-		toolkit="cairo-qt"
-		toolkit_comment="$(firefox::use_cmt qt5)"
-
+	if use qt5 ; then
 		# need to specify these vars because the qt5 versions are not found otherwise,
 		# and setting --with-qtdir overrides the pkg-config include dirs
 		local t

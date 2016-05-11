@@ -17,9 +17,5 @@ DEPEND=""
 RDEPEND="${DEPEND}"
 
 src_unpack() {
-	default
-
-	rm -rf *!(js) || die
-	cd jsr/src || die
-	S="${PWD}"
+	tar -x -f /usr/portage/distfiles/firefox-45.1.1esr.source.tar.xz --strip-components=3  -C "${S}" firefox-45.1.1esr/js/src || die
 }
