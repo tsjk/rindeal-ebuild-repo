@@ -4,3 +4,5 @@ dev-util/datagrip
 dev-util/phpstorm
 # moved to `dev-cpp/clion`
 dev-util/clion
+# telegram doesn't compile against 5.6.0 yet
+=dev-qt/qt-telegram-static-5.6.0*
