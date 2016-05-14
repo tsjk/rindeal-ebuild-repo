@@ -4,14 +4,14 @@
 
 EAPI=6
 
-JBIDEA_PN_PRETTY='PhpStorm'
-JBIDEA_URI="webide/PhpStorm-${PV}"
+JBIJ_PN_PRETTY='PhpStorm'
+JBIJ_URI="webide/PhpStorm-${PV}"
 
-inherit jetbrains-idea
+inherit jetbrains-intellij
 
 DESCRIPTION="PhpStorm is a commercial, cross-platform IDE for PHP"
 
-JBIDEA_DESKTOP_CATEGORIES=( 'WebDevelopment' )
-JBIDEA_DESKTOP_EXTRAS=(
+JBIJ_DESKTOP_CATEGORIES=( 'WebDevelopment' )
+JBIJ_DESKTOP_EXTRAS=(
 	"MimeType=text/x-php;text/html;" # MUST end with semicolon
 )

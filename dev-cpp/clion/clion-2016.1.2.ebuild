@@ -4,10 +4,10 @@
 
 EAPI=6
 
-JBIDEA_PN_PRETTY='CLion'
-JBIDEA_URI="cpp/CLion-${PV}"
+JBIJ_PN_PRETTY='CLion'
+JBIJ_URI="cpp/CLion-${PV}"
 
-inherit jetbrains-idea
+inherit jetbrains-intellij
 
 DESCRIPTION="A complete toolset for C and C++ development"
 
@@ -18,12 +18,12 @@ RDEPEND="
 	system-gdb? ( >=sys-devel/gdb-7.8 )"
 
 src_unpack() {
-	local JBIDEA_TAR_EXCLUDE=()
-	use python         || JBIDEA_TAR_EXCLUDE+=( 'plugins/python' )
-	use system-cmake   && JBIDEA_TAR_EXCLUDE+=( 'bin/cmake' )
-	use system-gdb     && JBIDEA_TAR_EXCLUDE+=( 'bin/gdb' )
+	local JBIJ_TAR_EXCLUDE=()
+	use python         || JBIJ_TAR_EXCLUDE+=( 'plugins/python' )
+	use system-cmake   && JBIJ_TAR_EXCLUDE+=( 'bin/cmake' )
+	use system-gdb     && JBIJ_TAR_EXCLUDE+=( 'bin/gdb' )
 
-	jetbrains-idea_src_unpack
+	jetbrains-intellij_src_unpack
 }
 
 src_prepare() {
@@ -47,13 +47,13 @@ src_prepare() {
 }
 
 src_install() {
-	local JBIDEA_DESKTOP_EXTRAS=(
+	local JBIJ_DESKTOP_EXTRAS=(
 		"MimeType=text/plain;text/x-c;text/x-h;" # MUST end with semicolon
 	)
 
-	jetbrains-idea_src_install
+	jetbrains-intellij_src_install
 
-	cd "${D}/${JBIDEA_INSTALL_DIR}" || die
+	cd "${D}/${JBIJ_INSTALL_DIR}" || die
 	# globbing doesn't work with `fperms()`'
 	use system-cmake	|| { chmod -v a+x bin/cmake/bin/* || die ;}
 	use system-gdb		|| { chmod -v a+x bin/gdb/bin/*	  || die ;}
