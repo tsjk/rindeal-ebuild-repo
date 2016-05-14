@@ -7,6 +7,5 @@
   </maintainer>
   <use>
     <flag name="android">Enables Android plugin</flag>
-    <flag name="system-jre">Use system-wide JRE instead of the bundled copy</flag>
   </use>
 </pkgmetadata>

@@ -6,6 +6,5 @@
     <name>Jan Chren (rindeal)</name>
   </maintainer>
   <use>
-    <flag name="system-jre">Use system-wide JRE instead of the bundled copy</flag>
   </use>
 </pkgmetadata>
