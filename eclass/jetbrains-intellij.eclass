@@ -119,7 +119,7 @@ jetbrains-intellij_src_install() {
 		"${EPREFIX}/usr/bin/${_JBIJ_PN_SLOTTED} %U"	# exec
 		"${JBIJ_PN_PRETTY} ${SLOT}"	# name
 		"${_JBIJ_PN_SLOTTED}"		# icon
-		"Development;IDE;$(IFS=';'; echo "${JBIJ_DESKTOP_CATEGORIES[*]}")"	# categories
+		"Development;IDE;Java;$(IFS=';'; echo "${JBIJ_DESKTOP_CATEGORIES[*]}")"	# categories
 	)
 	make_desktop_entry_extras=(
 		"StartupWMClass=jetbrains-${PN}"
