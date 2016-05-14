@@ -92,7 +92,7 @@ jetbrains-intellij_src_install() {
 	insinto "${JBIJ_INSTALL_DIR}"
 	doins -r *
 
-	pushd "${D}/${JBIJ_INSTALL_DIR}" >/dev/null || die
+	pushd "${ED}/${JBIJ_INSTALL_DIR}" >/dev/null || die
 	{
 		# globbing doesn't work with `fperms()`'
 		chmod -v a+x bin/{${PN}.sh,fsnotifier*} || die
@@ -129,9 +129,9 @@ jetbrains-intellij_src_install() {
 		"$( printf '%s\n' "${make_desktop_entry_extras[@]}" )"
 
 	# recommended by: https://confluence.jetbrains.com/display/IDEADEV/Inotify+Watches+Limit
-	mkdir -p "${D}"/etc/sysctl.d || die
+	mkdir -p "${ED}"/etc/sysctl.d || die
 	echo "fs.inotify.max_user_watches = 524288" \
-		>"${D}"/etc/sysctl.d/30-idea-inotify-watches.conf || die
+		>"${ED}"/etc/sysctl.d/30-idea-inotify-watches.conf || die
 }
 
 jetbrains-intellij_pkg_postinst() {
