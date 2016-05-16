@@ -34,7 +34,7 @@ install:
     - export PATH="${PORTAGE_ROOT}/usr/bin:${PATH}"
 
 script:
-    - repoman full -d
+    - repoman full --xmlparse --verbose
 
 # after_success:
 #     - cd "${TRAVIS_BUILD_DIR}"
