@@ -4,10 +4,9 @@
 
 EAPI=6
 
-GH_USER='fcambus'
-GH_TAG="${PV}"
+GH_URI='github/fcambus'
 
-inherit github
+inherit git-hosting
 
 DESCRIPTION='Weather in your terminal, with ANSI colors and Unicode symbols'
 LICENSE='BSD'
