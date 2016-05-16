@@ -4,10 +4,10 @@
 
 EAPI=6
 
-GH_USER='jpmens'
-GH_TAG="v${PV}"
+GH_URI='github/jpmens'
+GH_REF="v${PV}"
 
-inherit github autotools
+inherit git-hosting autotools
 
 DESCRIPTION='Web log analyzer using probabilistic data structures'
 LICENSE='GPL-2'
