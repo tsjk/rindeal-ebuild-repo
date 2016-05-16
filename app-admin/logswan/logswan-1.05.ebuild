@@ -4,9 +4,9 @@
 
 EAPI=6
 
-GH_USER='fcambus'
+GH_URI='github/fcambus'
 
-inherit github cmake-utils
+inherit git-hosting cmake-utils
 
 DESCRIPTION='Web log analyzer using probabilistic data structures'
 LICENSE='BSD'
@@ -26,7 +26,7 @@ RDEPEND="${CDEPEND}"
 
 src_configure() {
 	local mycmakeargs=(
-		"-DGEOIPDIR=$(pkg-config --variable=databasedir geoip)"
+		-DGEOIPDIR="$(pkg-config --variable=databasedir geoip)"
 	)
 
 	cmake-utils_src_configure
