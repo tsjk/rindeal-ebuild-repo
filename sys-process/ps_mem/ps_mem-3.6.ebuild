@@ -5,13 +5,12 @@
 EAPI=6
 
 PYTHON_COMPAT=( python{2_7,3_{3,4,5}} )
-
 DISTUTILS_SINGLE_IMPL=true
 
-GH_USER='pixelb'
-GH_TAG="v${PV}"
+GH_URI='github/pixelb'
+GH_REF="v${PV}"
 
-inherit github distutils-r1
+inherit git-hosting distutils-r1
 
 DESCRIPTION='A utility to accurately report the in core memory usage for a program'
 LICENSE='LGPL-2.1'
