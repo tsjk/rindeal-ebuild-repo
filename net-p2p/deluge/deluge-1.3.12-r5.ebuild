@@ -12,16 +12,12 @@ inherit distutils-r1 eutils user
 DESCRIPTION='BitTorrent client with a client/server model'
 HOMEPAGE='http://deluge-torrent.org/'
 LICENSE='GPL-2'
+
+SLOT='0'
 SRC_URI="http://download.deluge-torrent.org/source/${P}.tar.bz2"
 
 KEYWORDS='~amd64 ~arm ~x86'
-SLOT='0'
-
 IUSE='console +daemon geoip +gtk +libnotify +setproctitle +sound webui'
-REQUIRED_USE='
-	sound? ( gtk )
-	libnotify? ( gtk )
-	|| ( console daemon gtk webui )'
 
 CDEPEND="daemon? ( >=net-libs/libtorrent-rasterbar-0.14.9:0[python,${PYTHON_USEDEP}] )"
 DEPEND="${CDEPEND}
@@ -45,9 +41,15 @@ RDEPEND="${CDEPEND}
 	setproctitle? ( dev-python/setproctitle[${PYTHON_USEDEP}] )
 	webui? ( dev-python/mako[${PYTHON_USEDEP}] )"
 
-PLOCALES='af ar ast be bg bn bs ca cs cy da de el en_AU en_CA en_GB eo es et eu fa fi fo fr fy ga gl
+REQUIRED_USE='
+	sound? ( gtk )
+	libnotify? ( gtk )
+	|| ( console daemon gtk webui )'
+
+PLOCALES=( af ar ast be bg bn bs ca cs cy da de el en_AU en_CA en_GB eo es et eu fa fi fo fr fy ga gl
 	he hi hr hu id is it ja ka kk km kn ko ku ky la lb lt lv mk ml ms nb nds nl nn oc pl pt pt_BR ro
-	ru si sk sl sr sv ta te th tl tlh tr uk ur vi zh_CN zh_HK zh_TW'
+	ru si sk sl sr sv ta te th tl tlh tr uk ur vi zh_CN zh_HK zh_TW )
+PLOCALES_MASK=( nap pms iu )
 inherit l10n
 
 python_prepare_all() {
