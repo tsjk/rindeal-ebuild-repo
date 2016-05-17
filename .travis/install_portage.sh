@@ -51,9 +51,11 @@ fold_start portage.install "Install Portage"
             "${tmp_dir}/portage-src"
         cd "${tmp_dir}/portage-src"
 
-        # allow to have arbitrary copyright holder name
+        # allow to have arbitrary copyright holder name and deprecate $Id$ header
         grep -r --files-with-matches 'gentoo_copyright.*Gentoo Foundation' pym/repoman | \
-            xargs sed -r 's|(gentoo_copyright.*)Gentoo Foundation|\1.*|' -i --
+            xargs sed -r \
+                -e 's|(gentoo_copyright.*)Gentoo Foundation|\1.*|' \
+                -e 's|(return) errors.ID_HEADER_ERROR|\1|' -i --
     }
     fold_end portage.install.pre
 
