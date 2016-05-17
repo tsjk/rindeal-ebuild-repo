@@ -146,12 +146,13 @@ src_prepare() {
 
 	rm -rf *.*proj* || die	# delete Xcode/MSVS files
 
-	local best_ver="$(best_version dev-qt/qt-telegram-static)"
+	local p='dev-qt/qt-telegram-static'
+	local best_ver="$(best_version "${p}" | sed "s|.*${p}-||")"
 	echo
-	elog "${P} is going to be linked against '${best_ver#*/}'"
+	elog "${P} is going to be linked against '${p}-${best_ver}'"
 	echo
-	best_ver="${best_ver##*-}"
-	qt_ver="${best_ver%%_*}"
+	best_ver="${best_ver%%-*}" # strip revision
+	qt_ver="${best_ver%%_p*}"
 	qt_patch_date="${best_ver##*_p}"
 
 	declare -g QT5_PREFIX="${EPREFIX}/opt/qt-telegram-static/${qt_ver}/${qt_patch_date}"
