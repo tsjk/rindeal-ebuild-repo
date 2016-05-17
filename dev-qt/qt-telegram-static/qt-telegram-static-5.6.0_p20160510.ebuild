@@ -16,8 +16,6 @@ inherit versionator
 	qt_patch_uri_path="Telegram/Patches/qtbase_${qt_ver//./_}.diff"
 	qt_patch_local_name="${P}-qtbase.patch"
 
-	SLOT="${qt_ver}/${qt_patch_date}"
-
 	# 'module > subdir > package' bindings: https://wiki.gentoo.org/wiki/Project:Qt/Qt5status
 	QT5_MODULE='qtbase' # base ( core dbus gui network widgets ) imageformats
 	QT_MODULES=( qtbase qtimageformats )
@@ -29,9 +27,10 @@ inherit versionator
 	# prevent qttest from being assigned to DEPEND, this is very dirty hack
 	E_DEPEND="${E_DEPEND/test? \( \~dev-qt\/qttest-* \)}"
 
+	SLOT="${qt_ver}/${qt_patch_date}" ; readonly SLOT
+
 	# this path must be in sync with net-im/telegram ebuild
-	QT5_PREFIX="${EPREFIX}/opt/${PN}/${SLOT}"
-	readonly QT5_PREFIX
+	QT5_PREFIX="${EPREFIX}/opt/${PN}/${SLOT}" ; readonly QT5_PREFIX
 }
 
 DESCRIPTION='Patched Qt for net-im/telegram'
@@ -232,6 +231,10 @@ qt5_symlink_tools_to_build_dir() { : ; }
 
 # customized qt5-build_src_configure()
 src_configure() {
+	einfo
+	einfo "${PN} is going to be installed into '${QT5_PREFIX}'"
+	einfo
+
 	local myconf=(
 		-static
 
