@@ -1,22 +1,19 @@
 # Copyright 1999-2016 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Id$
 
 EAPI="6"
 
-inherit autotools eutils fdo-mime
-
-SLOT="3"
-MY_PN="${PN}${SLOT}"
+inherit autotools eutils fdo-mime flag-o-matic
 
 DESCRIPTION="Gambas is a free development environment based on a Basic interpreter"
 HOMEPAGE="http://gambas.sourceforge.net/en/main.html"
 LICENSE="GPL-2"
+
+SLOT="3"
+MY_PN="${PN}${SLOT}"
 SRC_URI="mirror://sourceforge/${PN}/${MY_PN}-${PV}.tar.bz2"
 
-RESTRICT="mirror"
 KEYWORDS="~amd64"
-
 IUSE=(
 	'+curl' '+net' '+qt4' '+x11'
 	'bzip2' 'cairo' 'crypt' 'dbus' 'examples' 'gmp' 'gnome' 'gsl' 'gstreamer' 'gtk2' 'gtk3'
@@ -76,7 +73,7 @@ RDEPEND="
 	opengl? ( media-libs/mesa )
 	openssl? ( dev-libs/openssl:0 )
 	pcre? ( dev-libs/libpcre )
-	pdf? ( app-text/poppler )
+	pdf? ( app-text/poppler:= )
 	postgres? ( dev-db/postgresql:* )
 	qt4? (
 		dev-qt/qtcore:4[qt3support]
@@ -106,23 +103,26 @@ RDEPEND="
 	xml? ( dev-libs/libxml2 dev-libs/libxslt )
 	zlib? ( sys-libs/zlib )
 "
-
 DEPEND="${RDEPEND}
 	virtual/libintl
 "
+
+RESTRICT="mirror"
 
 S="${WORKDIR}/${MY_PN}-${PV}"
 
 autocrap_cleanup() {
 	sed -e "/^\(AC\|GB\)_CONFIG_SUBDIRS(${1}[,)]/d" \
-		-i "${S}/configure.ac" || die
+		-i -- "${S}/configure.ac" || die
 	sed -e "/^ \(@${1}_dir@\|${1}\)/d" \
-		-i "${S}/Makefile.am" || die
+		-i -- "${S}/Makefile.am" || die
 }
 
 src_prepare() {
 	# funtoo-ism
 	epatch "${FILESDIR}/xdgutils.patch"
+
+	eapply_user
 
 	# deprecated
 	autocrap_cleanup sqlite2
@@ -166,18 +166,23 @@ src_prepare() {
 	use_if_iuse xml || autocrap_cleanup xml
 	use_if_iuse zlib || autocrap_cleanup zlib
 
-	eapply_user
-
 	eautoreconf
 }
 
 src_configure() {
-	local args=
+	append-cppflags -std=gnu++11
+	append-cxxflags -std=gnu++11
 
-	if use qt4; then
-		cd "${S}/gb.qt4"
-		args=( $(use_enable qt4-opengl qtopengl) $(use_enable qt4-webkit qtwebkit) )
+	local args=()
+
+	if use qt4 ; then
+		pushd "${S}/gb.qt4" >/dev/null || die
+		args=(
+			$(use_enable qt4-opengl qtopengl)
+			$(use_enable qt4-webkit qtwebkit)
+		)
 		econf "${args[@]}"
+		popd >/dev/null || die
 	fi
 
 	args=(
@@ -219,22 +224,20 @@ src_configure() {
 		$(use_enable xml)
 		$(use_enable zlib)
 	)
-	cd "${S}" && econf "${args[@]}"
+	econf "${args[@]}"
 }
 
 src_install() {
 	emake -j1 DESTDIR="${D}" install
 
-	dodoc AUTHORS ChangeLog NEWS README
+	einstalldocs
 
 	if use net ; then
 		newdoc gb.net/src/doc/README gb.net-README
 		newdoc gb.net/src/doc/changes.txt gb.net-ChangeLog
 	fi
 
-	if use pcre ; then
-		newdoc gb.pcre/src/README gb.pcre-README
-	fi
+	use pcre && newdoc gb.pcre/src/README gb.pcre-README
 
 	if use qt4 ; then
 		doicon "${S}/app/desktop/${MY_PN}.svg"
