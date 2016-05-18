@@ -189,7 +189,8 @@ l10n_find_plocales_changes() {
 		einfo "There are changes in locales!"
 		if [ ${#added[@]} -gt 0 ] ; then
 			einfo "Locales added: '${added[*]}'"
-		elif [ ${#removed[@]} -gt 0 ] ; then
+		fi
+		if [ ${#removed[@]} -gt 0 ] ; then
 			einfo "Locales removed: '${removed[*]}'"
 		fi
 	else
