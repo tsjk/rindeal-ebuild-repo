@@ -1,10 +1,10 @@
-# Copyright 1999-2016 Gentoo Foundation
+# Copyright 1999-2015 Gentoo Foundation
+# Copyright 2016 Jan Chren (rindeal)
 # Distributed under the terms of the GNU General Public License v2
-# $Id$
 
 # @ECLASS: l10n.eclass
 # @MAINTAINER:
-# Ben de Groot <yngwin@gentoo.org>
+#   Jan Chren <dev.rindeal+gentoo@gmail.com>
 # @BLURB: convenience functions to handle localizations
 # @DESCRIPTION:
 # The l10n (localization) eclass offers a number of functions to more
@@ -131,7 +131,7 @@ _l10n_for_each_locale_do() {
 #
 # Example: l10n_for_each_locale_do install_locale
 l10n_for_each_locale_do() {
-	local _locales=( $(l10n_get_locales))
+	local _locales=( $(l10n_get_locales) )
 	_l10n_for_each_locale_do "$@"
 }
 
@@ -142,7 +142,7 @@ l10n_for_each_locale_do() {
 # locales that are disabled. This could be used for example to remove
 # locales from a Makefile, to prevent them from being built needlessly.
 l10n_for_each_disabled_locale_do() {
-	local _locales=( $(l10n_get_locales disabled))
+	local _locales=( $(l10n_get_locales disabled) )
 	_l10n_for_each_locale_do "$@"
 }
 
@@ -156,14 +156,14 @@ l10n_for_each_disabled_locale_do() {
 # Example: l10n_find_plocales_changes "${S}/src/translations" "${PN}_" '.ts'
 l10n_find_plocales_changes() {
 	debug-print-function ${FUNCNAME} "$@"
-	[[ $# -ne 3 ]] && die "Exactly 3 arguments are needed!"
+	[[ ${#} != 3 ]] && die "Exactly 3 arguments are needed!"
 	local l dir="${1}" pre="${2}" post="${3}"
 
 	# using assoc array to allow instant lookup
 	declare -A found known
 
 	einfo "Looking in '${dir}' for changes in locales ..."
-	pushd "${dir}" >/dev/null || die "Cannot access ${dir}"
+	pushd "${dir}" >/dev/null || die "Cannot access '${dir}'"
 	for l in "${pre}"*"${post}" ; do
 		l="${l#"${pre}"}"
 		l="${l%"${post}"}"
@@ -179,18 +179,18 @@ l10n_find_plocales_changes() {
 
 	local added=() removed=()
 	for l in "${!known[@]}" ; do
-		[ -v found["${l}"] ] || removed+=( "${l}" )
+		[[ -v found["${l}"] ]] || removed+=( "${l}" )
 	done
 	for l in "${!found[@]}" ; do
-		[ -v known["${l}"] ] || added+=( "${l}" )
+		[[ -v known["${l}"] ]] || added+=( "${l}" )
 	done
 
-	if [ $(( ${#added[@]} + ${#removed[@]} )) -gt 0 ] ; then
+	if [[ $(( ${#added[@]} + ${#removed[@]} )) > 0 ]] ; then
 		einfo "There are changes in locales!"
-		if [ ${#added[@]} -gt 0 ] ; then
+		if [[ ${#added[@]} > 0 ]] ; then
 			einfo "Locales added: '${added[*]}'"
 		fi
-		if [ ${#removed[@]} -gt 0 ] ; then
+		if [[ ${#removed[@]} > 0 ]] ; then
 			einfo "Locales removed: '${removed[*]}'"
 		fi
 	else
