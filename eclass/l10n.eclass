@@ -38,7 +38,7 @@ else
 fi
 
 # Add linguas useflags
-IUSE+="$(printf ' linguas_%s' "${_PLOCALES[@]}")"
+IUSE+=" ${_PLOCALES[@]/#/linguas_}"
 
 # @ECLASS-VARIABLE: PLOCALE_BACKUP
 # @DEFAULT_UNSET
