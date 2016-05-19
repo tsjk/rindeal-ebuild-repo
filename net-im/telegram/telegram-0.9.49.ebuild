@@ -1,17 +1,12 @@
-# Copyright 1999-2016 Gentoo Foundation
+# Copyright 2016 Jan Chren (rindeal)
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
 
-{
-	min_qt_ver="5.5.1"
-	min_qt_patch_date="20160510"
-}
+GH_URI='github/telegramdesktop/tdesktop'
+GH_REF="v${PV}"
 
-GH_REPO='telegramdesktop/tdesktop'
-GH_TAG="v${PV}"
-
-inherit flag-o-matic check-reqs fdo-mime eutils qmake-utils github
+inherit flag-o-matic fdo-mime eutils qmake-utils git-hosting versionator
 
 DESCRIPTION='Official cross-platorm desktop client for Telegram'
 HOMEPAGE='https://desktop.telegram.org/'
@@ -20,39 +15,43 @@ LICENSE='GPL-3' # with OpenSSL exception
 SLOT='0'
 
 KEYWORDS='~amd64 ~arm ~x86'
-
-RESTRICT+=' test'
+IUSE='proxy'
 
 RDEPEND=(
-	'dev-libs/libappindicator:3'
+	'dev-libs/libappindicator:3'	# pspecific_linux.cpp
 	'>=media-libs/openal-1.17.2'	# Telegram requires shiny new versions
 	'sys-libs/zlib[minizip]'
 	'virtual/ffmpeg[opus]'
 )
 DEPEND=( "${RDEPEND[@]}"
-	">=dev-qt/qt-telegram-static-${min_qt_ver}_p${min_qt_patch_date}"
+	# 5.6.0 is required since 0.9.49
+	">=dev-qt/qt-telegram-static-5.6.0_p20160510:5.6.0"
 	'virtual/pkgconfig'
 )
 DEPEND="${DEPEND[*]}"
 RDEPEND="${RDEPEND[*]}"
 
-PLOCALES='de es it ko nl pt_BR'
+RESTRICT+=' test'
+
+PLOCALES=( de es it ko nl pt_BR )
 inherit l10n
 
-CHECKREQS_DISK_BUILD='800M'
+CHECKREQS_DISK_BUILD='1G'
+inherit check-reqs
 
-tg_dir="${S}/Telegram"
-tg_pro="${tg_dir}/Telegram.pro"
+TG_DIR="${S}/Telegram"
+TG_PRO="${TG_DIR}/Telegram.pro"
 
 # override qt5 path for use with eqmake5
 qt5_get_bindir() { echo "${QT5_PREFIX}/bin" ; }
 
 src_prepare-locales() {
-	l10n_find_plocales_changes 'Resources/langs' 'lang_' '.strings'
+	local dir='Resources/langs' pre='lang_' post='.strings'
+	l10n_find_plocales_changes "${dir}" "${pre}" "${post}"
 	rm_loc() {
-		rm -v -f "Resources/langs/lang_${1}.strings" || die
-		sed -e "\|lang_${1}.strings|d" \
-			-i -- "${tg_pro}" 'Resources/telegram.qrc' || die
+		rm -v -f "${dir}/${pre}${1}${post}" || die
+		sed -e "\|${pre}${1}${post}|d" \
+			-i -- "${TG_PRO}" 'Resources/telegram.qrc' || die
 	}
 	l10n_for_each_disabled_locale_do rm_loc
 }
@@ -62,38 +61,36 @@ src_prepare-delete_and_modify() {
 
 	## change references to static Qt dir
 	args=(
-		 -e "s#/usr/local[^ ]*/Qt[^ ]*/((include|plugins)/[^ ]*)#${QT5_PREFIX}/\1#g"
-		 -e "s|[^ ]*Libraries/QtStatic/qtbase/([^ \"\\]*)|${QT5_PREFIX}/\1|g"
+		 -e "s:/usr/local[^ ]*/Qt[^ ]*/((include|plugins)/[^ ]*):${QT5_PREFIX}/\1 # QT_PREFIX:g"
+		 -e "s:[^ ]*Libraries/QtStatic/qtbase/([^ \"\\]*):${QT5_PREFIX}/\1 # QT_PREFIX:g"
 	)
 	sed -r "${args[@]}" \
 		-i -- *.pro || die
-	sed -r -e 's|".*src/gui/text/qfontengine_p.h"|<private/qfontengine_p.h>|' \
-		-i -- 'SourceFiles/ui/text'/{text.h,text_block.h} || die
 
-	## patch "${tg_pro}"
+	## patch "${TG_PRO}"
 	args=(
 		# delete any references to local includes/libs
-		-e 's|[^ ]*/usr/local/[^ \\]* *(\\?)| \1|'
+		-e 's|^(.*[^ ]*/usr/local/[^ \\]* *\\?)|# local includes/libs # \1|'
 		# delete any hardcoded includes
-		-e 's|(.*INCLUDEPATH *\+= *"/usr.*)|#hardcoded includes#\1|'
+		-e 's|^(.*INCLUDEPATH *\+= *"/usr.*)|# hardcoded includes # \1|'
 		# delete any hardcoded libs
-		-e 's|(.*LIBS *\+= *-l.*)|#hardcoded libs#\1|'
+		-e 's|^(.*LIBS *\+= *-l.*)|# hardcoded libs # \1|'
 		# delete refs to bundled Google Breakpad
-		-e 's|(.*breakpad/src.*)|#Google Breakpad#\1|'
+		-e 's|^(.*breakpad/src.*)|# Google Breakpad # \1|'
 		# delete refs to bundled minizip, Gentoo uses it's own patched version
-		-e 's|(.*minizip.*)|#minizip#\1|'
+		-e 's|^(.*minizip.*)|# minizip # \1|'
 		# delete CUSTOM_API_ID defines, use default ID
-		-e 's|(.*CUSTOM_API_ID.*)|#CUSTOM_API_ID#\1|'
+		-e 's|^(.*CUSTOM_API_ID.*)|# CUSTOM_API_ID # \1|'
 		# remove hardcoded flags
-		-e 's|(.*QMAKE_[A-Z]*FLAGS.*)|#hardcoded flags#\1|'
+		-e 's|^(.*QMAKE_[A-Z]*FLAGS.*)|# hardcoded flags # \1|'
 		# use release versions
-		-e 's:Debug(Style|Lang):Release\1:g'
-		-e 's|/Debug|/Release|g'
+		-e 's:(.*)Debug(Style|Lang)(.*):\1Release\2\3 # Debug -> Release Style/Lang:g'
+		-e 's|(.*)/Debug(.*)|\1/Release\2 # Debug -> Release|g'
 		# fix Qt version
-		-e "s|5.6.0|${qt_ver}|g"
+		-e "s|(.*)/(5.[56].[0-9])/(.*)|\1/${QT_VER}/\3 # QT_VER, was \2|g"
 	)
 	sed -r "${args[@]}" \
-		-i -- "${tg_pro}" || die
+		-i -- "${TG_PRO}" || die
 
 	## nuke libunity references
 	args=(
@@ -101,12 +98,8 @@ src_prepare-delete_and_modify() {
 		-e 's|if *\( *_psUnityLauncherEntry *\)|if(0)|'
 		# this is probably not needed, but anyway
 		-e 's|noTryUnity *= *false,|noTryUnity = true,|'
-		# delete includes
-		-e 's|(.*unity\.h.*)|// \1|'
-		# delete various refs
-		-e 's|(.*f_unity*)|// \1|'
-		-e 's|(.*ps_unity_*)|// \1|'
-		-e 's|(.*UnityLauncher*)|// \1|'
+		# delete various refs and includes
+		-e 's:(.*(unity\.h|f_unity|ps_unity_|UnityLauncher).*):// \1:'
 	)
 	sed -r "${args[@]}" \
 		-i -- 'SourceFiles/pspecific_linux.cpp' || die
@@ -114,50 +107,65 @@ src_prepare-delete_and_modify() {
 
 src_prepare-appends() {
 	# make sure there is at least one empty line at the end before adding anything
-	echo >> "${tg_pro}"
+	echo >> "${TG_PRO}"
 
-	printf '%s\n\n' '# --- EBUILD APPENDS BELOW ---' >> "${tg_pro}" || die
+	printf '%s\n\n' '# --- EBUILD APPENDS BELOW ---' >> "${TG_PRO}" || die
 
 	## add corrected dependencies back
-	local deps=( 'appindicator3-0.1' 'minizip')
+	local deps=( 'minizip' )
 	local libs=( "${deps[@]}"
 		'lib'{avcodec,avformat,avutil,swresample,swscale}
 		'openal' 'openssl' 'zlib' )
-	local includes=( "${deps[@]}" ) # dee-1.0 # TODO
+	local includes=( "${deps[@]}" 'appindicator3-0.1' ) # TODO: dee-1.0
 
 	my_do() {
-		local x var="$1" flags="$2" ; shift 2
+		local x var="$1" flags="$2" transformer="$3" ; shift 3
 		for x in "${@}" ; do
-			printf '%s += ' "${var}" >>"${tg_pro}" || die
-			pkg-config "${flags}" "${x}" | tr -d '\n' >>"${tg_pro}"
+			printf '%s += ' "${var}" >>"${TG_PRO}" || die
+			pkg-config "${flags}" "${x}" | tr '\n' ' ' | eval "${transformer}" >>"${TG_PRO}"
 			assert
-			echo " # $x" >>"${tg_pro}" || die
+			echo " # ${x}" >>"${TG_PRO}" || die
 		done
 	}
-
-	my_do QMAKE_CXXFLAGS	--cflags-only-I	"${includes[@]}"
-	my_do LIBS				--libs			"${libs[@]}"
+	my_do INCLUDEPATH	--cflags-only-I	'sed "s|-I||g"'	"${includes[@]}"
+	my_do LIBS			--libs			'cat'			"${libs[@]}"
 }
 
 src_prepare() {
 	eapply_user
 
-	cd "${tg_dir}" || die
+	cd "${TG_DIR}" || die
 
-	rm -rf *.*proj* || die	# delete Xcode/MSVS files
+	rm -rf *.*proj*		|| die # delete Xcode/MSVS files
+	rm -rf ThirdParty	|| die # prevent accidentically using something from there
 
-	local p='dev-qt/qt-telegram-static'
-	local best_ver="$(best_version "${p}" | sed "s|.*${p}-||")"
+	if [ -z "${QT_TELEGRAM_STATIC_SLOT}" ] ; then
+		local qtstatic='dev-qt/qt-telegram-static'
+		local qtstatic_PVR="$(best_version "${qtstatic}" | sed "s|.*${qtstatic}-||")"
+		local qtstatic_PV="${qtstatic_PVR%%-*}" # strip revision
+		declare -g QT_VER="${qtstatic_PV%%_p*}" QT_PATCH_DATE="${qtstatic_PV##*_p}"
+		declare -g QT_TELEGRAM_STATIC_SLOT="${QT_VER}/${QT_PATCH_DATE}"
+	else
+		einfo "Using QT_TELEGRAM_STATIC_SLOT from environment - '${QT_TELEGRAM_STATIC_SLOT}'"
+		declare -g QT_VER="${QT_TELEGRAM_STATIC_SLOT%%/*}" QT_PATCH_DATE="${QT_TELEGRAM_STATIC_SLOT##*/}"
+	fi
+
 	echo
-	elog "${P} is going to be linked against '${p}-${best_ver}'"
+	einfo "${P} is going to be linked against 'Qt ${QT_VER} (p${QT_PATCH_DATE})'"
 	echo
-	best_ver="${best_ver%%-*}" # strip revision
-	qt_ver="${best_ver%%_p*}"
-	qt_patch_date="${best_ver##*_p}"
 
-	declare -g QT5_PREFIX="${EPREFIX}/opt/qt-telegram-static/${qt_ver}/${qt_patch_date}"
-	readonly QT5_PREFIX
+	if [[ $(get_version_component_range 2 ${QT_VER}) < 6 ]] ; then
+		ewarn "You've requested to link against Qt < 5.6.0, this will likely won't work"
+	fi
+
+	declare -g QT5_PREFIX="${EPREFIX}/opt/qt-telegram-static/${QT_TELEGRAM_STATIC_SLOT}"
 	[ -d "${QT5_PREFIX}" ] || die "QT5_PREFIX dir doesn't exist: '${QT5_PREFIX}'"
+
+	readonly QT_TELEGRAM_STATIC_SLOT QT_VER  QT_PATCH_DATE
+
+	# This formatter converts multiline var defines to multiple lines.
+	# Such .pro files are then easier to debug and modify in src_prepare-delete_and_modify().
+	gawk -f "${FILESDIR}/format_pro.awk" -i inplace -- *.pro || die
 
 	src_prepare-locales
 	src_prepare-delete_and_modify
@@ -165,7 +173,7 @@ src_prepare() {
 }
 
 src_configure() {
-	## add flags previously stripped from "${tg_pro}"
+	## add flags previously stripped from "${TG_PRO}"
 	append-cxxflags '-fno-strict-aliasing'
 	# `append-ldflags '-rdynamic'` was stripped because it's used probably only for GoogleBreakpad
 	# which is not supported anyway
@@ -184,11 +192,11 @@ src_configure() {
 		echo 'DEFINES += TDESKTOP_DISABLE_REGISTER_CUSTOM_SCHEME'
 
 		# https://github.com/telegramdesktop/tdesktop/commit/0b2bcbc3e93a7fe62889abc66cc5726313170be7
-		# echo 'DEFINES += TDESKTOP_DISABLE_NETWORK_PROXY'
+		$(usex proxy 'DEFINES += TDESKTOP_DISABLE_NETWORK_PROXY' '')
 
 		# disable google-breakpad support
 		echo 'DEFINES += TDESKTOP_DISABLE_CRASH_REPORTS'
-	) >>"${tg_pro}" || die
+	) >>"${TG_PRO}" || die
 }
 
 src_compile() {
@@ -200,7 +208,7 @@ src_compile() {
 
 		elog "Building: ${PWD/${S}\/}"
 		eqmake5 CONFIG+="${mode}" \
-			"${tg_dir}/build/qmake/codegen_${module}/codegen_${module}.pro"
+			"${TG_DIR}/build/qmake/codegen_${module}/codegen_${module}.pro"
 		emake
 	done
 
@@ -209,7 +217,7 @@ src_compile() {
 		mkdir -v -p "${d}" && cd "${d}" || die
 
 		elog "Building: ${PWD/${S}\/}"
-		eqmake5 CONFIG+="${mode}" "${tg_dir}/Meta${module}.pro"
+		eqmake5 CONFIG+="${mode}" "${TG_DIR}/Meta${module}.pro"
 		emake
 	done
 
@@ -217,16 +225,16 @@ src_compile() {
 	mkdir -v -p "${d}" && cd "${d}" || die
 
 	elog "Preparing the main build ..."
-	# this qmake will fail to find "${tg_dir}/GeneratedFiles/*", but it's required for ...
-	eqmake5 CONFIG+="${mode}" "${tg_pro}"
+	# this qmake will fail to find "${TG_DIR}/GeneratedFiles/*", but it's required for ...
+	eqmake5 CONFIG+="${mode}" "${TG_PRO}"
 	# ... this make, which will generate those files
-	local targets=( $( awk '/^PRE_TARGETDEPS *\+=/ { $1=$2=""; print }' "${tg_pro}" ) )
+	local targets=( $( awk '/^PRE_TARGETDEPS *\+=/ { $1=$2=""; print }' "${TG_PRO}" ) )
 	[ ${#targets[@]} -eq 0 ] && die
 	emake ${targets[@]}
 
 	# now we have everything we need, so let's begin!
 	elog "Building Telegram ..."
-	eqmake5 CONFIG+="${mode}" "${tg_pro}"
+	eqmake5 CONFIG+="${mode}" "${TG_PRO}"
 	emake
 }
 
@@ -235,7 +243,7 @@ src_install() {
 
 	local s
 	for s in 16 32 48 64 128 256 512 ; do
-		newicon -s ${s} "${tg_dir}/Resources/art/icon${s}.png" "${PN}.png"
+		newicon -s ${s} "${TG_DIR}/Resources/art/icon${s}.png" "${PN}.png"
 	done
 
 	local make_desktop_entry_args

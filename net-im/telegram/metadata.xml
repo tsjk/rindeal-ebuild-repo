@@ -5,4 +5,7 @@
     <email>dev.rindeal+gentoo-overlay@gmail.com</email>
     <name>Jan Chren (rindeal)</name>
   </maintainer>
+  <use>
+    <flag name="proxy">Enable proxy support</flag>
+  </use>
 </pkgmetadata>
