@@ -1,4 +1,4 @@
-# Copyright 2016 Jan Chren (rindeal)
+# Copyright 2015-2016 Jan Chren (rindeal)
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
@@ -8,46 +8,45 @@ inherit versionator
 {
 	telegram_ver="0.9.48"
 
-	qt_ver="$(get_version_component_range 1-3)"
-
-	qt_patch_date="$(get_version_component_range 4 | tr -d 'p')"
-	# convert date to ISO8601 and format it properly as a git rev
-	qt_patch_rev="master@{${qt_patch_date:0:4}-${qt_patch_date:4:2}-${qt_patch_date:6:2}}"
-	qt_patch_uri_path="Telegram/Patches/qtbase_${qt_ver//./_}.diff"
-	qt_patch_local_name="${P}-qtbase.patch"
-
+	QT_VER="$(get_version_component_range 1-3)"
+	QT_PATCH_DATE="$(get_version_component_range 4 | tr -d 'p')"
+}
+{
 	# 'module > subdir > package' bindings: https://wiki.gentoo.org/wiki/Project:Qt/Qt5status
 	QT5_MODULE='qtbase' # base ( core dbus gui network widgets ) imageformats
-	QT_MODULES=( qtbase qtimageformats )
-
-	GH_REPO="telegramdesktop/tdesktop"
+	QT_MODULES=( qtbase qtimageformats ) # list of qt modules used to generate SRC_URI
 
 	inherit check-reqs eutils qmake-utils qt5-build
 
-	# prevent qttest from being assigned to DEPEND, this is very dirty hack
+	# prevent qttest from being assigned to DEPEND, this is a very dirty hack
 	E_DEPEND="${E_DEPEND/test? \( \~dev-qt\/qttest-* \)}"
-
-	SLOT="${qt_ver}/${qt_patch_date}" ; readonly SLOT
-
+}
+{
+	SLOT="${QT_VER}/${QT_PATCH_DATE}" ; readonly SLOT
 	# this path must be in sync with net-im/telegram ebuild
 	QT5_PREFIX="${EPREFIX}/opt/${PN}/${SLOT}" ; readonly QT5_PREFIX
 }
 
+GH_REPO="telegramdesktop/tdesktop"
 DESCRIPTION='Patched Qt for net-im/telegram'
 HOMEPAGE="https://github.com/${GH_REPO} https://www.qt.io"
 
-SRC_URI="https://github.com/${GH_REPO}/raw/${qt_patch_rev}/${qt_patch_uri_path} -> ${qt_patch_local_name}"
+# convert date to ISO8601 and format it properly as a git rev
+_qt_patch_rev="master@{${QT_PATCH_DATE:0:4}-${QT_PATCH_DATE:4:2}-${QT_PATCH_DATE:6:2}}"
+_qt_patch_uri_path="Telegram/Patches/qtbase_${QT_VER//./_}.diff"
+QT_PATCH_LOCAL_NAME="${P}-qtbase.patch"
+
+SRC_URI="https://github.com/${GH_REPO}/raw/${_qt_patch_rev}/${_qt_patch_uri_path} -> ${QT_PATCH_LOCAL_NAME}"
 my_gen_qt_uris() {
 	local m qt_submodules_base_uri="
-		https://download.qt-project.org/official_releases/qt/${qt_ver%.*}/${qt_ver}/submodules"
+		https://download.qt-project.org/official_releases/qt/${QT_VER%.*}/${QT_VER}/submodules"
 	for m in "${QT_MODULES[@]}" ; do
-		SRC_URI+="${qt_submodules_base_uri}/${m}-opensource-src-${qt_ver}.tar.xz"
+		SRC_URI+="${qt_submodules_base_uri}/${m}-opensource-src-${QT_VER}.tar.xz"
 	done
 }
 my_gen_qt_uris
 
 KEYWORDS='~amd64 ~arm ~arm64 ~x86'
-
 IUSE='bindist gtkstyle ibus +icu libinput libproxy systemd tslib'
 
 RDEPEND=(
@@ -120,7 +119,6 @@ DEPEND=("${RDEPEND[@]}"
 	'virtual/pkgconfig'
 )
 PDEPEND=(
-	">=net-im/telegram-${telegram_ver}"
 	# 'ibus? ( app-i18n/ibus )' # QtGui
 )
 
@@ -146,27 +144,28 @@ QT5_TARGET_SUBDIRS=(
 	'qtbase/src/network'
 	## END - QtNetwork
 
-	## BEGIN - QtGui (core,dbus)
+	## BEGIN - QtGui (core, dbus)
 	'qtbase/src/'{gui,platform{headers,support}}
 	'qtbase/src/plugins/'{generic,imageformats,platforms,platform{inputcontexts,themes}}
 	## END - QtGui
 
-	## BEGIN - QtImageFormats (core,gui)
+	## BEGIN - QtImageFormats (core, gui)
 	'qtimageformats'
 	## END - QtImageFormats
 
-	## BEGIN - QtWidgets (core,gui)
+	## BEGIN - QtWidgets (core, gui)
 	'qtbase/src/tools/uic'
 	'qtbase/src/widgets'
 	## END - QtWidgets
 )
 
 QTBASE_PATCHES=()
-if [ "${qt_ver}" = "5.6.0" ]  ; then
+if version_is_at_least "5.6.0" "${QT_VER}" ; then
 	QTBASE_PATCHES+=( "${FILESDIR}"/qtdbus-5.6.0-deadlock.patch)
 fi
 
-CHECKREQS_DISK_BUILD='1G'
+# size varies between 400M-1100M depending on compiler flags
+CHECKREQS_DISK_BUILD='800M'
 
 S="${WORKDIR}"
 QT5_BUILD_DIR="${S}"
@@ -177,7 +176,7 @@ src_unpack() {
 
 	local m
 	for m in ${QT_MODULES[@]} ; do
-		mv -v "${m}-opensource-src-${qt_ver}" "${m}" || die
+		mv -v "${m}-opensource-src-${QT_VER}" "${m}" || die
 	done
 }
 
@@ -192,7 +191,7 @@ qt5_prepare_env() {
 	QT5_IMPORTDIR="${QT5_ARCHDATADIR}/imports"
 	QT5_QMLDIR="${QT5_ARCHDATADIR}/qml"
 	QT5_DATADIR="${QT5_PREFIX}/share"
-	QT5_DOCDIR="${QT5_PREFIX}/share/doc/qt-${qt_ver}"
+	QT5_DOCDIR="${QT5_PREFIX}/share/doc/qt-${QT_VER}"
 	QT5_TRANSLATIONDIR="${QT5_DATADIR}/translations"
 	QT5_EXAMPLESDIR="${QT5_DATADIR}/examples"
 	QT5_TESTSDIR="${QT5_DATADIR}/tests"
@@ -201,16 +200,18 @@ qt5_prepare_env() {
 		QT5_LIBEXECDIR QT5_IMPORTDIR QT5_QMLDIR QT5_DATADIR QT5_DOCDIR QT5_TRANSLATIONDIR \
 		QT5_EXAMPLESDIR QT5_TESTSDIR QT5_SYSCONFDIR
 
-	# see mkspecs/features/qt_config.prf
-	export QMAKEMODULES="${QT5_BUILD_DIR}/mkspecs/modules:${S}/mkspecs/modules:${QT5_ARCHDATADIR}/mkspecs/modules"
+	# WARNING: this is very dangerous to change, if you put QT5_ARCHDATADIR here,
+	# the installation will result into a spaghetti mix up.
+	# See: mkspecs/features/qt_config.prf
+	export QMAKEMODULES="${QT5_BUILD_DIR}/mkspecs/modules:${S}/mkspecs/modules"
 }
 
 src_prepare() {
 	cd "${qtbase_dir}" || die
 
-	eapply "${DISTDIR}/${qt_patch_local_name}"
+	eapply "${DISTDIR}/${QT_PATCH_LOCAL_NAME}" # this bitch is why this ebuild exists
 
-	[ "${#QTBASE_PATCHES[@]}" -gt 0 ] && eapply "${QTBASE_PATCHES[@]}"
+	[[ ${#QTBASE_PATCHES[@]} > 0 ]] && eapply "${QTBASE_PATCHES[@]}"
 
 	# apply user patches now, because qt5-build_src_prepare() calls default() in a wrong dir
 	pushd "${S}" >/dev/null || die
@@ -231,9 +232,9 @@ qt5_symlink_tools_to_build_dir() { : ; }
 
 # customized qt5-build_src_configure()
 src_configure() {
-	einfo
+	echo
 	einfo "${PN} is going to be installed into '${QT5_PREFIX}'"
-	einfo
+	echo
 
 	local myconf=(
 		-static
@@ -242,15 +243,15 @@ src_configure() {
 		-system-{freetype,harfbuzz,libjpeg,libpng,pcre,xcb,xkbcommon-x11,zlib}
 
 		# enabled features
-		-{fontconfig,glib,gui,iconv,xcb,xcb-xlib,xinput2,xkb,xrender,widgets}
+		-{fontconfig,gui,iconv,xcb,xcb-xlib,xinput2,xkb,xrender,widgets}
 		-{dbus,openssl}-linked
 		# disabled features
-		-no-{nis,qml-debug}
+		-no-{glib,nis,qml-debug}
 
 		# Telegram doesn't support sending files >4GB
 		-no-largefile
 
-		$(usex amd64 -reduce-relocations '') # buggy on arm
+		$(usex amd64 -reduce-relocations '') # buggy on other arches
 
 		$(qt_use gtkstyle)
 		$(qt_use icu)
@@ -286,9 +287,9 @@ src_compile() {
 
 src_install() {
 	qt5_foreach_target_subdir \
-		emake INSTALL_ROOT="${D}" install
+		emake INSTALL_ROOT="${ED}" install
 
-	emake -C "${qtbase_dir}" INSTALL_ROOT="${D}" install_qmake install_mkspecs
+	emake -C "${qtbase_dir}" INSTALL_ROOT="${ED}" install_{qmake,mkspecs}
 
 	# fix .prl files
 	local args=(
