@@ -27,6 +27,7 @@ DEPEND=( "${RDEPEND[@]}"
 	# 5.6.0 is required since 0.9.49
 	">=dev-qt/qt-telegram-static-5.6.0_p20160510:5.6.0"
 	'virtual/pkgconfig'
+	'>=sys-apps/gawk-4.1' # required for inplace support for .pro files formatter
 )
 DEPEND="${DEPEND[*]}"
 RDEPEND="${RDEPEND[*]}"
