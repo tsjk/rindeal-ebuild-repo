@@ -41,6 +41,9 @@ REQUIRED_USE="python? ( ${PYTHON_REQUIRED_USE} )"
 RESTRICT+=' test'
 
 src_prepare() {
+	PATCHES=(
+		"${FILESDIR}"/1.1.0-remove__msse4_2_commandline_option_from_configure_script.patch # remove in >1.1.0
+	)
 	default
 
 	# make sure lib search dir points to the main `S` dir and not to python copies
