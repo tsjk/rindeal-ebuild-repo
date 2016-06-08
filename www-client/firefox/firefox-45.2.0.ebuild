@@ -1,6 +1,5 @@
 # Copyright 2016 Jan Chren (rindeal)
 # Distributed under the terms of the GNU General Public License v2
-# $Id$
 
 # upstream guide: https://developer.mozilla.org/en-US/docs/Mozilla/Developer_guide/Build_Instructions
 
@@ -27,17 +26,17 @@ SRC_URI="https://archive.mozilla.org/pub/firefox/releases/${MOZ_PV}/source/${MOZ
 
 KEYWORDS='~amd64 ~arm ~arm64 ~x86'
 IUSE_A=(
-	## since v46 gtk3 is default
+	## since v46 gtk3 is default, but we're now on 45.x branch
 	+X +gtk2 gtk3 -qt5 +pango
 
 	## compiler options
-	ccache custom-{cflags,optimization} debug hardened pgo rust +yasm
+	ccache custom-optimization debug hardened pgo rust +yasm
 
 	## privacy
 	-crashreporter -healthreport -safe-browsing -telemetry -wifi
 
 	accessibility bindist cups dbus
-	+gssapi +jemalloc +jit +libproxy neon system-jemalloc
+	+gssapi +jemalloc +jit +libproxy neon
 	+startup-notification
 
 	## media
@@ -50,13 +49,14 @@ IUSE_A=(
 	-system-cairo	# buggy, rather use the bundled and patched version
 	-system-sqlite	# requires non-standard USE flags
 	-system-js
+	-system-jemalloc # requires new and currently unstable jemalloc version
 
-	test -ipdl-tests
+	-test -ipdl-tests
 
 	# Gnome
 	-gnomeui +gio +gconf
 
-	+webrtc gamepad
+	+webrtc -gamepad
 )
 IUSE="${IUSE_A[*]}"
 
@@ -112,11 +112,11 @@ CDEPEND_A=(
 		# 'media-plugins/gst-plugins-libav:1.0'	# TODO: check necessity
 	')'
 	'gtk2? (' "${gtk_deps[@]}"
-			'x11-libs/gtk+:2'
+			'x11-libs/gtk+:2='
 	')'
 	'gtk3? (' "${gtk_deps[@]}"
-		'x11-libs/gtk+:3'
-		'dev-libs/glib:2'
+		'x11-libs/gtk+:3='
+		'dev-libs/glib:2='
 	')'
 	'libproxy?	( net-libs/libproxy:0 )'
 	'pango? ( x11-libs/pango:0 )'
@@ -239,7 +239,7 @@ pkg_setup() {
 
 	# Ensure that we have a sane build enviroment
 	export+=( MOZILLA_CLIENT='1' BUILD_OPT='1' USE_PTHREADS='1' VERBOSE='1'
-		MOZ_MAKE_FLAGS="${MAKEOPTS}" SHELL="${EPREFIX}/bin/bash" )
+		MOZ_MAKE_FLAGS="${MAKEOPTS}" )
 
 	# Avoid PGO profiling problems due to enviroment leakage
 	# These should *always* be cleaned up anyway
@@ -289,15 +289,15 @@ src_unpack() {
 		--file "${arch}"
 		--directory="${S}"
 
+		--exclude='nsprpub/src'
 		"$(my_usexclude system-icu 'intl/icu/source/data')"
 		"$(my_usexclude system-jemalloc "${jemalloc_dir}")"
-		--exclude='nsprpub/src'
 	)
+	# possibly exclude some unnecessary and relatively big dirs
 	if ! use test ; then
 		tar+=(
 			--exclude='testing/web-platform'/{meta,tests}
 			--exclude='testing/talos/talos'
-			#--exclude='*/tests'
 		)
 	fi
 
@@ -316,7 +316,8 @@ src_prepare() {
 			-i -- "${S}"/build/unix/run-mozilla.sh || die
 	fi
 
-	# Ensure that our plugins dir is enabled as default FIXME: review
+	# FIXME: review
+	# Ensure that our plugins dir is enabled as default
 	sed -e 's|'/usr/lib/mozilla/plugins'|'/usr/lib/nsbrowser/plugins'|g' \
 		-e 's|'/usr/lib64/mozilla/plugins'|'/usr/lib64/nsbrowser/plugins'|g' \
 		-i -- "${S}"/xpcom/io/nsAppFileLocationProvider.cpp || die
@@ -338,13 +339,17 @@ src_prepare() {
 	sed -e "s|@MOZ_APP_NAME@|${PN}|g" \
 		-- "${FILESDIR}"/${PN}.1.in > "${T}"/${PN}.1 || die
 
+	# fix `c++: error: unrecognized command line option '--param lto-partitions=1'`
+	find -type f -name "*.build"	| xargs sed -r -e "s|'(--param) |'\1', '|" -i --
+	assert
+
+	# --- --- --- --- ---
+
 	eautoreconf
 
-	# FIXME: make spidermonkey optional
-	# spidermonkey
 	# Must run autoconf in js/src
-# 	cd "${S}"/js/src || die
-# 	eautoconf
+ 	cd "${S}"/js/src || die
+ 	eautoconf
 
 	if use jemalloc ; then
 		# Need to update jemalloc's configure FIXME
@@ -358,14 +363,11 @@ src_prepare() {
 
 my::src_configure::compiler() {
 	# -O* compiler flags are passed only via `--enable-optimize=` option
+	# when not specified, mozilla default is used (-O2 last time I checked - 2016/06)
 	local o="$(get-flag '-O*')"
 	if use custom-optimization && [ -n "${o}" ] ; then
 		$mozconfig::add_options 'from *FLAGS' --enable-optimize="${o}"
 	fi
-	filter-flags '-O*'
-
-	# Strip over-aggressive CFLAGS
-	use custom-cflags || strip-flags
 
 	# We want rpath support to prevent unneeded hacks on different libc variants
 	append-ldflags -Wl,-rpath="${MOZILLA_FIVE_HOME}"
@@ -379,6 +381,7 @@ my::src_configure::compiler() {
 
 	$mozconfig::use_with ccache
 
+	## PGO
 	# https://developer.mozilla.org/en-US/docs/Mozilla/Developer_guide/Build_Instructions/Building_with_Profile-Guided_Optimization
 	$mozconfig::use_set pgo
 	# mk_add_options PROFILE_GEN_SCRIPT='xvfb-run -a @MOZ_PYTHON@ @TOPSRCDIR@/@MOZ_OBJDIR@/_profile/pgo/profileserver.py 10'
@@ -391,21 +394,21 @@ my::src_configure::compiler() {
 
 	# --- --- ---
 
+	## stripping
 	options=( --disable-{install-strip,strip,strip-libs} )
 	$mozconfig::add_options 'disable stripping' "${options[@]}"
 
-	if use debug ; then
-		options=( --enable-{debug,profiling} --enable-{address,memory,thread}-sanitizer )
-		$mozconfig::add_options "$(firefox::use_cmt debug)" "${options[@]}"
-	else
-		$mozconfig::add_options "$(firefox::use_cmt debug)" --enable-release
-	fi
+	## debug
+	local debug_options=( --enable-{debug,profiling} --enable-{address,memory,thread}-sanitizer )
+	$mozconfig::add_options "$(firefox::use_cmt debug)" $(usex debug "${options[@]}" --enable-release)
 	$mozconfig::use_enable	debug	debug-symbols
 	$mozconfig::use_set		!debug	BUILDING_RELEASE
 }
 
 my::src_configure::gui() {
+	# ${uset} contains one of gtk2, gtk3, qt5 or die
 	local uset=$(usex gtk2{,} $(usex gtk3{,} $(usex qt5{,} 'die')))
+	[[ ${uset} == 'die' ]] && die
 	local toolkit="cairo-${uset}"
 	local toolkit_comment="$(firefox::use_cmt ${uset})"
 
@@ -430,7 +433,8 @@ my::src_configure::gui() {
 
 	$mozconfig::add_options '' --enable-system-pixman
 
-	# $mozconfig::add_options 'Gentoo default' --disable-skia # FIXME: use or not?
+	# FIXME: use or not?
+	# $mozconfig::add_options 'Gentoo default' --disable-skia
 	# --disable-skia-gpu
 }
 
@@ -483,7 +487,7 @@ src_configure() {
 	# mozconfig
 	##
 	export MOZCONFIG="${S}/mozconfig" || die
-	echo >"${MOZCONFIG}" || die
+	echo >"${MOZCONFIG}" || die # ensure it exists and is empty
 
 	local mozconfig=firefox::mozconfig # "class"
 	$mozconfig::init
@@ -494,7 +498,7 @@ src_configure() {
 	options=(
 		--x-includes="${EPREFIX}/usr/include" --x-libraries="${EPREFIX}/usr/$(get_libdir)"
 		--with-nss-prefix="${EPREFIX}/usr"
-		# --with-qtdir="$(qt5_get_dir)"
+		# --with-qtdir="$(qt5_get_dir)" # FIXME
 		--with-default-mozilla-five-home="${MOZILLA_FIVE_HOME}"
 	)
 	$mozconfig::add_options 'paths' "${options[@]}"
@@ -511,30 +515,32 @@ src_configure() {
 	use bindist && $mozconfig::add_options "$(firefox::use_cmt bindist)" --with-branding='browser/branding/aurora'
 	$mozconfig::add_options 'id' --with-distribution-id='org.gentoo'
 
+	## test
 	$mozconfig::use_enable test tests
 
 	options=( --disable-{installer,updater} )
 	$mozconfig::add_options 'disable installer/updater' "${options[@]}"
 	# pref("browser.pocket.enabled", true);
 
-	# $mozconfig::add_options 'build static SpiderMonkey' --disable-shared-js
-	$mozconfig::stmt 'export' 'disable JS' JS_STANDALONE=  BUILDING_JS=
+	$mozconfig::add_options 'build static SpiderMonkey' --disable-shared-js
+	#$mozconfig::stmt 'export' 'disable JS' JS_STANDALONE=  BUILDING_JS=
 
+	$mozconfig::use_enable jit ion
 
 	# jemalloc
 	$mozconfig::use_enable	jemalloc
 	$mozconfig::use_enable	jemalloc replace-malloc
 	$mozconfig::use_set		system-jemalloc MOZ_JEMALLOC4
 
-	$mozconfig::use_enable jit ion
-
 	$mozconfig::use_enable rust
 
+	## toolkit
 	my::src_configure::gui
 
 	## system libs
 	my::src_configure::system_libs
 
+	# TODO
 	# '--enable-build-backend=FasterMake'
 	# --disable-startupcache
 	# --disable-mozril-geoloc
@@ -542,6 +548,7 @@ src_configure() {
 	# --disable-synth-speechd
 
 	$mozconfig::use_enable speech-dispatcher
+	# TODO
 	# --disable-websms-backend
 	# use x86 || use amd64 || --disable-webrtc
 	# --enable-hardware-aec-ns
@@ -559,9 +566,11 @@ src_configure() {
 # 	ac_add_options --enable-system-ffi
 # 	%%endif
 
+	# FIXME
 	# e10s
 	# $mozconfig::use_enable content-sandbox
 
+	## accessibility
 	$mozconfig::use_enable accessibility
 	$mozconfig::add_options 'ECMAScript Internationalization API' --with-intl-api
 
@@ -574,16 +583,10 @@ src_configure() {
 	## video
 	$mozconfig::use_enable ffmpeg
 	$mozconfig::add_options '' --enable-webm # html5 video
-	if use gstreamer ; then
-		# FIXME: isn't ffmpeg default now?
-		use ffmpeg && einfo "${PN} will not use ffmpeg unless gstreamer:1.0 is not available at runtime"
-		$mozconfig::add_options "$(firefox::use_cmt gstreamer)" --enable-gstreamer=1.0
-	else
-		$mozconfig::add_options "$(firefox::use_cmt gstreamer)" --disable-gstreamer
-	fi
+	$mozconfig::add_options "$(firefox::use_cmt gstreamer)" $(usex '--enable-gstreamer=1.0' '--disable-gstreamer')
 
 	## desktop integration
-	$mozconfig::use_enable	startup-notification # TODO: what is this?
+	$mozconfig::use_enable	startup-notification # x11-libs/startup-notification
 	$mozconfig::use_enable	dbus	# MOZ_ENABLE_DBUS
 
 	## privacy
@@ -609,6 +612,7 @@ src_configure() {
 	$mozconfig::use_enable libproxy
 	$mozconfig::use_enable gssapi negotiateauth
 
+	## printing
 	$mozconfig::use_enable cups printing
 
 	## BEGIN: arch specific stuff (keep this at the end to allow overrides)
@@ -675,9 +679,7 @@ src_compile() {
 
 # --------------------------------------------------------------------------------------------------
 
-src_test() {
-	return 0
-}
+src_test() { : ; }
 
 # --------------------------------------------------------------------------------------------------
 
@@ -690,9 +692,9 @@ mozconfig_install_prefs() {
 	echo "pref(\"spellchecker.dictionary_path\", \"${EPREFIX}/usr/share/myspell\");" \
 		>>"${prefs_file}" || die
 
-		# FIXME
-		echo "sticky_pref(\"gfx.font_rendering.graphite.enabled\",true);" \
-			>>"${prefs_file}" || die
+	# FIXME
+	echo "sticky_pref(\"gfx.font_rendering.graphite.enabled\",true);" \
+		>>"${prefs_file}" || die
 }
 
 src_install() {
@@ -783,9 +785,7 @@ src_install() {
 
 	# Add StartupNotify=true bug 237317
 	if use startup-notification ; then
-		echo "StartupNotify=true"\
-			 >> "${ED}/usr/share/applications/${PN}.desktop" \
-			|| die
+		echo "StartupNotify=true" >> "${ED}/usr/share/applications/${PN}.desktop" || die
 	fi
 
 	doman "${T}/${PN}.1"
