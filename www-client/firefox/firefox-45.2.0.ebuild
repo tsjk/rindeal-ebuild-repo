@@ -11,7 +11,7 @@ PYTHON_REQ_USE='ncurses,sqlite,ssl,threads'
 # will resolve to 2.13, newer don't work (https://bugzilla.mozilla.org/show_bug.cgi?id=104642)
 WANT_AUTOCONF="2.1"
 
-inherit gnome2-utils check-reqs flag-o-matic python-any-r1 autotools rindeal firefox eclass-patches
+inherit gnome2-utils check-reqs flag-o-matic python-any-r1 autotools rindeal firefox eclass-patches pax-utils
 
 DESCRIPTION="Firefox Web Browser"
 HOMEPAGE='https://www.mozilla.com/firefox'
@@ -50,6 +50,7 @@ IUSE_A=(
 	-system-sqlite	# requires non-standard USE flags
 	-system-js
 	-system-jemalloc # requires new and currently unstable jemalloc version
+	-system-harfbuzz -system-graphite2 # nonstandard options, added via patch
 
 	-test -ipdl-tests
 
@@ -167,7 +168,7 @@ RDEPEND_A=( "${CDEPEND_A[@]}"
 	'virtual/freedesktop-icon-theme'
 	'ffmpeg? ( virtual/ffmpeg )'
 	'gnomeui? ( gnome-base/libgnomeui:0 )'
-	'wifi? ( net-misc/networkmanager:0 )'	# TODO: check when is NM needed
+	'wifi? ( net-misc/networkmanager:0 )'
 )
 
 DEPEND="${DEPEND_A[*]}"
@@ -332,10 +333,29 @@ src_prepare() {
 # 	sed '/^MOZ_PKG_FATAL_WARNINGS/s@= 1@= 0@' \
 # 		-i -- "${S}"/browser/installer/Makefile.in || die
 
+	# FIXME
+	# Don't error out when there's no files to be removed:
+# 	sed 's@\(xargs rm\)$@\1 -f@' \
+# 		-i "${S}"/toolkit/mozapps/installer/packager.mk || die
+
 	# Keep codebase the same even if not using official branding
 	sed -r '/^MOZ_DEV_EDITION=1/d' \
 		-i -- "${S}"/browser/branding/aurora/configure.sh || die
 
+	# strip version from install dirs; replaces `2000-firefox_gentoo_install_dirs.patch`
+	sed 's|\(/$(MOZ_APP_NAME)\)-$(MOZ_APP_VERSION)|\1|' \
+		-i -- "${S}"/baseconfig.mk || die
+
+	# do not install SDK; replaces `2001_disable-sdk-install.patch`
+	sed -r 's|INSTALL_SDK[ ]*=|d' \
+		-i -- "${S}"/baseconfig.mk || die
+
+	# replaces `2002_fix-preferences-gentoo.patch`
+	sed '\|@RESPATH@/browser/@PREF_DIR@/firefox.js|i \
+		@RESPATH@/browser/@PREF_DIR@/all-gentoo.js'
+		-i -- "${S}"/browser/installer/package-manifest.in || die
+
+	## expand
 	sed -e "s|@MOZ_APP_NAME@|${PN}|g" \
 		-- "${FILESDIR}"/${PN}.1.in > "${T}"/${PN}.1 || die
 
@@ -446,6 +466,9 @@ my::src_configure::system_libs() {
 		--with-system-{libvpx,nss}
 		--enable-system-{ffi,hunspell} )
 	$mozconfig::add_options "${cmt}" "${options[@]}"
+
+	$mozconfig::use_with system-harfbuzz
+	$mozconfig::use_with system-graphite2
 
 	# SQLite
 	$mozconfig::use_enable system-sqlite
@@ -674,7 +697,7 @@ src_compile() {
 
 	# xvfb-run -a -s "-extension GLX -screen 0 1280x1024x24"
 
-	emake -f client.mk build
+	emake -f client.mk $(usex pgo profiledbuild build)
 }
 
 # --------------------------------------------------------------------------------------------------
@@ -698,9 +721,7 @@ mozconfig_install_prefs() {
 }
 
 src_install() {
-	return 0
-
-	cd -v "${BUILD_OBJ_DIR}" || die
+	cd "${BUILD_DIR}" || die
 
 	# FIXME: Add our default prefs for firefox
 # 	cp "${FILESDIR}"/gentoo-default-prefs.js-1 \
