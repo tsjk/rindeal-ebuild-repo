@@ -18,9 +18,9 @@ esac
 __class_end() {
 	local __d__ __o__ __f__
 	while read __d__  __o__ __f__ ; do
-		[[ "${__f__}" != "$self::"* ]] && continue
+		[[ "${__f__}" != "${self}::"* ]] && continue # match only the specified "class"
 		__f__="$(declare -f "$__f__")"
-		eval "${__f__//\$self/${self}}"
+		eval "${__f__//\$self/${self}}" # expand all class vars
 	done < <(declare -F)
 	unset self
 }
@@ -28,7 +28,7 @@ __class_end() {
 namespace=firefox
 
 firefox::use_cmt() {
-	echo "USE=$(usex $1 '' '!')$1"
+	echo "USE=$(usex ${1} '' '!')${1}"
 }
 
 # BEGIN firefox::mozconfig
@@ -36,7 +36,7 @@ firefox::use_cmt() {
 self=firefox::mozconfig
 
 firefox::mozconfig::stmt() {
-	local stmt="$1" cmt="$2"
+	local stmt="${1}" cmt="${2}"
 	shift 2
 	[[ $# -gt 0 ]] || die "${FUNCNAME} called with no flags. Comment: '${cmt}'"
 	[ ! -v MOZCONFIG ] && die "MOZCONFIG not defined"
@@ -100,7 +100,7 @@ firefox::mozconfig::init() {
 	)
 	$self::add_options 'econf' "${econf[@]}"
 
-	$self::add_options '' --enable-application=browser
+	$self::add_options '' --enable-application=browser # this is default, but nevermind
 }
 
 firefox::mozconfig::keyfiles() {
