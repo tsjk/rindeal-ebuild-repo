@@ -12,29 +12,47 @@ case "${EAPI:-0}" in
     *) die "Unsupported EAPI='${EAPI}' for '${ECLASS}'" ;;
 esac
 
+# @FUNCTION: get-flag
+# @USAGE: <flag>
+# @DESCRIPTION:
+# Find and echo the value for a particular flag.  Accepts shell globs.
+#
+# Example:
+# @CODE
+# CFLAGS="-march=i686 -O1"
+# get-flag -march # outputs "-march=i686"
+# get-flag march  # outputs "i686"
+# get-flag '-O*'  # outputs "-O1"
+# @CODE
 # ORIGIN: flag-o-matic
 # PR: https://github.com/gentoo/gentoo/pull/1425
 get-flag() {
-	local var findflag="${1}"
+	local var pattern="${1}"
+	# ensure ${needle} starts with a single dash
+	local needle="-${pattern#-}"
 
-	# this code looks a little flaky but seems to work for
-	# everything we want ...
-	# for example, if CFLAGS="-march=i686":
-	# `get-flag -march` == "-march=i686"
-	# `get-flag march` == "i686"
 	for var in $(all-flag-vars) ; do
-		# reverse loop
-		set -- ${!var}
-		local i=$#
-		while [ $i -gt 0 ] ; do
-			local f="${!i}"
-			if [ "${f#-${findflag#-}}" != "${f}" ] ; then
-				printf "%s\n" "${f#-${findflag}=}"
+		local i flags=( ${!var} )
+
+		# reverse loop because last flag wins
+		for (( i = ${#flags[@]} - 1 ; i >= 0 ; i-- )) ; do
+			local flag="${flags[i]}"
+			# strip value as it's not needed for comparison
+			local haystack="${flag%%=*}"
+
+			# as long as ${needle} remains unquoted, wildcards will work
+			if [[ "${haystack}" == ${needle} ]] ; then
+				# preserve only value if only flag name was provided
+				local ret="${flag#-${pattern}=}"
+
+				# ${ret} might contain `-e` or `-n` which confuses echo
+				printf '%s\n' "${ret}"
+
 				return 0
 			fi
-			((i--))
 		done
 	done
+
 	return 1
 }
 
