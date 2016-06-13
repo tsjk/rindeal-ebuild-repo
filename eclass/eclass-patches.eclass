@@ -130,3 +130,14 @@ _cmake_ninja_src_make() {
 	echo "$@"
 	"$@" || die
 }
+
+## Origin: portage - bin/isolated-functions.sh
+## PR: https://github.com/gentoo/portage/pull/26
+has() {
+	local needle=$'\a'"$1"$'\a'
+	shift
+	local IFS=$'\a'
+	local haystack=$'\a'"$@"$'\a'
+
+	[[ "${haystack}" == *"${needle}"* ]]
+}
