@@ -1,6 +1,5 @@
 # Copyright 2016 Jan Chren (rindeal)
 # Distributed under the terms of the GNU General Public License v2
-# $Id$
 
 # @ECLASS: eclass-patches.eclass
 # @MAINTAINER:
