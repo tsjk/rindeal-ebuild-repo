@@ -24,10 +24,9 @@ RDEPEND=(
 	'virtual/ffmpeg[opus]'
 )
 DEPEND=( "${RDEPEND[@]}"
-	# 5.6.0 is required since 0.9.49
-	">=dev-qt/qt-telegram-static-5.6.0_p20160510:5.6.0"
+	">=dev-qt/qt-telegram-static-5.6.0_p20160510:5.6.0"	# 5.6.0 is required since 0.9.49
 	'virtual/pkgconfig'
-	'>=sys-apps/gawk-4.1' # required for inplace support for .pro files formatter
+	'>=sys-apps/gawk-4.1'	# required for inplace support for .pro files formatter
 )
 DEPEND="${DEPEND[*]}"
 RDEPEND="${RDEPEND[*]}"
@@ -60,14 +59,6 @@ src_prepare-locales() {
 src_prepare-delete_and_modify() {
 	local args
 
-	## change references to static Qt dir
-	args=(
-		 -e "s:/usr/local[^ ]*/Qt[^ ]*/((include|plugins)/[^ ]*):${QT5_PREFIX}/\1 # QT_PREFIX:g"
-		 -e "s:[^ ]*Libraries/QtStatic/qtbase/([^ \"\\]*):${QT5_PREFIX}/\1 # QT_PREFIX:g"
-	)
-	sed -r "${args[@]}" \
-		-i -- *.pro || die
-
 	## patch "${TG_PRO}"
 	args=(
 		# delete any references to local includes/libs
@@ -87,8 +78,6 @@ src_prepare-delete_and_modify() {
 		# use release versions
 		-e 's:(.*)Debug(Style|Lang)(.*):\1Release\2\3 # Debug -> Release Style/Lang:g'
 		-e 's|(.*)/Debug(.*)|\1/Release\2 # Debug -> Release|g'
-		# fix Qt version
-		-e "s|(.*)/(5.[56].[0-9])/(.*)|\1/${QT_VER}/\3 # QT_VER, was \2|g"
 	)
 	sed -r "${args[@]}" \
 		-i -- "${TG_PRO}" || die
@@ -104,6 +93,10 @@ src_prepare-delete_and_modify() {
 	)
 	sed -r "${args[@]}" \
 		-i -- 'SourceFiles/pspecific_linux.cpp' || die
+
+	# patch c++ version, this was fixed in 0.9.52
+	sed -r -e 's|(CONFIG .*)c\+\+11|\1c++14|' \
+		-i -- *.pro || die
 }
 
 src_prepare-appends() {
@@ -175,7 +168,7 @@ src_prepare() {
 
 src_configure() {
 	## add flags previously stripped from "${TG_PRO}"
-	append-cxxflags '-fno-strict-aliasing'
+	append-cxxflags '-fno-strict-aliasing' -std=c++14
 	# `append-ldflags '-rdynamic'` was stripped because it's used probably only for GoogleBreakpad
 	# which is not supported anyway
 
@@ -200,34 +193,42 @@ src_configure() {
 	) >>"${TG_PRO}" || die
 }
 
+my_eqmake5() {
+	local args=(
+		CONFIG+='release'
+		QT_TDESKTOP_VERSION="${QT_VER}"
+		QT_TDESKTOP_PATH="${QT5_PREFIX}"
+	)
+	eqmake5 "${args[@]}" "$@"
+}
+
 src_compile() {
-	local d mode='release' module
+	local d module
 
 	for module in style numbers ; do	# order of modules matters
-		d="${S}/Linux/obj/codegen_${module}/${mode^}"
+		d="${S}/Linux/obj/codegen_${module}/Release"
 		mkdir -v -p "${d}" && cd "${d}" || die
 
 		elog "Building: ${PWD/${S}\/}"
-		eqmake5 CONFIG+="${mode}" \
-			"${TG_DIR}/build/qmake/codegen_${module}/codegen_${module}.pro"
+		my_eqmake5 "${TG_DIR}/build/qmake/codegen_${module}/codegen_${module}.pro"
 		emake
 	done
 
 	for module in Lang ; do		# order of modules matters
-		d="${S}/Linux/${mode^}Intermediate${module}"
+		d="${S}/Linux/ReleaseIntermediate${module}"
 		mkdir -v -p "${d}" && cd "${d}" || die
 
 		elog "Building: ${PWD/${S}\/}"
-		eqmake5 CONFIG+="${mode}" "${TG_DIR}/Meta${module}.pro"
+		my_eqmake5 "${TG_DIR}/Meta${module}.pro"
 		emake
 	done
 
-	d="${S}/Linux/${mode^}Intermediate"
+	d="${S}/Linux/ReleaseIntermediate"
 	mkdir -v -p "${d}" && cd "${d}" || die
 
 	elog "Preparing the main build ..."
 	# this qmake will fail to find "${TG_DIR}/GeneratedFiles/*", but it's required for ...
-	eqmake5 CONFIG+="${mode}" "${TG_PRO}"
+	my_eqmake5 "${TG_PRO}"
 	# ... this make, which will generate those files
 	local targets=( $( awk '/^PRE_TARGETDEPS *\+=/ { $1=$2=""; print }' "${TG_PRO}" ) )
 	[ ${#targets[@]} -eq 0 ] && die
@@ -235,7 +236,7 @@ src_compile() {
 
 	# now we have everything we need, so let's begin!
 	elog "Building Telegram ..."
-	eqmake5 CONFIG+="${mode}" "${TG_PRO}"
+	my_eqmake5 "${TG_PRO}"
 	emake
 }
 
