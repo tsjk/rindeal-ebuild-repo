@@ -126,3 +126,41 @@ Package | Description | :house: | :back:
 <a id="www-client-opera"></a><a href="./www-client/opera"><sub><sup>www-client/</sup></sub><strong>opera</strong></a> | A fast and secure web browser | [:house:](https://www.opera.com/) | [:back:](#cat-www-client)
 <a id="www-client-phantomjs"></a><a href="./www-client/phantomjs"><sub><sup>www-client/</sup></sub><strong>phantomjs</strong></a> | A headless WebKit scriptable with a JavaScript API | [:house:](http://phantomjs.org) | [:back:](#cat-www-client)
 <a id="x11-themes-libreoffice-breeze-icons"></a><a href="./x11-themes/libreoffice-breeze-icons"><sub><sup>x11-themes/</sup></sub><strong>libreoffice-breeze-icons</strong></a> | Breeze dark icons set for Libreoffice | [:house:](https://github.com/NitruxSA/plasma-next-icons) | [:back:](#cat-x11-themes)
+
+&nbsp;
+
+&nbsp;
+
+&nbsp;
+
+&nbsp;
+
+&nbsp;
+
+&nbsp;
+
+&nbsp;
+
+&nbsp;
+
+&nbsp;
+
+&nbsp;
+
+&nbsp;
+
+&nbsp;
+
+&nbsp;
+
+&nbsp;
+
+&nbsp;
+
+&nbsp;
+
+&nbsp;
+
+&nbsp;
+
+&nbsp;
