@@ -48,3 +48,7 @@ for c in sorted(cats):
         desc, home = portage_db.aux_get(pkg, ['DESCRIPTION', 'HOMEPAGE'])
         print('<a id="{0}-{1}"></a><a href="./{0}/{1}"><sub><sup>{0}/</sup></sub><strong>{1}</strong></a> | {2} | [:house:]({3}) | [:back:](#cat-{0})'.format(c, p, desc, home))
 
+# insert vertical space so that clicking on a reference scrolls down nicely
+for i in range(1, 20):
+    print()
+    print('&nbsp;')
