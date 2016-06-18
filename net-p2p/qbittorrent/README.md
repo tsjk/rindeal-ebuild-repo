@@ -1,0 +1,3 @@
+- locales
+- workaround for parallel build failures
+- verbose build
