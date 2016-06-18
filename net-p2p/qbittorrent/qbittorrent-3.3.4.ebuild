@@ -19,7 +19,7 @@ IUSE="+dbus debug +qt5 webui +X"
 
 RDEPEND="
 	dev-libs/boost:=
-	net-libs/libtorrent-rasterbar:0=
+	<net-libs/libtorrent-rasterbar-1.1:0/8
 	sys-libs/zlib
 	!qt5? (
 		dev-libs/qjson[qt4(+)]
