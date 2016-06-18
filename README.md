@@ -1,6 +1,7 @@
 Rindeal's Gentoo Overlay
 ==========================
 [![Build Status](https://img.shields.io/travis/rindeal/gentoo-overlay/master.svg?style=flat-square&label=repoman full)](https://travis-ci.org/rindeal/gentoo-overlay)
+[![Dev Branch Build Status](https://img.shields.io/travis/rindeal/gentoo-overlay/dev.svg?style=flat-square&label=dev)](https://travis-ci.org/rindeal/gentoo-overlay)
 
 Repository consists mostly of packages I haven't found anywhere else, more up-to-date versions of official packages,
 or ebuilds with features enhanced to my liking. In each _category/package directory_ you should find a _README_ file
