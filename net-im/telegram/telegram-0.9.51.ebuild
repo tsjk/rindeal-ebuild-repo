@@ -17,13 +17,17 @@ SLOT='0'
 KEYWORDS='~amd64 ~arm ~x86'
 IUSE='proxy'
 
-RDEPEND=(
+CDEPEND=(
 	'dev-libs/libappindicator:3'	# pspecific_linux.cpp
 	'>=media-libs/openal-1.17.2'	# Telegram requires shiny new versions
 	'sys-libs/zlib[minizip]'
 	'virtual/ffmpeg[opus]'
 )
-DEPEND=( "${RDEPEND[@]}"
+RDEPEND=(
+	'!net-im/telegram-bin'
+	'!net-im/telegram-desktop'{,-bin}
+)
+DEPEND=( "${CDEPEND[@]}"
 	">=dev-qt/qt-telegram-static-5.6.0_p20160510:5.6.0"	# 5.6.0 is required since 0.9.49
 	'virtual/pkgconfig'
 	'>=sys-apps/gawk-4.1'	# required for inplace support for .pro files formatter
