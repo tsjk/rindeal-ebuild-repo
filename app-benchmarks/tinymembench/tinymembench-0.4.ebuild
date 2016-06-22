@@ -3,10 +3,10 @@
 
 EAPI=6
 
-GH_USER='ssvb'
-GH_TAG="v${PV}"
+GH_URI='github/ssvb'
+GH_REF="v${PV}"
 
-inherit flag-o-matic github
+inherit flag-o-matic git-hosting
 
 DESCRIPTION="Simple benchmark for memory throughput and latency"
 LICENSE="MIT"
