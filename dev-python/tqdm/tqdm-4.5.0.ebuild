@@ -14,4 +14,5 @@ DESCRIPTION='A fast, extensible progress bar for Python'
 LICENSE='MPL-2.0 MIT'
 
 SLOT='0'
+
 KEYWORDS='~amd64 ~arm ~x86'
