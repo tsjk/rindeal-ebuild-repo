@@ -7,9 +7,9 @@ PYTHON_COMPAT=( python{2_7,3_{3,4,5}} )
 
 DISTUTILS_SINGLE_IMPL=true
 
-GH_USER='lord63'
+GH_URI='github/lord63'
 
-inherit github distutils-r1
+inherit git-hosting distutils-r1
 
 DESCRIPTION='Licence file generator. Yet another lice, but implemented with Jinja2 and docopt'
 LICENSE='MIT'
