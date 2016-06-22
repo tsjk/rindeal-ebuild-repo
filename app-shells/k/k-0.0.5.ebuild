@@ -3,9 +3,9 @@
 
 EAPI=6
 
-GH_USER='supercrabtree'
+GH_URI='github/supercrabtree'
 
-inherit github
+inherit git-hosting
 
 DESCRIPTION='Directory listings for zsh with git features'
 LICENSE='MIT'
