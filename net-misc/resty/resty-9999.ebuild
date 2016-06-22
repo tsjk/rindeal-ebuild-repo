@@ -14,19 +14,12 @@ SLOT='0'
 
 KEYWORDS='~amd64 ~x86 ~arm'
 
-CDEPEND_A=( )
-DEPEND_A=( "${CDEPEND_A[@]}" )
-RDEPEND_A=( "${CDEPEND_A[@]}" )
-
-DEPEND="${DEPEND_A[*]}"
-RDEPEND="${RDEPEND_A[*]}"
-
 # opt: lynx/html2text for pretty printing
 
 src_install() {
 	insinto "/usr/share/${PN}"
 	doins "${PN}"
 
-	local DOCS=( 'CHANGES.md' 'README.md' )
+	local DOCS=( CHANGES.md README.md )
 	einstalldocs
 }
