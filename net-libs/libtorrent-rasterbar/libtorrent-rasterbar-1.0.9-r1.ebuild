@@ -9,10 +9,10 @@ PYTHON_REQ_USE="threads"
 DISTUTILS_OPTIONAL=true
 DISTUTILS_IN_SOURCE_BUILD=true
 
-GH_REPO='arvidn/libtorrent'
-GH_TAG="libtorrent-${PV//./_}"
+GH_URI='github/arvidn/libtorrent'
+GH_REF="libtorrent-${PV//./_}"
 
-inherit autotools github distutils-r1
+inherit autotools git-hosting distutils-r1
 
 DESCRIPTION='C++ BitTorrent implementation focusing on efficiency and scalability'
 HOMEPAGE='http://libtorrent.org'
