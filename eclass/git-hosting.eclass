@@ -28,27 +28,35 @@ _GH_USER="${_GH_URI_A[1]:-"${PN}"}"
 _GH_REPO="${_GH_URI_A[2]:-"${PN}"}"
 unset _GH_URI_A
 
-# @ECLASS-VARIABLE: GH_REF
-# @DEFAULT: ${PV}
-# @DESCRIPTION:
-# Tag/commit/git_ref (except branches) that is fetched from Github.
-#
-# a research conducted on April 2016 among the first 700 repos with >10000 stars shows:
-# - no tags: 158
-# - `v` prefix: 350
-# - no prefix: 192
-: ${GH_REF:="${PV}"}
-
 # @ECLASS-VARIABLE: GH_FETCH_TYPE
 # @DESCRIPTION:
 # Defines if fetched from git ("live") or archive ("snapshot")
 if [ -z "${GH_FETCH_TYPE}" ] ; then
-	if [[ ${PV} == *9999* ]] ; then
+	if [[ "${PV}" == *9999* ]] ; then
 		GH_FETCH_TYPE='live'
 	else
 		GH_FETCH_TYPE='snapshot'
 	fi
 fi
+
+# @ECLASS-VARIABLE: GH_REF
+# @DEFAULT: ${PV}
+# @DESCRIPTION:
+# Tag/commit/git_ref (except branches) that is fetched from Github.
+if [ -z "${GH_REF}" ] ; then
+	case "${GH_FETCH_TYPE}" in
+		'live') GH_REF="master" ;;
+
+		# a research conducted on April 2016 among the first 700 repos with >10000 stars shows:
+		# - no tags: 158
+		# - `v` prefix: 350
+		# - no prefix: 192
+		'snapshot') GH_REF="${PV}" ;;
+
+		*) die "Unsupported fetch type: '${GH_FETCH_TYPE}'" ;;
+	esac
+fi
+
 
 case "${_GH_PROVIDER}" in
 	'bitbucket')
@@ -62,7 +70,7 @@ esac
 
 _GH_BASE_URI="https://${_GH_DOMAIN}/${_GH_USER}/${_GH_REPO}"
 
-if [ -z "${SRC_URI}" ] ; then
+if [ -z "${SRC_URI}" ] && [ "${GH_FETCH_TYPE}" == 'snapshot' ] ; then
 	case "${_GH_PROVIDER}" in
 		'bitbucket')
 			SRC_URI="${_GH_BASE_URI}/get/${GH_REF}.tar.bz2 -> ${P}.tar.bz2" ;;
@@ -79,6 +87,7 @@ if [ -z "${EGIT_REPO_URI}" ] ; then
 		${_GH_BASE_URI}.git
 		git@${_GH_DOMAIN}:${_GH_USER}/${_GH_REPO}.git"
 fi
+
 
 case "${GH_FETCH_TYPE}" in
 	'live')
