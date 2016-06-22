@@ -3,11 +3,10 @@
 
 EAPI=6
 
-GH_USER='kokoko3k'
-# GH_TAG="${PV}"
-GH_TAG="${PV}-hotfix"
+GH_URI='github/kokoko3k'
+GH_REF="${PV}-hotfix"
 
-inherit eutils github
+inherit eutils git-hosting
 
 DESCRIPTION="Xt7-Player-mpv is a graphical interface to mpv, focused on usability"
 HOMEPAGE="http://xt7-player.sourceforge.net/xt7forum/"
