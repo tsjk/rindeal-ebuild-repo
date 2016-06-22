@@ -5,10 +5,10 @@ EAPI=6
 
 PYTHON_COMPAT=( python{2_7,3_{3,4,5}} )
 
-GH_USER='Robpol86'
-GH_TAG="v${PV}"
+GH_URI='github/Robpol86'
+GH_REF="v${PV}"
 
-inherit github distutils-r1
+inherit git-hosting distutils-r1
 
 DESCRIPTION='Generate simple tables in terminals from a nested list of strings'
 LICENSE='MIT'
