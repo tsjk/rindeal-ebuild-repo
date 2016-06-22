@@ -3,9 +3,9 @@
 
 EAPI=6
 
-GH_USER='micha'
+GH_URI='github/micha'
 
-inherit github
+inherit git-hosting
 
 DESCRIPTION='Little command line REST client that you can use in pipelines (bash or zsh)'
 LICENSE='MIT'
