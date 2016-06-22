@@ -9,7 +9,7 @@
 if [ -z "${_GH_ECLASS}" ] ; then
 
 case "${EAPI:-0}" in
-	6) ;;
+	5|6) ;;
 	*) die "Unsupported EAPI='${EAPI}' for '${ECLASS}'" ;;
 esac
 
