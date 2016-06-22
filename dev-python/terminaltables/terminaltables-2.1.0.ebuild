@@ -14,4 +14,5 @@ DESCRIPTION='Generate simple tables in terminals from a nested list of strings'
 LICENSE='MIT'
 
 SLOT='0'
+
 KEYWORDS='~amd64 ~arm ~x86'
