@@ -5,28 +5,52 @@ EAPI=6
 
 PYTHON_COMPAT=( python2_7 python3_{3,4} )
 
-inherit distutils-r1 python-r1
+GH_URI='github/gpocentek/python-gitlab'
 
-MY_PN="python-gitlab"
-MY_P="${MY_PN}-${PV}"
+inherit distutils-r1 git-hosting
 
 DESCRIPTION="Python wrapper for the GitLab API"
-HOMEPAGE="https://github.com/gpocentek/python-gitlab"
+HOMEPAGE+=" https://python-gitlab.readthedocs.io"
 LICENSE="LGPL-3"
-SRC_URI="mirror://pypi/${MY_PN:0:1}/${MY_PN}/${MY_P}.tar.gz"
 
 SLOT="0"
-KEYWORDS="~amd64 ~x86 ~arm"
+
+KEYWORDS="~amd64 ~x86"
 IUSE="test"
 
+DEPEND="
+	dev-python/sphinx
+	test? (
+		dev-python/coverage
+		dev-python/testrepository
+		>=dev-python/hacking-0.9.2
+		<dev-python/hacking-0.10
+		dev-python/httmock
+		dev-python/jinja
+		dev-python/mock
+		>=dev-python/sphinx-1.3
+	)
+"
 RDEPEND="
 	>dev-python/requests-1
 	dev-python/six"
 
-S="${WORKDIR}/${MY_P}"
-
 src_prepare() {
-	use test || rm -rvf 'gitlab/tests'
-
 	default
+
+	use test || rm -rvf 'gitlab/tests'
+}
+
+python_compile_all() {
+	emake -C docs man
+}
+
+python_test() {
+	esetup.py testr
+}
+
+python_install_all() {
+	distutils-r1_python_install_all
+
+	doman 'docs/_build/man/python-gitlab.1'
 }
