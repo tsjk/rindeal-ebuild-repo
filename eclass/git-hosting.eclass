@@ -112,7 +112,7 @@ RESTRICT="${RESTRICT} primaryuri"
 EXPORT_FUNCTIONS src_unpack
 
 
-# @FUNCTION: github_src_unpack
+# @FUNCTION: git-hosting_src_unpack
 git-hosting_src_unpack() {
 	debug-print-function ${FUNCNAME} "$@"
 
