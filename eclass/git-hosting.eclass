@@ -45,14 +45,14 @@ fi
 # Tag/commit/git_ref (except branches) that is fetched from Github.
 if [ -z "${GH_REF}" ] ; then
 	case "${GH_FETCH_TYPE}" in
-		'live') GH_REF="master" ;;
-
-		# a research conducted on April 2016 among the first 700 repos with >10000 stars shows:
-		# - no tags: 158
-		# - `v` prefix: 350
-		# - no prefix: 192
-		'snapshot') GH_REF="${PV}" ;;
-
+		'live')
+			GH_REF="master" ;;
+		'snapshot')
+			# a research conducted on April 2016 among the first 700 repos with >10000 stars shows:
+			# - no tags: 158
+			# - `v` prefix: 350
+			# - no prefix: 192
+			GH_REF="${PV}" ;;
 		*) die "Unsupported fetch type: '${GH_FETCH_TYPE}'" ;;
 	esac
 fi
