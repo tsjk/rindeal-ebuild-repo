@@ -15,10 +15,11 @@ SRC_URI="
 	x86?	( ${src_uri_base}-386.zip )
 "
 
-KEYWORDS='~amd64 ~arm ~x86'
+KEYWORDS='-* ~amd64 ~arm ~x86'
 
-RDEPEND="
-	!${CATEGORY}/rclone"
+RDEPEND="!${CATEGORY}/rclone"
+
+RESTRICT="mirror"
 
 src_unpack() {
 	default
@@ -26,17 +27,14 @@ src_unpack() {
 	S="${PWD}"
 }
 
+inst_d='opt/rclone'
+QA_PRESTRIPPED="${inst_d}/bin/rclone"
+
 src_install() {
-	local inst_d='opt/rclone'
-
-	QA_PREBUILT="${inst_d}/bin/*"
-
-	doman rclone.1
-
 	into "/${inst_d}"
 	dobin rclone
 	dosym "/${inst_d}"/bin/rclone /usr/bin/rclone
 
-	insinto "/${inst_d}"/doc
-	doins README.*
+	doman rclone.1
+	dodoc README.*
 }
