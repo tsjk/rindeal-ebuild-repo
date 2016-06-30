@@ -5,6 +5,10 @@ EAPI=6
 
 GH_URI='github/telegramdesktop/tdesktop'
 GH_REF="v${PV}"
+if [ -n "${TELEGRAM_DEBUG}" ] ; then
+	GH_FETCH_TYPE=live
+	EGIT_CLONE_TYPE=shallow
+fi
 
 inherit flag-o-matic fdo-mime eutils qmake-utils git-hosting versionator
 
@@ -28,7 +32,7 @@ RDEPEND=(
 	'!net-im/telegram-desktop'{,-bin}
 )
 DEPEND=( "${CDEPEND[@]}"
-	">=dev-qt/qt-telegram-static-5.6.0_p20160510:5.6.0"	# 5.6.0 is required since 0.9.49
+	">=dev-qt/qt-telegram-static-5.6.0_p20160510"	# 5.6.0 is required since 0.9.49
 	'virtual/pkgconfig'
 	'>=sys-apps/gawk-4.1'	# required for inplace support for .pro files formatter
 )
@@ -85,18 +89,6 @@ src_prepare-delete_and_modify() {
 	)
 	sed -r "${args[@]}" \
 		-i -- "${TG_PRO}" || die
-
-	## nuke libunity references
-	args=(
-		# ifs cannot be deleted, so replace them with 0
-		-e 's|if *\( *_psUnityLauncherEntry *\)|if(0)|'
-		# this is probably not needed, but anyway
-		-e 's|noTryUnity *= *false,|noTryUnity = true,|'
-		# delete various refs and includes
-		-e 's:(.*(unity\.h|f_unity|ps_unity_|UnityLauncher).*):// \1:'
-	)
-	sed -r "${args[@]}" \
-		-i -- 'SourceFiles/pspecific_linux.cpp' || die
 }
 
 src_prepare-appends() {
@@ -128,6 +120,9 @@ src_prepare-appends() {
 src_prepare() {
 	eapply_user
 
+	# https://github.com/telegramdesktop/tdesktop/pull/2200
+	eapply "${FILESDIR}/0.9.56-New_define_TDESKTOP_DISABLE_UNITY_INTEGRATION.patch"
+
 	cd "${TG_DIR}" || die
 
 	rm -rf *.*proj*		|| die # delete Xcode/MSVS files
@@ -138,21 +133,17 @@ src_prepare() {
 		local qtstatic_PVR="$(best_version "${qtstatic}" | sed "s|.*${qtstatic}-||")"
 		local qtstatic_PV="${qtstatic_PVR%%-*}" # strip revision
 		declare -g QT_VER="${qtstatic_PV%%_p*}" QT_PATCH_DATE="${qtstatic_PV##*_p}"
-		declare -g QT_TELEGRAM_STATIC_SLOT="${QT_VER}/${QT_PATCH_DATE}"
+		declare -g QT_TELEGRAM_STATIC_SLOT="${QT_VER}-${QT_PATCH_DATE}"
 	else
 		einfo "Using QT_TELEGRAM_STATIC_SLOT from environment - '${QT_TELEGRAM_STATIC_SLOT}'"
-		declare -g QT_VER="${QT_TELEGRAM_STATIC_SLOT%%/*}" QT_PATCH_DATE="${QT_TELEGRAM_STATIC_SLOT##*/}"
+		declare -g QT_VER="${QT_TELEGRAM_STATIC_SLOT%%-*}" QT_PATCH_DATE="${QT_TELEGRAM_STATIC_SLOT##*-}"
 	fi
 
 	echo
-	einfo "${P} is going to be linked against 'Qt ${QT_VER} (p${QT_PATCH_DATE})'"
+	einfo "${P} is going to be linked with 'Qt ${QT_VER} (p${QT_PATCH_DATE})'"
 	echo
 
-	if [[ $(get_version_component_range 2 ${QT_VER}) < 6 ]] ; then
-		ewarn "You've requested to link against Qt < 5.6.0, this will likely won't work"
-	fi
-
-	declare -g QT5_PREFIX="${EPREFIX}/opt/qt-telegram-static/${QT_TELEGRAM_STATIC_SLOT}"
+	declare -g QT5_PREFIX="${EPREFIX}/opt/qt-telegram-static/${QT_VER}/${QT_PATCH_DATE}"
 	[ -d "${QT5_PREFIX}" ] || die "QT5_PREFIX dir doesn't exist: '${QT5_PREFIX}'"
 
 	readonly QT_TELEGRAM_STATIC_SLOT QT_VER  QT_PATCH_DATE
@@ -185,11 +176,17 @@ src_configure() {
 		# disable registering `tg://` scheme from within the app
 		echo 'DEFINES += TDESKTOP_DISABLE_REGISTER_CUSTOM_SCHEME'
 
+		# disable .desktop file generation
+		echo 'DEFINES += TDESKTOP_DISABLE_DESKTOP_FILE_GENERATION'
+
 		# https://github.com/telegramdesktop/tdesktop/commit/0b2bcbc3e93a7fe62889abc66cc5726313170be7
 		$(usex proxy 'DEFINES += TDESKTOP_DISABLE_NETWORK_PROXY' '')
 
 		# disable google-breakpad support
 		echo 'DEFINES += TDESKTOP_DISABLE_CRASH_REPORTS'
+
+		# remove Unity support
+		echo 'DEFINES += TDESKTOP_DISABLE_UNITY_INTEGRATION'
 	) >>"${TG_PRO}" || die
 }
 
