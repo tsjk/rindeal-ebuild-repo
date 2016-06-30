@@ -6,15 +6,9 @@ EAPI=6
 inherit versionator
 
 {
-	telegram_ver="0.9.48"
-
-	QT_VER="$(get_version_component_range 1-3)"
-	QT_PATCH_DATE="$(get_version_component_range 4 | tr -d 'p')"
-}
-{
 	# 'module > subdir > package' bindings: https://wiki.gentoo.org/wiki/Project:Qt/Qt5status
-	QT5_MODULE='qtbase' # base ( core dbus gui network widgets ) imageformats
-	QT_MODULES=( qtbase qtimageformats ) # list of qt modules used to generate SRC_URI
+	QT5_MODULE='qtbase'	# base ( core dbus gui network widgets ) imageformats
+	QT_MODULES=( qtbase qtimageformats )	# list of qt modules used to generate SRC_URI
 
 	inherit check-reqs eutils qmake-utils qt5-build
 
@@ -22,9 +16,11 @@ inherit versionator
 	E_DEPEND="${E_DEPEND/test? \( \~dev-qt\/qttest-* \)}"
 }
 {
-	SLOT="${QT_VER}/${QT_PATCH_DATE}" ; readonly SLOT
+	QT_VER="$(get_version_component_range 1-3)"
+	QT_PATCH_DATE="$(get_version_component_range 4 | tr -d 'p')"
+	SLOT="${QT_VER}-${QT_PATCH_DATE}" ; readonly SLOT
 	# this path must be in sync with net-im/telegram ebuild
-	QT5_PREFIX="${EPREFIX}/opt/${PN}/${SLOT}" ; readonly QT5_PREFIX
+	QT5_PREFIX="${EPREFIX}/opt/${PN}/${QT_VER}/${QT_PATCH_DATE}" ; readonly QT5_PREFIX
 }
 
 GH_REPO="telegramdesktop/tdesktop"
@@ -46,7 +42,7 @@ my_gen_qt_uris() {
 }
 my_gen_qt_uris
 
-KEYWORDS='~amd64 ~arm ~arm64 ~x86'
+KEYWORDS='~amd64 ~arm ~x86'
 IUSE='bindist gtkstyle ibus +icu libinput libproxy systemd tslib'
 
 RDEPEND=(
@@ -129,6 +125,7 @@ PDEPEND="${PDEPEND[*]}"
 RESTRICT='test'
 
 ## !!! ORDER MATTERS !!!
+## deps are in parentheses
 QT5_TARGET_SUBDIRS=(
 	## BEGIN - QtCore
 	'qtbase/src/tools/'{bootstrap,moc,rcc}
@@ -159,10 +156,7 @@ QT5_TARGET_SUBDIRS=(
 	## END - QtWidgets
 )
 
-QTBASE_PATCHES=()
-if version_is_at_least "5.6.0" "${QT_VER}" ; then
-	QTBASE_PATCHES+=( "${FILESDIR}"/qtdbus-5.6.0-deadlock.patch)
-fi
+QTBASE_PATCHES=( "${FILESDIR}"/qtdbus-5.6.0-deadlock.patch )
 
 # size varies between 400M-1100M depending on compiler flags
 CHECKREQS_DISK_BUILD='800M'
@@ -242,14 +236,12 @@ src_configure() {
 		# use system libs
 		-system-{freetype,harfbuzz,libjpeg,libpng,pcre,xcb,xkbcommon-x11,zlib}
 
-		# enabled features
+		## enabled features
 		-{fontconfig,gui,iconv,xcb,xcb-xlib,xinput2,xkb,xrender,widgets}
 		-{dbus,openssl}-linked
-		# disabled features
+		## disabled features
 		-no-{glib,nis,qml-debug}
-
-		# Telegram doesn't support sending files >4GB
-		-no-largefile
+		-no-largefile # Telegram doesn't support sending files >4GB
 
 		$(usex amd64 -reduce-relocations '') # buggy on other arches
 
@@ -287,18 +279,18 @@ src_compile() {
 
 src_install() {
 	qt5_foreach_target_subdir \
-		emake INSTALL_ROOT="${ED}" install
+		emake INSTALL_ROOT="${D}" install
 
-	emake -C "${qtbase_dir}" INSTALL_ROOT="${ED}" install_{qmake,mkspecs}
+	emake -C "${qtbase_dir}" INSTALL_ROOT="${D}" install_{qmake,mkspecs}
 
 	# fix .prl files
-	local args=(
+	local sed_args=(
 		# - Drop QMAKE_PRL_BUILD_DIR because it references the build dir
 		-e '/^QMAKE_PRL_BUILD_DIR/d'
 		# - Fix -L paths referencing build dir
 		-e "s|-L${S}[^ ]*||g"
 	)
-	find "${ED}" -type f -name '*.prl' | xargs sed "${args[@]}" -i --
+	find "${D}" -type f -name '*.prl' | xargs sed "${sed_args[@]}" -i --
 	assert
 }
 
