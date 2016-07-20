@@ -10,11 +10,11 @@
 if [ -z "${_JETBRAINS_INTELLIJ_ECLASS}" ] ; then
 
 case "${EAPI:-0}" in
-    6) ;;
-    *) die "Unsupported EAPI='${EAPI}' for '${ECLASS}'" ;;
+	6) ;;
+	*) die "Unsupported EAPI='${EAPI}' for '${ECLASS}'" ;;
 esac
 
-inherit eutils versionator fdo-mime
+inherit eutils versionator xdg
 
 HOMEPAGE="https://www.jetbrains.com/${PN}"
 LICENSE="IDEA || ( IDEA_Academic IDEA_Classroom IDEA_OpenSource IDEA_Personal )"
@@ -33,15 +33,18 @@ RESTRICT="mirror strip test"
 
 RDEPEND="system-jre? ( >=virtual/jre-1.8 )"
 
+
 # @ECLASS-VARIABLE: JBIJ_TAR_EXCLUDE
 
 # @ECLASS-VARIABLE: JBIJ_PN_PRETTY
 : "${JBIJ_PN_PRETTY:="${PN^}"}"
 
-EXPORT_FUNCTIONS src_unpack src_compile src_install pkg_postinst
+
+EXPORT_FUNCTIONS src_unpack src_prepare src_compile pkg_preinst src_install pkg_postinst pkg_postrm
+
 
 jetbrains-intellij_src_unpack() {
-	debug-print-function ${FUNCNAME} "$@"
+	debug-print-function ${FUNCNAME}
 
 	local A=( $A )
 	[ ${#A[@]} -eq 1 ] || die "Your SRC_URI contains too many archives"
@@ -76,7 +79,21 @@ jetbrains-intellij_src_unpack() {
 	"${tar[@]}" || die
 }
 
-jetbrains-intellij_src_compile() { : ;}
+
+jetbrains-intellij_src_prepare() {
+	debug-print-function ${FUNCNAME}
+	xdg_src_prepare
+}
+
+
+jetbrains-intellij_src_compile() { : ; }
+
+
+jetbrains-intellij_pkg_preinst() {
+	debug-print-function ${FUNCNAME}
+	xdg_pkg_preinst
+}
+
 
 # @ECLASS-VARIABLE: JBIJ_DESKTOP_CATEGORIES=()
 
@@ -86,7 +103,7 @@ jetbrains-intellij_src_compile() { : ;}
 : ${JBIJ_INSTALL_DIR:="/opt/${_JBIJ_PN_SLOTTED}"}
 
 jetbrains-intellij_src_install() {
-	debug-print-function ${FUNCNAME} "$@"
+	debug-print-function ${FUNCNAME}
 
 	insinto "${JBIJ_INSTALL_DIR}"
 	doins -r *
@@ -133,10 +150,16 @@ jetbrains-intellij_src_install() {
 		>"${ED}"/etc/sysctl.d/30-idea-inotify-watches.conf || die
 }
 
-jetbrains-intellij_pkg_postinst() {
-	debug-print-function ${FUNCNAME} "$@"
 
-	fdo-mime_desktop_database_update
+jetbrains-intellij_pkg_postinst() {
+	debug-print-function ${FUNCNAME}
+	xdg_pkg_postinst
+}
+
+
+jetbrains-intellij_pkg_postrm() {
+	debug-print-function ${FUNCNAME}
+	xdg_pkg_postrm
 }
 
 _JETBRAINS_INTELLIJ_ECLASS=1
