@@ -83,7 +83,7 @@ jetbrains-intellij_src_compile() { : ;}
 # @ECLASS-VARIABLE: JBIJ_DESKTOP_EXTRAS=()
 
 # @ECLASS-VARIABLE: JBIJ_INSTALL_DIR
-: ${JBIJ_INSTALL_DIR:="${EPREFIX}/opt/${_JBIJ_PN_SLOTTED}"}
+: ${JBIJ_INSTALL_DIR:="/opt/${_JBIJ_PN_SLOTTED}"}
 
 jetbrains-intellij_src_install() {
 	debug-print-function ${FUNCNAME} "$@"
@@ -97,8 +97,8 @@ jetbrains-intellij_src_install() {
 		chmod -v a+x bin/{${PN}.sh,fsnotifier*} || die
 		use system-jre		|| { chmod -v a+x jre/jre/bin/*	|| die ;}
 
-		[ -f "${JBIJ_INSTALL_DIR}"/bin/${PN}.sh ] || die
-		dosym "${JBIJ_INSTALL_DIR}"/bin/${PN}.sh /usr/bin/${_JBIJ_PN_SLOTTED}
+		[ -f "bin/${PN}.sh" ] || die
+		dosym "${JBIJ_INSTALL_DIR}/bin/${PN}.sh" /usr/bin/${_JBIJ_PN_SLOTTED}
 
 		eshopts_push -s nullglob
 		local svg=( bin/*.svg ) png=( bin/*.png )
