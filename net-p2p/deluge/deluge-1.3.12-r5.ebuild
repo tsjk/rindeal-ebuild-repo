@@ -91,48 +91,48 @@ esetup.py() {
 python_install_all() {
 	distutils-r1_python_install_all
 
-	local paths=()
+	local rm_paths=()
 
 	if use daemon ; then
 		newinitd "${FILESDIR}/deluged.init" 'deluged'
 		newconfd "${FILESDIR}/deluged.conf" 'deluged'
 	else
-		paths=(
+		rm_paths+=(
 			"${ED}/usr/bin/deluged"
-			"${ED}/usr/share/man/man1"/deluged.*
-		)
-		rm -rvf "${paths[@]}" || die
+			"${ED}/usr/share/man/man1"/deluged.* )
 	fi
 
 	if use webui ; then
 		newinitd "${FILESDIR}/deluge-web.init" 'deluge-web'
 		newconfd "${FILESDIR}/deluge-web.conf" 'deluge-web'
 	else
-		paths=(
+		rm_paths+=(
 			"${ED}/usr/bin/deluge-web"
 			"${ED}/usr"/lib*/py*/*-packages/deluge/ui/web/
-			"${ED}/usr/share/man/man1"/deluge-web.*
-		)
-		rm -rvf "${paths[@]}" || die
+			"${ED}/usr/share/man/man1"/deluge-web.* )
 	fi
 
 	if ! use gtk ; then
-		paths=(
+		rm_paths+=(
 			"${ED}/usr/bin/deluge-gtk"
 			"${ED}/usr"/lib*/py*/*-packages/deluge/ui/gtkui/
-			"${ED}/usr/share/applications/deluge-gtk.desktop"
-			"${ED}/usr/share/icons"/deluge*
-			"${ED}/usr/share/man/man1"/deluge-gtk.*
-		)
-		rm -rvf "${paths[@]}" || die
+			"${ED}/usr/share/applications/"
+			"${ED}/usr/share/icons/"
+			"${ED}/usr/share/man/man1"/deluge-gtk.* )
 	fi
 
 	if ! use console ; then
-		paths=(
+		rm_paths+=(
 			"${ED}/usr/bin/deluge-console"
 			"${ED}/usr"/lib*/py*/*-packages/deluge/ui/console/*
-			"${ED}/usr/share/man/man1"/deluge-console.*
-		)
-		rm -rvf "${paths[@]}" || die
+			"${ED}/usr/share/man/man1"/deluge-console.* )
 	fi
+
+	if ! use gtk && ! use webui ; then
+		rm_paths+=(
+			"${ED}/usr/share/pixmaps/"
+			"${ED}/usr"/lib*/py*/*-packages/deluge/data/pixmaps/ )
+	fi
+
+	rm -rvf "${rm_paths[@]}" || die
 }
