@@ -19,7 +19,7 @@ IUSE="+dbus debug +qt5 webui +X"
 
 RDEPEND="
 	dev-libs/boost:=
-	<net-libs/libtorrent-rasterbar-1.1:0/8
+	net-libs/libtorrent-rasterbar:0
 	sys-libs/zlib
 	!qt5? (
 		dev-libs/qjson[qt4(+)]
@@ -67,8 +67,6 @@ src_prepare() {
 	rm_loc() {
 		rm -vf "${loc_dir}/${loc_pre}${1}${loc_post}" || die
 		sed -e "/qbittorrent_${1}.qm/d" -i -- src/lang.qrc || die
-		# TODO: remove the line below on v3.3.5 bump
-		sed -e "/qbittorrent_${1}.ts/d" -i -- src/src.pro || die
 	}
 	l10n_for_each_disabled_locale_do rm_loc
 
@@ -89,12 +87,16 @@ src_configure() {
 		$(use_enable debug)
 		$(use_enable webui)
 		$(use_enable X gui)
-		$(use_enable !X systemd)
+		$(use_enable !X systemd) # Install the systemd service file (headless only).
 		$(use_with !qt5 qt4)
 	)
 	econf "${econf_args[@]}"
 
 	eqmake$(usex qt5 5 4)
+
+	# disable stripping
+	# TODO: find a way to do it in src_prepare()
+	sed -e '/-$(STRIP)/d' -i -- 'src/Makefile' || die
 }
 
 src_install() {
