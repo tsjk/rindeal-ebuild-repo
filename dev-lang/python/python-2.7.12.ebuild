@@ -25,42 +25,45 @@ IUSE="-berkdb build doc elibc_uclibc examples gdbm hardened ipv6 libressl +ncurs
 # run the bootstrap code on your dev box and include the results in the
 # patchset. See bug 447752.
 
-RDEPEND="
-	app-arch/bzip2:0=
-	>=sys-libs/zlib-1.1.3:0=
-	virtual/libffi
-	virtual/libintl
+CDEPEND_A=(
+	"app-arch/bzip2:0="
+	'sys-libs/zlib:0='
+	"virtual/libffi"
+	"virtual/libintl"
 
-	berkdb? (
-		>=sys-libs/db-4
-		<sys-libs/db-6
-	)
-	gdbm? ( sys-libs/gdbm:0=[berkdb] )
-	ncurses? (
-		>=sys-libs/ncurses-5.2:0=
-		readline? ( >=sys-libs/readline-4.1:0= )
-	)
-	sqlite? ( >=dev-db/sqlite-3.3.8:3= )
-	ssl? (
-		!libressl? ( dev-libs/openssl:0= )
-		libressl? ( dev-libs/libressl:= )
-	)
-	tk? (
-		>=dev-lang/tcl-8.0:0=
-		>=dev-lang/tk-8.0:0=
-		dev-tcltk/blt:0=
-		dev-tcltk/tix
-	)
-	xml? ( >=dev-libs/expat-2.1 )"
-DEPEND="${RDEPEND}
-	>=sys-devel/autoconf-2.65
-	!sys-devel/gcc[libffi]
-	virtual/pkgconfig"
-RDEPEND+=" !build? ( app-misc/mime-types )
-	doc? ( dev-python/python-docs:${SLOT} )"
-PDEPEND="
-	>=app-eselect/eselect-python-20140125-r1
-	app-admin/python-updater"
+	"berkdb? ("
+		">=sys-libs/db-4"
+		"<sys-libs/db-6"
+	")"
+	"gdbm? ( sys-libs/gdbm:0=[berkdb] )"
+	"ncurses? ("
+		"sys-libs/ncurses:0="
+		"readline? ( sys-libs/readline:0= )"
+	")"
+	"sqlite? ( dev-db/sqlite:3= )"
+	"ssl? ("
+		"!libressl? ( dev-libs/openssl:0= )"
+		"libressl? ( dev-libs/libressl:= )"
+	")"
+	"tk? ("
+		"dev-lang/tcl:0="
+		"dev-lang/tk:0="
+		"dev-tcltk/blt:0="
+		"dev-tcltk/tix"
+	")"
+	"xml? ( dev-libs/expat )" )
+DEPEND_A=( "${CDEPEND_A[@]}"
+	">=sys-devel/autoconf-2.65"
+	"!sys-devel/gcc[libffi]" # TODO: why?
+	"virtual/pkgconfig" )
+RDEPEND=( "${CDEPEND_A[@]}"
+	"!build? ( app-misc/mime-types )"
+	"doc? ( dev-python/python-docs:${SLOT} )" )
+PDEPEND_A=(
+	">=app-eselect/eselect-python-20140125-r1"
+	"app-admin/python-updater" )
+
+inherit arrays
 
 S="${WORKDIR}/${MY_P}"
 
@@ -81,15 +84,13 @@ pkg_setup() {
 
 src_prepare() {
 	# Ensure that internal copies of expat, libffi and zlib are not used.
-	rm -r Modules/expat || die
-	rm -r Modules/_ctypes/libffi* || die
-	rm -r Modules/zlib || die
+	rm -rf Modules/{expat,_ctypes/libffi*,zlib} || die
 
 	if tc-is-cross-compiler; then
 		local EPATCH_EXCLUDE="*_regenerate_platform-specific_modules.patch"
 	fi
 
-	EPATCH_SUFFIX="patch" epatch "${WORKDIR}/patches"
+	eapply "${FILESDIR}/patches"
 
 	# Fix for cross-compiling.
 	epatch "${FILESDIR}/python-2.7.5-nonfatal-compileall.patch"
@@ -114,25 +115,19 @@ src_prepare() {
 }
 
 src_configure() {
-		# dbm module can be linked against berkdb or gdbm.
-		# Defaults to gdbm when both are enabled, #204343.
-		local disable
-		use berkdb   || use gdbm || disable+=" dbm"
-		use berkdb   || disable+=" _bsddb"
-		use gdbm     || disable+=" gdbm"
-		use ncurses  || disable+=" _curses _curses_panel"
-		use readline || disable+=" readline"
-		use sqlite   || disable+=" _sqlite3"
-		use ssl      || export PYTHON_DISABLE_SSL="1"
-		use tk       || disable+=" _tkinter"
-		use xml      || disable+=" _elementtree pyexpat" # _elementtree uses pyexpat.
-		export PYTHON_DISABLE_MODULES="${disable}"
-
-		if ! use xml; then
-			ewarn "You have configured Python without XML support."
-			ewarn "This is NOT a recommended configuration as you"
-			ewarn "may face problems parsing any XML documents."
-		fi
+	# dbm module can be linked against berkdb or gdbm.
+	# Defaults to gdbm when both are enabled, #204343.
+	local disable
+	use berkdb   || use gdbm || disable+=" dbm"
+	use berkdb   || disable+=" _bsddb"
+	use gdbm     || disable+=" gdbm"
+	use ncurses  || disable+=" _curses _curses_panel"
+	use readline || disable+=" readline"
+	use sqlite   || disable+=" _sqlite3"
+	use ssl      || export PYTHON_DISABLE_SSL="1"
+	use tk       || disable+=" _tkinter"
+	use xml      || disable+=" _elementtree pyexpat" # _elementtree uses pyexpat.
+	export PYTHON_DISABLE_MODULES="${disable}"
 
 	if [[ -n "${PYTHON_DISABLE_MODULES}" ]]; then
 		einfo "Disabled modules: ${PYTHON_DISABLE_MODULES}"
