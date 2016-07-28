@@ -45,8 +45,7 @@ fi
 # Tag/commit/git_ref (except branches) that is fetched from Github.
 if [ -z "${GH_REF}" ] ; then
 	case "${GH_FETCH_TYPE}" in
-		'live')
-			GH_REF="master" ;;
+		'live') : ;;
 		'snapshot')
 			# a research conducted on April 2016 among the first 700 repos with >10000 stars shows:
 			# - no tags: 158
@@ -94,6 +93,7 @@ case "${GH_FETCH_TYPE}" in
 		if [ -n "${GH_REF}" ] && [ -z "${EGIT_COMMIT}" ] ; then
 			EGIT_COMMIT="${GH_REF}"
 		fi
+		[ -z "${EGIT_CLONE_TYPE}" ] && EGIT_CLONE_TYPE="shallow"
 
 		inherit git-r3
 		;;
