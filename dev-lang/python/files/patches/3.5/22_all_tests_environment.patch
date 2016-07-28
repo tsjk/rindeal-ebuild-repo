@@ -1,0 +1,190 @@
+https://bugs.python.org/issue1674555
+
+--- Lib/site.py
++++ Lib/site.py
+@@ -546,8 +546,12 @@
+     known_paths = venv(known_paths)
+     if ENABLE_USER_SITE is None:
+         ENABLE_USER_SITE = check_enableusersite()
+-    known_paths = addusersitepackages(known_paths)
+-    known_paths = addsitepackages(known_paths)
++    if os.environ.get("_PYTHONNOSITEPACKAGES") is None:
++        known_paths = addusersitepackages(known_paths)
++        known_paths = addsitepackages(known_paths)
++    else:
++        # Initialize USER_BASE and USER_SITE.
++        getusersitepackages()
+     setquit()
+     setcopyright()
+     sethelper()
+--- Lib/test/regrtest.py
++++ Lib/test/regrtest.py
+@@ -143,6 +143,7 @@
+ import unittest
+ import warnings
+ from inspect import isabstract
++from subprocess import Popen, PIPE
+ 
+ try:
+     import threading
+@@ -434,7 +435,6 @@
+     subprocess exits, its return code, stdout and stderr are returned as a
+     3-tuple.
+     """
+-    from subprocess import Popen, PIPE
+     base_cmd = ([sys.executable] + support.args_from_interpreter_flags() +
+                 ['-X', 'faulthandler', '-m', 'test.regrtest'])
+     # required to spawn a new process with PGO flag on/off
+@@ -657,9 +657,62 @@
+     support.use_resources = ns.use_resources
+     save_modules = sys.modules.keys()
+ 
++    def _runtest(test, verbose, quiet, huntrleaks=False, use_resources=None,
++                 output_on_failure=False, failfast=False, match_tests=None,
++                 timeout=None, *, pgo=False):
++        if test == "test_site":
++            base_cmd = ([sys.executable] + support.args_from_interpreter_flags() +
++                        ['-X', 'faulthandler', '-m', 'test.regrtest'])
++            # required to spawn a new process with PGO flag on/off
++            if pgo:
++                base_cmd = base_cmd + ['--pgo']
++            slaveargs = ((test, verbose, quiet),
++                         dict(huntrleaks=huntrleaks,
++                              use_resources=use_resources,
++                              output_on_failure=output_on_failure,
++                              timeout=timeout, failfast=failfast,
++                              match_tests=match_tests, pgo=pgo))
++            env = os.environ.copy()
++            try:
++                del env["_PYTHONNOSITEPACKAGES"]
++            except KeyError:
++                pass
++            popen = Popen(base_cmd + ['--slaveargs', json.dumps(slaveargs)],
++                          stdout=PIPE, stderr=PIPE,
++                          universal_newlines=True,
++                          close_fds=(os.name != 'nt'),
++                          cwd=support.SAVEDCWD,
++                          env=env)
++            stdout, stderr = popen.communicate()
++            retcode = popen.wait()
++            stdout, _, result = stdout.strip().rpartition("\n")
++            if retcode != 0:
++                result = (CHILD_ERROR, None)
++            else:
++                if not result:
++                    return (None, None)
++                result = json.loads(result)
++            stdout = stdout.rstrip()
++            stderr = stderr.rstrip()
++            if stdout:
++                print(stdout)
++            if stderr and not pgo:
++                print(stderr, file=sys.stderr)
++            sys.stdout.flush()
++            sys.stderr.flush()
++            if result[0] == INTERRUPTED:
++                raise KeyboardInterrupt
++            return result
++        else:
++            return runtest(test, verbose, quiet, huntrleaks=huntrleaks,
++                           use_resources=use_resources,
++                           output_on_failure=output_on_failure,
++                           failfast=failfast, match_tests=match_tests,
++                           timeout=timeout, pgo=pgo)
++
+     def accumulate_result(test, result):
+         ok, test_time = result
+-        if ok not in (CHILD_ERROR, INTERRUPTED):
++        if ok not in (None, CHILD_ERROR, INTERRUPTED):
+             test_times.append((test_time, test))
+         if ok == PASSED:
+             good.append(test)
+@@ -773,15 +826,15 @@
+             if ns.trace:
+                 # If we're tracing code coverage, then we don't exit with status
+                 # if on a false return value from main.
+-                tracer.runctx('runtest(test, ns.verbose, ns.quiet, timeout=ns.timeout)',
++                tracer.runctx('_runtest(test, ns.verbose, ns.quiet, timeout=ns.timeout)',
+                               globals=globals(), locals=vars())
+             else:
+                 try:
+-                    result = runtest(test, ns.verbose, ns.quiet,
+-                                     ns.huntrleaks,
+-                                     output_on_failure=ns.verbose3,
+-                                     timeout=ns.timeout, failfast=ns.failfast,
+-                                     match_tests=ns.match_tests, pgo=ns.pgo)
++                    result = _runtest(test, ns.verbose, ns.quiet,
++                                      ns.huntrleaks,
++                                      output_on_failure=ns.verbose3,
++                                      timeout=ns.timeout, failfast=ns.failfast,
++                                      match_tests=ns.match_tests, pgo=ns.pgo)
+                     accumulate_result(test, result)
+                 except KeyboardInterrupt:
+                     interrupted = True
+@@ -835,8 +888,8 @@
+             sys.stdout.flush()
+             try:
+                 ns.verbose = True
+-                ok = runtest(test, True, ns.quiet, ns.huntrleaks,
+-                             timeout=ns.timeout, pgo=ns.pgo)
++                ok = _runtest(test, True, ns.quiet, ns.huntrleaks,
++                              timeout=ns.timeout, pgo=ns.pgo)
+             except KeyboardInterrupt:
+                 # print a newline separate from the ^C
+                 print()
+@@ -1261,8 +1314,9 @@
+         for name, get, restore in self.resource_info():
+             current = get()
+             original = saved_values.pop(name)
+-            # Check for changes to the resource's value
+-            if current != original:
++            # Check for changes to the resource's value. test_site is always run
++            # in a subprocess and is allowed to change os.environ and sys.path.
++            if current != original and self.testname != "test_site":
+                 self.changed = True
+                 restore(original)
+                 if not self.quiet and not self.pgo:
+--- Lib/test/test_site.py
++++ Lib/test/test_site.py
+@@ -8,6 +8,7 @@
+ import test.support
+ from test.support import captured_stderr, TESTFN, EnvironmentVarGuard
+ import builtins
++import importlib
+ import os
+ import sys
+ import re
+@@ -26,6 +27,10 @@
+ 
+ import site
+ 
++if "_PYTHONNOSITEPACKAGES" in os.environ:
++    del os.environ["_PYTHONNOSITEPACKAGES"]
++    importlib.reload(site)
++
+ if site.ENABLE_USER_SITE and not os.path.isdir(site.USER_SITE):
+     # need to add user site directory for tests
+     try:
+@@ -443,8 +448,11 @@
+     def test_startup_imports(self):
+         # This tests checks which modules are loaded by Python when it
+         # initially starts upon startup.
++        env = os.environ.copy()
++        env["_PYTHONNOSITEPACKAGES"] = "1"
+         popen = subprocess.Popen([sys.executable, '-I', '-v', '-c',
+                                   'import sys; print(set(sys.modules))'],
++                                 env=env,
+                                  stdout=subprocess.PIPE,
+                                  stderr=subprocess.PIPE)
+         stdout, stderr = popen.communicate()
+--- Makefile.pre.in
++++ Makefile.pre.in
+@@ -1016,7 +1016,7 @@
+ ######################################################################
+ 
+ TESTOPTS=	$(EXTRATESTOPTS)
+-TESTPYTHON=	$(RUNSHARED) ./$(BUILDPYTHON) $(TESTPYTHONOPTS)
++TESTPYTHON=	_PYTHONNOSITEPACKAGES=1 $(RUNSHARED) ./$(BUILDPYTHON) $(TESTPYTHONOPTS)
+ TESTRUNNER=	$(TESTPYTHON) $(srcdir)/Tools/scripts/run_tests.py
+ TESTTIMEOUT=	3600
+ 

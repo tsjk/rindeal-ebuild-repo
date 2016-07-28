@@ -1,8 +1,8 @@
 # Copyright 1999-2016 Gentoo Foundation
+# Copyright 2016 Jan Chren (rindeal)
 # Distributed under the terms of the GNU General Public License v2
-# $Id$
 
-EAPI="5"
+EAPI="6"
 WANT_LIBTOOL="none"
 
 inherit autotools eutils flag-o-matic multilib pax-utils python-utils-r1 toolchain-funcs multiprocessing
@@ -11,13 +11,13 @@ MY_P="Python-${PV}"
 PATCHSET_VERSION="2.7.12-0"
 
 DESCRIPTION="An interpreted, interactive, object-oriented programming language"
-HOMEPAGE="http://www.python.org/"
-SRC_URI="https://www.python.org/ftp/python/${PV}/${MY_P}.tar.xz
-	https://dev.gentoo.org/~floppym/python/python-gentoo-patches-${PATCHSET_VERSION}.tar.xz"
-
+HOMEPAGE="https://www.python.org/"
 LICENSE="PSF-2"
+
 SLOT="2.7"
-KEYWORDS="~alpha ~amd64 ~arm ~arm64 ~hppa ~ia64 ~m68k ~mips ~ppc ~ppc64 ~s390 ~sh ~sparc ~x86 ~amd64-fbsd ~sparc-fbsd ~x86-fbsd"
+SRC_URI="https://www.python.org/ftp/python/${PV}/${MY_P}.tar.xz"
+
+KEYWORDS="~amd64 ~arm"
 IUSE="-berkdb build doc elibc_uclibc examples gdbm hardened ipv6 libressl +ncurses +readline sqlite +ssl +threads tk +wide-unicode wininst +xml"
 
 # Do not add a dependency on dev-lang/python to this ebuild.
@@ -25,23 +25,16 @@ IUSE="-berkdb build doc elibc_uclibc examples gdbm hardened ipv6 libressl +ncurs
 # run the bootstrap code on your dev box and include the results in the
 # patchset. See bug 447752.
 
-RDEPEND="app-arch/bzip2:0=
+RDEPEND="
+	app-arch/bzip2:0=
 	>=sys-libs/zlib-1.1.3:0=
 	virtual/libffi
 	virtual/libintl
-	berkdb? ( || (
-		sys-libs/db:5.3
-		sys-libs/db:5.2
-		sys-libs/db:5.1
-		sys-libs/db:5.0
-		sys-libs/db:4.8
-		sys-libs/db:4.7
-		sys-libs/db:4.6
-		sys-libs/db:4.5
-		sys-libs/db:4.4
-		sys-libs/db:4.3
-		sys-libs/db:4.2
-	) )
+
+	berkdb? (
+		>=sys-libs/db-4
+		<sys-libs/db-6
+	)
 	gdbm? ( sys-libs/gdbm:0=[berkdb] )
 	ncurses? (
 		>=sys-libs/ncurses-5.2:0=
@@ -58,15 +51,15 @@ RDEPEND="app-arch/bzip2:0=
 		dev-tcltk/blt:0=
 		dev-tcltk/tix
 	)
-	xml? ( >=dev-libs/expat-2.1 )
-	!!<sys-apps/portage-2.1.9"
+	xml? ( >=dev-libs/expat-2.1 )"
 DEPEND="${RDEPEND}
-	virtual/pkgconfig
 	>=sys-devel/autoconf-2.65
-	!sys-devel/gcc[libffi]"
+	!sys-devel/gcc[libffi]
+	virtual/pkgconfig"
 RDEPEND+=" !build? ( app-misc/mime-types )
 	doc? ( dev-python/python-docs:${SLOT} )"
-PDEPEND=">=app-eselect/eselect-python-20140125-r1
+PDEPEND="
+	>=app-eselect/eselect-python-20140125-r1
 	app-admin/python-updater"
 
 S="${WORKDIR}/${MY_P}"
