@@ -16,12 +16,12 @@ case "${EAPI:-0}" in
     *) die "Unsupported EAPI='${EAPI}' for '${ECLASS}'" ;;
 esac
 
-for _v in {,R,P,C}DEPEND_A ; do
-	if [[ "$(declare -p ${_v} 2>/dev/null)" == "declare -a"* ]] ; then
-		debug-print "Converting ${_v} to ${_v%_A}"
-		eval "${_v%_A}+=\" \${${_v}[*]}\""
-		debug-print "Unsetting ${_v}"
-		unset ${_v}
+for _v in SRC_URI KEYWORDS IUSE {,R,P,C}DEPEND REQUIRED_USE ; do
+	if [[ "$(declare -p ${_v}_A 2>/dev/null)" == "declare -a"* ]] ; then
+		debug-print "Converting ${_v}_A to ${_v}"
+		eval "${_v}+=\" \${${_v}_A[*]}\""
+		debug-print "Unsetting ${_v}_A"
+		unset ${_v}_A
 	fi
 done
 unset _v
