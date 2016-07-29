@@ -20,7 +20,7 @@ __class_end() {
 	while read __d__  __o__ __f__ ; do
 		[[ "${__f__}" != "${self}::"* ]] && continue # match only the specified "class"
 		__f__="$(declare -f "$__f__")"
-		eval "${__f__//\$self/${self}}" # expand all class vars
+		eval "${__f__//\$self::/${self}::}" # expand all class vars
 	done < <(declare -F)
 	unset self
 }
@@ -143,7 +143,7 @@ firefox::mozconfig::fix_enable-extensions() {
 		echo "mozconfig: merging multiple extensions: '${joint}"
 		sed -e '/^ac_add_options *--enable-extensions/d' \
 			-i -- "${MOZCONFIG}" || die
-		$mozconfig::add_options "extensions" --enable-extensions="${joint}"
+		$self::add_options "extensions" --enable-extensions="${joint}"
 	fi
 }
 
