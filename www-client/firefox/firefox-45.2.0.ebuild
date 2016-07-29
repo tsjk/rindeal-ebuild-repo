@@ -6,7 +6,7 @@
 EAPI=6
 
 PYTHON_COMPAT=( python2_7 )
-PYTHON_REQ_USE='ncurses,sqlite,ssl,threads'
+PYTHON_REQ_USE='ncurses,sqlite,ssl,threads' # TODO: why?
 
 # will resolve to 2.13, newer don't work (https://bugzilla.mozilla.org/show_bug.cgi?id=104642)
 WANT_AUTOCONF="2.1"
@@ -24,7 +24,7 @@ MOZ_P="${PN}-${MOZ_PV}"
 SLOT="0${ESR:+"/esr"}"
 SRC_URI="https://archive.mozilla.org/pub/firefox/releases/${MOZ_PV}/source/${MOZ_P}.source.tar.xz"
 
-KEYWORDS='~amd64 ~arm ~arm64 ~x86'
+KEYWORDS='~amd64 ~arm'
 IUSE_A=(
 	## since v46 gtk3 is default, but we're now on 45.x branch
 	+X +gtk2 gtk3 -qt5 +pango
