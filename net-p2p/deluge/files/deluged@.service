@@ -1,0 +1,32 @@
+[Unit]
+Description=Deluge BitTorrent client - instance '%I'
+Documentation=man:deluged
+Documentation=http://dev.deluge-torrent.org/wiki/UserGuide
+
+Requires=local-fs.target
+Wants=network.target
+After=local-fs.target network.target
+
+
+[Service]
+# USER var is not set if config doesn't contain `User=` directive
+ExecStartPre=/usr/bin/test -n ${USER}
+# daemon must not run as root
+ExecStartPre=/usr/bin/test ${USER} != 'root'
+
+ExecStart=/usr/bin/deluged --do-not-daemonize --loglevel=warning  \
+    $DELUGED_OPT_PORT $DELUGED_OPT_IFACE \
+    $DELUGED_OPT_UI_IFACE \
+    $DELUGED_OPT_CONFIG \
+    $DELUGED_OPT_LOGFILE \
+    $DELUGED_OPT_LOGLEVEL \
+    $DELUGED_OPTS
+TimeoutStartSec=30s
+
+# stopping deluged may take time, but waiting now is still better
+# than waiting for forced checks to finish
+TimeoutStopSec=3m
+
+
+[Install]
+WantedBy=multi-user.target

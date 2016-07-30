@@ -7,7 +7,7 @@ PYTHON_COMPAT=( python2_7 )
 
 DISTUTILS_SINGLE_IMPL=true
 
-inherit distutils-r1 eutils
+inherit distutils-r1 eutils systemd
 
 DESCRIPTION='BitTorrent client with a client/server model'
 HOMEPAGE='http://deluge-torrent.org/'
@@ -96,6 +96,8 @@ python_install_all() {
 	if use daemon ; then
 		newinitd "${FILESDIR}/deluged.init" 'deluged'
 		newconfd "${FILESDIR}/deluged.conf" 'deluged'
+
+		systemd_dounit "${FILESDIR}/deluged@.service"
 	else
 		rm_paths+=(
 			"${ED}/usr/bin/deluged"
