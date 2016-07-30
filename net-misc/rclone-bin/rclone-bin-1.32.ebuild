@@ -7,8 +7,10 @@ DESCRIPTION='Sync files to and from Google Drive, S3, Swift, Cloudfiles, Dropbox
 HOMEPAGE='http://rclone.org/'
 LICENSE='MIT'
 
+
+PN_NO_BIN="${PN%-bin}"
 SLOT='0'
-src_uri_base="https://github.com/ncw/rclone/releases/download/v${PV}/rclone-v${PV}-linux"
+src_uri_base="http://downloads.rclone.org/${PN_NO_BIN}-v${PV}-linux"
 SRC_URI="
 	amd64?	( ${src_uri_base}-amd64.zip )
 	arm?	( ${src_uri_base}-arm.zip )
@@ -17,24 +19,24 @@ SRC_URI="
 
 KEYWORDS='-* ~amd64 ~arm ~x86'
 
-RDEPEND="!${CATEGORY}/rclone"
+RDEPEND="!${CATEGORY}/${PN_NO_BIN}"
 
 RESTRICT="mirror"
 
 src_unpack() {
 	default
-	cd "${WORKDIR}"/rclone-*/ || die
+	cd "${WORKDIR}"/${PN_NO_BIN}-*/ || die
 	S="${PWD}"
 }
 
-inst_d='opt/rclone'
-QA_PRESTRIPPED="${inst_d}/bin/rclone"
+inst_d='opt/${PN_NO_BIN}'
+QA_PRESTRIPPED="${inst_d}/bin/${PN_NO_BIN}"
 
 src_install() {
 	into "/${inst_d}"
-	dobin rclone
-	dosym "/${inst_d}"/bin/rclone /usr/bin/rclone
+	dobin ${PN_NO_BIN}
+	dosym "/${inst_d}"/bin/${PN_NO_BIN} /usr/bin/${PN_NO_BIN}
 
-	doman rclone.1
+	doman ${PN_NO_BIN}.1
 	dodoc README.*
 }
