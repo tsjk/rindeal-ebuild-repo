@@ -19,7 +19,7 @@ inherit eutils versionator xdg
 HOMEPAGE="https://www.jetbrains.com/${PN}"
 LICENSE="IDEA || ( IDEA_Academic IDEA_Classroom IDEA_OpenSource IDEA_Personal )"
 
-SLOT="2016.1"
+SLOT="$(get_version_component_range 1-2)"
 _JBIJ_PN_SLOTTED="${PN}${SLOT}"
 
 # @ECLASS-VARIABLE: JBIJ_URI
