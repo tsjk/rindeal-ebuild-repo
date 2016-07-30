@@ -48,7 +48,6 @@ IUSE_A=(
 	+system-{icu,jpeg,libevent,libvpx}
 	-system-cairo	# buggy, rather use the bundled and patched version
 	-system-sqlite	# requires non-standard USE flags
-	-system-js
 	-system-jemalloc # requires new and currently unstable jemalloc version
 	-system-harfbuzz -system-graphite2 # nonstandard options, added via patch
 
@@ -59,7 +58,6 @@ IUSE_A=(
 
 	+webrtc -gamepad
 )
-IUSE="${IUSE_A[*]}"
 
 # deps guide: https://developer.mozilla.org/en-US/docs/Mozilla/Developer_guide/Build_Instructions/Linux_Prerequisites#Other_distros_and_other_Unix-based_systems
 
@@ -140,7 +138,6 @@ CDEPEND_A=(
 	'system-cairo? ( x11-libs/cairo:0[X=,xcb] )'
 	'system-icu? ( dev-libs/icu:0 )'
 	'system-jemalloc? ( >=dev-libs/jemalloc-4:0/2 )'
-	'system-js? ( dev-lang/spidermonkey )' # FIXME
 	# requires SECURE_DELETE, THREADSAFE, ENABLE_FTS3, ENABLE_UNLOCK_NOTIFY, ENABLE_DBSTAT_VTAB
 	# reference: configure.in
 	'system-sqlite? ( >=dev-db/sqlite-3.9.1:3[secure-delete,debug=] )'
@@ -171,9 +168,6 @@ RDEPEND_A=( "${CDEPEND_A[@]}"
 	'wifi? ( net-misc/networkmanager:0 )'
 )
 
-DEPEND="${DEPEND_A[*]}"
-RDEPEND="${RDEPEND_A[*]}"
-
 REQUIRED_USE_A=(
 	'^^ ( gtk2 gtk3 qt5 )'
 	'wifi? ( dbus )' # FF communicates with NM via dbus
@@ -190,8 +184,9 @@ REQUIRED_USE_A=(
 	'ipdl-tests? ( test )'
 	'system-jemalloc? ( jemalloc )'
 )
-REQUIRED_USE="${REQUIRED_USE_A[*]}"
 RESTRICT+='!bindist? ( bindist )' # FIXME: what is this?
+
+inherit arrays
 
 # QA_PRESTRIPPED="usr/lib*/${PN}/firefox" # FIXME
 # nested configure scripts in mozilla products generate unrecognized options
@@ -207,8 +202,8 @@ BUILD_DIR="${S}/ff"
 # should be called in both pkg_pretend() and pkg_setup()
 # https://developer.mozilla.org/en-US/docs/Mozilla/Developer_guide/Build_Instructions/Linux_Prerequisites#Hardware
 my_check_reqs() {
-	: CHECKREQS_MEMORY="2G"
-	: CHECKREQS_DISK_BUILD="5G"
+	#! CHECKREQS_MEMORY="2G"
+	#! CHECKREQS_DISK_BUILD="5G"
 
 	if is-flagq '-flto*' && ! is-flagq '-fno-lto' ; then
 		local lto=$(get-flag flto)
@@ -220,7 +215,7 @@ my_check_reqs() {
 
 	# Ensure we have enough disk space to compile
 	if use pgo || use debug || use test ; then
-		: CHECKREQS_DISK_BUILD="9G" # FIXME
+		#! CHECKREQS_DISK_BUILD="9G" # FIXME
 	fi
 
 	check-reqs_pkg_setup
