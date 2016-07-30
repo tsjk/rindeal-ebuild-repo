@@ -2,7 +2,7 @@
 
 Category | Packages
 --- | ---
-<a id="cat-app-admin"></a>**app-admin** | [logswan](#app-admin-logswan)
+<a id="cat-app-admin"></a>**app-admin** | [lnav](#app-admin-lnav), [logswan](#app-admin-logswan), [monit](#app-admin-monit)
 <a id="cat-app-benchmarks"></a>**app-benchmarks** | [interbench](#app-benchmarks-interbench), [tinymembench](#app-benchmarks-tinymembench)
 <a id="cat-app-dicts"></a>**app-dicts** | [sword-czeb21](#app-dicts-sword-czeb21), [sword-czecep](#app-dicts-sword-czecep), [sword-czecsp](#app-dicts-sword-czecsp), [sword-czekms](#app-dicts-sword-czekms)
 <a id="cat-app-misc"></a>**app-misc** | [ansiweather](#app-misc-ansiweather), [jo](#app-misc-jo)
@@ -12,7 +12,7 @@ Category | Packages
 <a id="cat-dev-db"></a>**dev-db** | [datagrip](#dev-db-datagrip), [dbeaver-bin](#dev-db-dbeaver-bin)
 <a id="cat-dev-java"></a>**dev-java** | [idea](#dev-java-idea), [idea-community](#dev-java-idea-community)
 <a id="cat-dev-lang"></a>**dev-lang** | [gambas](#dev-lang-gambas)
-<a id="cat-dev-php"></a>**dev-php** | [PEAR-PHP_Beautifier](#dev-php-PEAR-PHP_Beautifier), [phpstorm](#dev-php-phpstorm)
+<a id="cat-dev-php"></a>**dev-php** | [PEAR-PHP_Beautifier](#dev-php-PEAR-PHP_Beautifier), [composer](#dev-php-composer), [phpstorm](#dev-php-phpstorm), [psysh](#dev-php-psysh)
 <a id="cat-dev-python"></a>**dev-python** | [gitlab](#dev-python-gitlab), [pycharm](#dev-python-pycharm), [pycharm-community](#dev-python-pycharm-community), [terminaltables](#dev-python-terminaltables), [tqdm](#dev-python-tqdm)
 <a id="cat-dev-qt"></a>**dev-qt** | [qt-telegram-static](#dev-qt-qt-telegram-static)
 <a id="cat-dev-ruby"></a>**dev-ruby** | [descendants_tracker](#dev-ruby-descendants_tracker), [equatable](#dev-ruby-equatable), [github_api](#dev-ruby-github_api), [github_cli](#dev-ruby-github_cli), [jwt](#dev-ruby-jwt), [multi_xml](#dev-ruby-multi_xml), [necromancer](#dev-ruby-necromancer), [oauth2](#dev-ruby-oauth2), [pastel](#dev-ruby-pastel), [rubymine](#dev-ruby-rubymine), [tty](#dev-ruby-tty), [tty-color](#dev-ruby-tty-color), [tty-cursor](#dev-ruby-tty-cursor), [tty-pager](#dev-ruby-tty-pager), [tty-platform](#dev-ruby-tty-platform), [tty-progressbar](#dev-ruby-tty-progressbar), [tty-prompt](#dev-ruby-tty-prompt), [tty-screen](#dev-ruby-tty-screen), [tty-spinner](#dev-ruby-tty-spinner), [tty-table](#dev-ruby-tty-table), [tty-which](#dev-ruby-tty-which), [unicode_utils](#dev-ruby-unicode_utils), [verse](#dev-ruby-verse), [wisper](#dev-ruby-wisper)
@@ -21,8 +21,8 @@ Category | Packages
 <a id="cat-media-video"></a>**media-video** | [fswebcam](#media-video-fswebcam), [makemkv](#media-video-makemkv), [xt7-player-mpv](#media-video-xt7-player-mpv)
 <a id="cat-net-im"></a>**net-im** | [telegram](#net-im-telegram), [telegram-cli](#net-im-telegram-cli)
 <a id="cat-net-libs"></a>**net-libs** | [libtorrent-rasterbar](#net-libs-libtorrent-rasterbar), [telegram-qt](#net-libs-telegram-qt)
-<a id="cat-net-misc"></a>**net-misc** | [rclone-bin](#net-misc-rclone-bin), [resty](#net-misc-resty)
-<a id="cat-net-p2p"></a>**net-p2p** | [deluge](#net-p2p-deluge), [qbittorrent](#net-p2p-qbittorrent), [rtorrent](#net-p2p-rtorrent), [tixati](#net-p2p-tixati)
+<a id="cat-net-misc"></a>**net-misc** | [miredo](#net-misc-miredo), [rclone-bin](#net-misc-rclone-bin), [resty](#net-misc-resty)
+<a id="cat-net-p2p"></a>**net-p2p** | [deluge](#net-p2p-deluge), [qbittorrent](#net-p2p-qbittorrent), [tixati](#net-p2p-tixati)
 <a id="cat-sys-apps"></a>**sys-apps** | [hwinfo](#sys-apps-hwinfo), [openrc-rfl](#sys-apps-openrc-rfl)
 <a id="cat-sys-process"></a>**sys-process** | [ps_mem](#sys-process-ps_mem)
 <a id="cat-www-client"></a>**www-client** | [opera](#www-client-opera), [phantomjs](#www-client-phantomjs)
@@ -32,7 +32,9 @@ Category | Packages
 
 Package | Description | :house: | :back:
 --- | --- | --- | ---
+<a id="app-admin-lnav"></a><a href="./app-admin/lnav"><sub><sup>app-admin/</sup></sub><strong>lnav</strong></a> | A curses-based tool for viewing and analyzing log files | [:house:](http://lnav.org) | [:back:](#cat-app-admin)
 <a id="app-admin-logswan"></a><a href="./app-admin/logswan"><sub><sup>app-admin/</sup></sub><strong>logswan</strong></a> | Web log analyzer using probabilistic data structures | [:house:](https://github.com/fcambus/logswan) | [:back:](#cat-app-admin)
+<a id="app-admin-monit"></a><a href="./app-admin/monit"><sub><sup>app-admin/</sup></sub><strong>monit</strong></a> | Utility for monitoring and managing daemons or similar programs | [:house:](https://mmonit.com/monit/) | [:back:](#cat-app-admin)
 <a id="app-benchmarks-interbench"></a><a href="./app-benchmarks/interbench"><sub><sup>app-benchmarks/</sup></sub><strong>interbench</strong></a> | Con Kolivas' Benchmarking Suite -- Successor to Contest | [:house:](http://users.tpg.com.au/ckolivas/interbench/) | [:back:](#cat-app-benchmarks)
 <a id="app-benchmarks-tinymembench"></a><a href="./app-benchmarks/tinymembench"><sub><sup>app-benchmarks/</sup></sub><strong>tinymembench</strong></a> | Simple benchmark for memory throughput and latency | [:house:](https://github.com/ssvb/tinymembench) | [:back:](#cat-app-benchmarks)
 <a id="app-dicts-sword-czeb21"></a><a href="./app-dicts/sword-czeb21"><sub><sup>app-dicts/</sup></sub><strong>sword-czeb21</strong></a> | Czech Bible, Preklad 21. stoleti | [:house:](http://crosswire.org/sword/modules/ModInfo.jsp?modName=CzeB21) | [:back:](#cat-app-dicts)
@@ -50,7 +52,9 @@ Package | Description | :house: | :back:
 <a id="dev-java-idea-community"></a><a href="./dev-java/idea-community"><sub><sup>dev-java/</sup></sub><strong>idea-community</strong></a> | IntelliJ IDEA is a capable and ergonomic Java IDE | [:house:](https://www.jetbrains.com/idea-community) | [:back:](#cat-dev-java)
 <a id="dev-lang-gambas"></a><a href="./dev-lang/gambas"><sub><sup>dev-lang/</sup></sub><strong>gambas</strong></a> | Gambas is a free development environment based on a Basic interpreter | [:house:](http://gambas.sourceforge.net/en/main.html) | [:back:](#cat-dev-lang)
 <a id="dev-php-PEAR-PHP_Beautifier"></a><a href="./dev-php/PEAR-PHP_Beautifier"><sub><sup>dev-php/</sup></sub><strong>PEAR-PHP_Beautifier</strong></a> | Code Beautifier for PHP | [:house:](http://pear.php.net/PHP_Beautifier) | [:back:](#cat-dev-php)
+<a id="dev-php-composer"></a><a href="./dev-php/composer"><sub><sup>dev-php/</sup></sub><strong>composer</strong></a> | Dependency Manager for PHP | [:house:](https://getcomposer.org) | [:back:](#cat-dev-php)
 <a id="dev-php-phpstorm"></a><a href="./dev-php/phpstorm"><sub><sup>dev-php/</sup></sub><strong>phpstorm</strong></a> | PhpStorm is a commercial, cross-platform IDE for PHP | [:house:](https://www.jetbrains.com/phpstorm) | [:back:](#cat-dev-php)
+<a id="dev-php-psysh"></a><a href="./dev-php/psysh"><sub><sup>dev-php/</sup></sub><strong>psysh</strong></a> | A REPL for PHP | [:house:](http://psysh.org/) | [:back:](#cat-dev-php)
 <a id="dev-python-gitlab"></a><a href="./dev-python/gitlab"><sub><sup>dev-python/</sup></sub><strong>gitlab</strong></a> | Python wrapper for the GitLab API | [:house:](https://github.com/gpocentek/python-gitlab) | [:back:](#cat-dev-python)
 <a id="dev-python-pycharm"></a><a href="./dev-python/pycharm"><sub><sup>dev-python/</sup></sub><strong>pycharm</strong></a> | PyCharm is a Python IDE for professional developers | [:house:](https://www.jetbrains.com/pycharm) | [:back:](#cat-dev-python)
 <a id="dev-python-pycharm-community"></a><a href="./dev-python/pycharm-community"><sub><sup>dev-python/</sup></sub><strong>pycharm-community</strong></a> | PyCharm is a Python IDE for professional developers | [:house:](https://www.jetbrains.com/pycharm-community) | [:back:](#cat-dev-python)
@@ -99,12 +103,12 @@ Package | Description | :house: | :back:
 <a id="net-im-telegram-cli"></a><a href="./net-im/telegram-cli"><sub><sup>net-im/</sup></sub><strong>telegram-cli</strong></a> | Command line interface client for Telegram | [:house:](https://github.com/vysheng/tg) | [:back:](#cat-net-im)
 <a id="net-libs-libtorrent-rasterbar"></a><a href="./net-libs/libtorrent-rasterbar"><sub><sup>net-libs/</sup></sub><strong>libtorrent-rasterbar</strong></a> | C++ BitTorrent implementation focusing on efficiency and scalability | [:house:](http://libtorrent.org) | [:back:](#cat-net-libs)
 <a id="net-libs-telegram-qt"></a><a href="./net-libs/telegram-qt"><sub><sup>net-libs/</sup></sub><strong>telegram-qt</strong></a> | Telegram binding for Qt | [:house:](https://github.com/Kaffeine/telegram-qt) | [:back:](#cat-net-libs)
+<a id="net-misc-miredo"></a><a href="./net-misc/miredo"><sub><sup>net-misc/</sup></sub><strong>miredo</strong></a> | Miredo is an open-source Teredo IPv6 tunneling software | [:house:](http://www.remlab.net/miredo/ https://gitlab.com/rindeal/miredo) | [:back:](#cat-net-misc)
 <a id="net-misc-rclone-bin"></a><a href="./net-misc/rclone-bin"><sub><sup>net-misc/</sup></sub><strong>rclone-bin</strong></a> | Sync files to and from Google Drive, S3, Swift, Cloudfiles, Dropbox, ... | [:house:](http://rclone.org/) | [:back:](#cat-net-misc)
 <a id="net-misc-resty"></a><a href="./net-misc/resty"><sub><sup>net-misc/</sup></sub><strong>resty</strong></a> | Little command line REST client that you can use in pipelines (bash or zsh) | [:house:](https://github.com/micha/resty) | [:back:](#cat-net-misc)
 <a id="net-p2p-deluge"></a><a href="./net-p2p/deluge"><sub><sup>net-p2p/</sup></sub><strong>deluge</strong></a> | BitTorrent client with a client/server model | [:house:](http://deluge-torrent.org/) | [:back:](#cat-net-p2p)
 <a id="net-p2p-qbittorrent"></a><a href="./net-p2p/qbittorrent"><sub><sup>net-p2p/</sup></sub><strong>qbittorrent</strong></a> | BitTorrent client in C++/Qt based on libtorrent-rasterbar | [:house:](http://www.qbittorrent.org/ https://github.com/qbittorrent/qBittorrent) | [:back:](#cat-net-p2p)
-<a id="net-p2p-rtorrent"></a><a href="./net-p2p/rtorrent"><sub><sup>net-p2p/</sup></sub><strong>rtorrent</strong></a> | BitTorrent Client using libtorrent | [:house:](https://rakshasa.github.io/rtorrent/) | [:back:](#cat-net-p2p)
-<a id="net-p2p-tixati"></a><a href="./net-p2p/tixati"><sub><sup>net-p2p/</sup></sub><strong>tixati</strong></a> | Tixati is a New and Powerful P2P System | [:house:](http://www.tixati.com) | [:back:](#cat-net-p2p)
+<a id="net-p2p-tixati"></a><a href="./net-p2p/tixati"><sub><sup>net-p2p/</sup></sub><strong>tixati</strong></a> | Tixati is a New and Powerful P2P System | [:house:](https://www.tixati.com) | [:back:](#cat-net-p2p)
 <a id="sys-apps-hwinfo"></a><a href="./sys-apps/hwinfo"><sub><sup>sys-apps/</sup></sub><strong>hwinfo</strong></a> | Hardware detection tool used in SuSE Linux | [:house:](https://github.com/openSUSE/hwinfo) | [:back:](#cat-sys-apps)
 <a id="sys-apps-openrc-rfl"></a><a href="./sys-apps/openrc-rfl"><sub><sup>sys-apps/</sup></sub><strong>openrc-rfl</strong></a> | Rindeal's Function Library for OpenRC | [:house:](https://github.com/rindeal/openrc-rfl) | [:back:](#cat-sys-apps)
 <a id="sys-process-ps_mem"></a><a href="./sys-process/ps_mem"><sub><sup>sys-process/</sup></sub><strong>ps_mem</strong></a> | A utility to accurately report the in core memory usage for a program | [:house:](https://github.com/pixelb/ps_mem) | [:back:](#cat-sys-process)
