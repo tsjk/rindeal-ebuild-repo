@@ -21,7 +21,7 @@ LICENSE='BSD'
 SONAME='8'
 SLOT="0/${SONAME}"
 
-KEYWORDS='~amd64 ~arm'
+KEYWORDS='amd64 arm'
 RESTRICT+=' test'
 IUSE='+crypt debug +dht doc examples python static-libs test'
 REQUIRED_USE="python? ( ${PYTHON_REQUIRED_USE} )"
