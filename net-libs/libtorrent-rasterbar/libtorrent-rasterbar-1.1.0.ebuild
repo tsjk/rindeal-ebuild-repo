@@ -21,7 +21,7 @@ LICENSE='BSD'
 SONAME='9'
 SLOT="0/${SONAME}"
 
-KEYWORDS='~amd64 ~arm ~x86'
+KEYWORDS='~amd64 ~arm'
 IUSE='+crypt debug +dht doc examples python static-libs test'
 
 RDEPEND="
