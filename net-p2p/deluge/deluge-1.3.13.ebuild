@@ -15,7 +15,7 @@ LICENSE='GPL-2'
 SLOT='0'
 SRC_URI="http://git.deluge-torrent.org/deluge/snapshot/${P}.tar.bz2"
 
-KEYWORDS='~amd64 ~arm ~x86'
+KEYWORDS='~amd64 ~arm'
 IUSE='console +daemon geoip +gtk +libnotify +setproctitle +sound webui'
 
 CDEPEND_A=(
