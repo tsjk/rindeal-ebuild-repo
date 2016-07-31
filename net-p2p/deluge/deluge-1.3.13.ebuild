@@ -4,7 +4,6 @@
 EAPI='6'
 
 PYTHON_COMPAT=( python2_7 )
-
 DISTUTILS_SINGLE_IMPL=true
 
 inherit distutils-r1 eutils systemd
@@ -19,32 +18,40 @@ SRC_URI="http://git.deluge-torrent.org/deluge/snapshot/${P}.tar.bz2"
 KEYWORDS='~amd64 ~arm ~x86'
 IUSE='console +daemon geoip +gtk +libnotify +setproctitle +sound webui'
 
-CDEPEND="daemon? ( <net-libs/libtorrent-rasterbar-1.1:0[python,${PYTHON_USEDEP}] )"
-DEPEND="${CDEPEND}
-	dev-python/setuptools[${PYTHON_USEDEP}]
-	dev-util/intltool"
-RDEPEND="${CDEPEND}
-	dev-python/chardet[${PYTHON_USEDEP}]
-	dev-python/pyopenssl[${PYTHON_USEDEP}]
-	dev-python/pyxdg[${PYTHON_USEDEP}]
-	>=dev-python/twisted-core-8.1[${PYTHON_USEDEP}]
-	>=dev-python/twisted-web-8.1[${PYTHON_USEDEP}]
+CDEPEND_A=(
+	"daemon? ("
+		# deluge devs said that there is no support for libtorrent-1.1.x in deluge-1.3.x
+		"net-libs/libtorrent-rasterbar:0/8[python,${PYTHON_USEDEP}]"
+	")"
+)
+DEPEND_A=( "${CDEPEND_A[@]}"
+	"dev-python/setuptools[${PYTHON_USEDEP}]"
+	"dev-util/intltool" )
+RDEPEND_A=( "${CDEPEND_A[@]}"
+	"dev-python/chardet[${PYTHON_USEDEP}]"
+	"dev-python/pyopenssl[${PYTHON_USEDEP}]"
+	"dev-python/pyxdg[${PYTHON_USEDEP}]"
+	">=dev-python/twisted-core-8.1[${PYTHON_USEDEP}]"
+	">=dev-python/twisted-web-8.1[${PYTHON_USEDEP}]"
 
-	geoip? ( dev-libs/geoip )
-	gtk? (
-		libnotify? ( dev-python/notify-python[${PYTHON_USEDEP}] )
-		sound? ( dev-python/pygame[${PYTHON_USEDEP}] )
-		dev-python/pygobject:2[${PYTHON_USEDEP}]
-		>=dev-python/pygtk-2.12:2[${PYTHON_USEDEP}]
-		gnome-base/librsvg
-	)
-	setproctitle? ( dev-python/setproctitle[${PYTHON_USEDEP}] )
-	webui? ( dev-python/mako[${PYTHON_USEDEP}] )"
+	"geoip? ( dev-libs/geoip )"
+	"gtk? ("
+		"libnotify? ( dev-python/notify-python[${PYTHON_USEDEP}] )"
+		"sound? ( dev-python/pygame[${PYTHON_USEDEP}] )"
+		"dev-python/pygobject:2[${PYTHON_USEDEP}]"
+		">=dev-python/pygtk-2.12:2[${PYTHON_USEDEP}]"
+		"gnome-base/librsvg"
+	")"
+	"setproctitle? ( dev-python/setproctitle[${PYTHON_USEDEP}] )"
+	"webui? ( dev-python/mako[${PYTHON_USEDEP}] )"
+)
 
-REQUIRED_USE='
+REQUIRED_USE="
 	sound? ( gtk )
 	libnotify? ( gtk )
-	|| ( console daemon gtk webui )'
+	|| ( console daemon gtk webui )"
+
+inherit arrays
 
 PLOCALES=( af ar ast be bg bn bs ca cs cy da de el en_AU en_CA en_GB eo es et eu fa fi fo fr fy ga gl
 	he hi hr hu id is it ja ka kk km kn ko ku ky la lb lt lv mk ml ms nb nds nl nn oc pl pt pt_BR ro
@@ -53,21 +60,17 @@ PLOCALES_MASK=( nap pms iu )
 inherit l10n
 
 python_prepare_all() {
-	eapply "${FILESDIR}/1.3.12-Scheduler_Revert_erroneous_fix_backported_from_develop_branch.patch"
-
 	local args
 
+	# disable libtorrent checks
 	args=(
 		-e 's|build_libtorrent = True|build_libtorrent = False|'
 		-e "/Compiling po file/a \\\tuptoDate = False" )
-	sed -i "${args[@]}" \
-        -- 'setup.py' || die
-	args=(
-		-e 's|"new_release_check": True|"new_release_check": False|'
-		-e 's|"check_new_releases": True|"check_new_releases": False|'
-		-e 's|"show_new_releases": True|"show_new_releases": False|' )
-	sed -i "${args[@]}" \
-        -- 'deluge/core/preferencesmanager.py' || die
+	sed "${args[@]}" \
+        -i -- 'setup.py' || die
+	# disable new release checks
+	sed -e 's|"new_release_check": True|"new_release_check": False|' \
+        -i -- 'deluge/core/preferencesmanager.py' || die
 
 	local loc_dir='deluge/i18n' loc_pre='' loc_post='.po'
 	l10n_find_plocales_changes "${loc_dir}" "${loc_pre}" "${loc_post}"
@@ -94,6 +97,7 @@ python_install_all() {
 	local rm_paths=()
 
 	if use daemon ; then
+		# TODO: drop OpenRC support on deluge-1.4 release
 		newinitd "${FILESDIR}/deluged.init" 'deluged'
 		newconfd "${FILESDIR}/deluged.conf" 'deluged'
 
@@ -105,6 +109,7 @@ python_install_all() {
 	fi
 
 	if use webui ; then
+		# TODO: drop OpenRC support on deluge-1.4 release
 		newinitd "${FILESDIR}/deluge-web.init" 'deluge-web'
 		newconfd "${FILESDIR}/deluge-web.conf" 'deluge-web'
 	else
