@@ -17,18 +17,25 @@ env:
     global:
         ## configurable variables
         - OVERLAY_NAME='rindeal'
-        - PORTAGE_ROOT="$(mktemp -d --suffix=-portage_root)"
+        - PORTAGE_ROOT="$(mktemp -d --suffix=-PORTAGE_ROOT)"
         ## do not modify these
         - PORTAGE_CONFIGROOT="${PORTAGE_ROOT}" ROOT="${PORTAGE_ROOT}"
         - PORTAGE_GRPNAME='root' PORTAGE_USERNAME='root'    # silences crappy warnings
     matrix:
-        - PORTAGE_VER="2.2.28"
+        - PORTAGE_VER="2.3.0" REPOMAN_VER="2.3.0"
 
 matrix:
     fast_finish: true
 
+cache:
+    directories:
+        - $HOME/.cache/pip
+before_cache:
+    - rm -f $HOME/.cache/pip/log/debug.log
+
 
 install:
+    - pip --verbose install 'lxml>=3.6,<3.7'
     - .travis/install_portage.sh
     - export PATH="${PORTAGE_ROOT}/usr/bin:${PATH}"
 

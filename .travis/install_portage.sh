@@ -3,15 +3,16 @@
 [ -z "${PORTAGE_ROOT}" ] && { echo "PORTAGE_ROOT not set"; exit 1; }
 mkdir -v -p "${PORTAGE_ROOT}"
 [ -z "${PORTAGE_VER}" ] && { echo "PORTAGE_VER not set"; exit 1; }
+[ -z "${REPOMAN_VER}" ] && { echo "REPOMAN_VER not set"; exit 1; }
 : ${OVERLAY_NAME:=${TRAVIS_REPO_SLUG##*/}}
 
+# die on failure
 set -e
-
 
 . "$(dirname "${BASH_SOURCE[0]}")/travis-functions.sh"
 
 get_archive() {
-    local url="$1" dir="$2"
+    local url="${1?}" dir="${2?}"
     local tmpd="$(mktemp -d)" file="${url##*/}"
 
     pushd "${tmpd}" >/dev/null
@@ -24,98 +25,174 @@ get_archive() {
     rm -r -f "${tmpd}"
 }
 
-
 ## prepare env
 ## ------------
 fold_start environment "Prepare environment"
 
-tmp_dir="$(mktemp -d)"
-gentoo_tree_dir="${PORTAGE_ROOT}/usr/portage"   && mkdir -v -p "${gentoo_tree_dir}"
-portage_conf_dir="${PORTAGE_ROOT}/etc/portage"  && mkdir -v -p "${portage_conf_dir}"
-DISTDIR="$(mktemp -d --suffix=-distdir)"        && echo "DISTDIR: ${DISTDIR}"
+PORTAGE_REPOS_DIR="${PORTAGE_ROOT}/usr/portage"   && mkdir -v -p "${PORTAGE_REPOS_DIR}"
+PORTAGE_CONF_DIR="${PORTAGE_ROOT}/etc/portage"  && mkdir -v -p "${PORTAGE_CONF_DIR}"
+DISTDIR="$(mktemp -d --suffix=-DISTDIR)"        && echo "DISTDIR: ${DISTDIR}"
 
 mkdir -v -p "${PORTAGE_ROOT}/usr/lib64"
-ln -v -s lib64 "${PORTAGE_ROOT}/usr/lib"
+ln -v -s 'lib64' "${PORTAGE_ROOT}/usr/lib"
 
 fold_end environment
 
 
-## install portage
-## ----------------
-fold_start portage.install "Install Portage"
-{
-    fold_start portage.install.pre
-    {
-        get_archive \
-            "https://github.com/gentoo/portage/archive/v${PORTAGE_VER}.tar.gz" \
-            "${tmp_dir}/portage-src"
-        cd "${tmp_dir}/portage-src"
+run_module() {
+    local mod_name="$1"
 
-        # allow to have arbitrary copyright holder name and deprecate $Id$ header
-        grep -r --files-with-matches 'gentoo_copyright.*Gentoo Foundation' pym/repoman | \
-            xargs sed -r \
-                -e 's|(gentoo_copyright.*)Gentoo Foundation|\1.*|' \
-                -e 's|(return) errors.ID_HEADER_ERROR|\1|' -i --
-    }
-    fold_end portage.install.pre
+    local WORKDIR="$(mktemp -d --suffix=-WORKDIR)"
+    local S="${WORKDIR}/${mod_name}"
 
-    fold_start portage.install.run
-    {
-        args=(
-            -O2
-            --system-prefix="${PORTAGE_ROOT}/usr"
-            --sysconfdir="${PORTAGE_ROOT}/etc"
-        )
-        ./setup.py install "${args[@]}"
-    }
-    fold_end portage.install.run
+    pushd "${WORKDIR}" >/dev/null
 
-    fold_start portage.install.post
-    {
-        wget 'https://www.gentoo.org/dtd/metadata.dtd' -P "${DISTDIR}/"
-    }
-    fold_end portage.install.post
+    local phases=(
+        setup
+        fetch
+        prepare
+        configure
+        compile
+        preinst
+        install
+        postinst
+    )
+
+    (
+    fold_start "${mod_name}" "Running module '${mod_name}'"
+
+    for ph in "${phases[@]}" ; do
+        local fn="${mod_name}:${ph}"
+
+        [[ "${ph}" == prepare ]] && [ -d "${S}" ] && cd "${S}"
+
+        if declare -f "${fn}" >/dev/null ; then
+            fold_start "${fn//:/.}" "${ph^}"
+            "${fn}"
+            fold_end "${fn//:/.}"
+        fi
+    done
+
+    fold_end "${mod_name}"
+    )
+
+    popd >/dev/null
+    rm -rf "${WORKDIR}"
 }
-fold_end portage.install
 
-## install gentoo tree
-## --------------------
-fold_start gentoo_tree "Install Gentoo Portage Tree"
+## BEGIN -- portage -----------------------------------------------------------
 
-get_archive \
-    'https://github.com/gentoo-mirror/gentoo/archive/master.tar.gz' \
-    "${gentoo_tree_dir}"
+portage:fetch() {
+    get_archive \
+            "https://github.com/gentoo/portage/archive/portage-${PORTAGE_VER}.tar.gz" \
+            "${S}"
+}
 
-fold_end gentoo_tree
+portage:install() {
+    local args=(
+        -O2
+        --system-prefix="${PORTAGE_ROOT}/usr"
+        --sysconfdir="${PORTAGE_ROOT}/etc"
+    )
+    ./setup.py install "${args[@]}"
+}
+
+## END -- portage -------------------------------------------------------------
+
+## BEGIN -- repoman -----------------------------------------------------------
+
+repoman:fetch() {
+    get_archive \
+            "https://github.com/gentoo/portage/archive/repoman-${REPOMAN_VER}.tar.gz" \
+            "${S}"
+    S+="/repoman"
+}
+
+repoman:prepare() {
+    :
+
+    # allow to have arbitrary copyright holder name and deprecate $Id$ header
+    sed -e 's|if num > 2:|if num >= 0:|' \
+        -i -- pym/repoman/modules/scan/ebuild/checks.py
+}
+
+repoman:install() {
+    local args=(
+        -O2
+        --system-prefix="${PORTAGE_ROOT}/usr"
+        --sysconfdir="${PORTAGE_ROOT}/etc"
+    )
+    ./setup.py install "${args[@]}"
+}
+
+repoman:postinst() {
+    wget 'https://www.gentoo.org/dtd/metadata.dtd' -P "${DISTDIR}/"
+}
+
+## END -- repoman -------------------------------------------------------------
+
+## BEGIN -- repos -------------------------------------------------------------
+
+# declaration inside a function doesn't work
+declare -g -A REPOS=(
+    [gentoo]='https://github.com/gentoo-mirror/gentoo/archive/master.tar.gz'
+)
+
+repos:fetch() {
+    local r
+    for r in "${!REPOS[@]}" ; do
+        get_archive \
+            "${REPOS[${r}]}" \
+            "${S}/${r}"
+    done
+}
+
+repos:install() {
+    local r
+    for r in "${!REPOS[@]}" ; do
+        mv -v "${r}" "${PORTAGE_REPOS_DIR}/"
+    done
+}
+
+repos:postinst() {
+    mkdir -v -p "${PORTAGE_CONF_DIR}/repos.conf"
+
+    announce tee "${PORTAGE_CONF_DIR}/repos.conf/default" <<-_EOF_
+    [DEFAULT]
+    main-repo = gentoo
+_EOF_
+
+    announce tee "${PORTAGE_CONF_DIR}/repos.conf/${OVERLAY_NAME}" <<-_EOF_
+    [${OVERLAY_NAME}]
+    location = ${TRAVIS_BUILD_DIR}
+_EOF_
+
+    local r
+    for r in "${!REPOS[@]}" ; do
+        announce tee "${PORTAGE_CONF_DIR}/repos.conf/${r}" <<-_EOF_
+        [${r}]
+        location = ${PORTAGE_REPOS_DIR}/${r}
+_EOF_
+    done
+}
+
+## END -- repos ---------------------------------------------------------------
+
+run_module portage
+run_module repoman
+run_module repos
 
 ## install portage configs
 ## ------------------------
 fold_start configuration "Configure"
 
-mkdir -v -p "${portage_conf_dir}/repos.conf"
-announce tee "${portage_conf_dir}/repos.conf/repos" << _EOF_
-[DEFAULT]
-main-repo = gentoo
-
-[gentoo]
-location = ${gentoo_tree_dir}
-
-[${OVERLAY_NAME}]
-location = ${TRAVIS_BUILD_DIR}
-_EOF_
-
-announce tee "${portage_conf_dir}/make.conf" << _EOF_
+announce tee "${PORTAGE_CONF_DIR}/make.conf" << _EOF_
 DISTDIR="${DISTDIR}"
-PKGDIR="$(mktemp -d --suffix=-pkdir)"
-PORTAGE_TMPDIR="$(mktemp -d --suffix=-portage_tmpdir)"
-RPMDIR="$(mktemp -d --suffix=-rpmdir)"
+PKGDIR="$(mktemp -d --suffix=-PKGDIR)"
+PORTAGE_TMPDIR="$(mktemp -d --suffix=-PORTAGE_TMPDIR)"
+RPMDIR="$(mktemp -d --suffix=-RPMDIR)"
 _EOF_
 
-ln -v -s "${gentoo_tree_dir}/profiles/base" "${portage_conf_dir}/make.profile"
+ln -v -s "${PORTAGE_REPOS_DIR}/gentoo/profiles/base" "${PORTAGE_CONF_DIR}/make.profile"
 
 fold_end configuration
-
-## cleanup
-## --------
-cd ~
-rm -rf "${tmp_dir}"
