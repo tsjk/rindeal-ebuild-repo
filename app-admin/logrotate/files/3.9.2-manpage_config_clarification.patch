@@ -1,0 +1,19 @@
+Source: OpenSuse
+Status: ready for upstream
+Reason: man page clarification
+
+Index: logrotate-3.8.5/logrotate.8
+===================================================================
+--- logrotate-3.8.5.orig/logrotate.8	2013-07-25 15:30:36.687434418 +0200
++++ logrotate-3.8.5/logrotate.8	2013-07-31 16:08:57.460078472 +0200
+@@ -121,6 +121,10 @@
+ anywhere in the config file as long as the first non-whitespace
+ character on the line is a \fB#\fR.
+
++Values are separated from directives by whitespace and/or an optional =.
++Numbers must be specified in a format understood by
++.BR strtoul(3).
++
+ The next section of the config file defines how to handle the log file
+ \fI/var/log/messages\fR. The log will go through five weekly rotations before
+ being removed. After the log file has been rotated (but before the old

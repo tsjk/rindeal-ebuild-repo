@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "http://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+  <maintainer type="person">
+    <email>dev.rindeal+gentoo-overlay@gmail.com</email>
+    <name>Jan Chren (rindeal)</name>
+  </maintainer>
+  <longdescription lang="en">
+		Logrotate allows for the automatic rotation compression, removal
+		and mailing of log files. Logrotate can be set to handle a log
+		file daily, weekly, monthly or when the log file gets to a certain
+		size.
+  </longdescription>
+  <use>
+    <flag name="acl">Installs acl support</flag>
+    <flag name="cron">Installs cron file</flag>
+    <flag name="selinux">Installs Security Enhanced Linux support</flag>
+  </use>
+</pkgmetadata>
