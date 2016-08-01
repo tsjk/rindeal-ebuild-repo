@@ -3,11 +3,12 @@ Rindeal's Gentoo Overlay
 [![Build Status](https://img.shields.io/travis/rindeal/gentoo-overlay/master.svg?style=flat-square&label=repoman full)](https://travis-ci.org/rindeal/gentoo-overlay)
 [![Dev Branch Build Status](https://img.shields.io/travis/rindeal/gentoo-overlay/dev.svg?style=flat-square&label=dev)](https://travis-ci.org/rindeal/gentoo-overlay)
 
-Repository consists mostly of packages I haven't found anywhere else, more up-to-date versions of official packages,
-or ebuilds with features enhanced to my liking. In each _category/package directory_ you should find a _README_ file
-describing the exact reason of its inclusion in this repository. If not then it probably means that it's simply a new package.
+Repository consists mostly of new packages, more up-to-date versions of official packages,
+or rewritten ebuilds with fixed bugs and enhanced features (USE flags, systemd services, ...).
+In each _category/package directory_ you should find a _README_ file describing the exact reason of its inclusion in this repository.
 
 For a full package listing see [LISTING] \(don't hesitate, it's nice).
+
 
 Highlights
 -----------
@@ -19,11 +20,16 @@ My package is the only source-based package for _Telegram Desktop_ app, the othe
 I've created a special eclass for _IntelliJ_ based IDEs, which allows to easily add and update any such IDE,
 while still providing features like slotting and component unbundling (JRE, CMake, GDB, ...) using USE-flags.
 
+### libtorrent-rasterbar + deluge (+ qBittorrent)
+I'm providing a top-notch support and very nice ebuilds for these two packages.
+Official packages usually backport fixes and features from my ebuilds.
 
-Stability
-----------
+
+Stability and QA
+-----------------
 
 I am trying to maintain high quality and stable ebuilds here.
+You should be able to switch completely to packages from my overlay without regrets.
 To achieve this goal I'm using several safety guards:
 
 - _[Travis CI]_, which runs _[repoman]_
@@ -61,6 +67,8 @@ sync-uri = https://github.com/rindeal/gentoo-overlay.git
 #sync-uri =  https://github.com/gentoo-mirror/rindeal.git
 sync-type = git
 auto-sync = yes
+## prefer my packages over official ones
+# priority = 9999
 ```
 
 
