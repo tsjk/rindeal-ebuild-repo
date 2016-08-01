@@ -16,8 +16,8 @@
     <flag name="libxml">Enable <pkg>dev-libs/libxml2</pkg> support</flag>
     <flag name="openssl">Enable <pkg>dev-libs/openssl</pkg> support</flag>
     <flag name="pop3">Enable POP3 protocol support</flag>
-    <flag name="qt4-opengl">Enable <pkg>dev-qt/qtopengl:4</pkg> support</flag>
-    <flag name="qt4-webkit">Enable <pkg>dev-qt/qtwebkit:4</pkg> support</flag>
+    <flag name="qt4-opengl">Enable <pkg>dev-qt/qtopengl</pkg>:4 support</flag>
+    <flag name="qt4-webkit">Enable <pkg>dev-qt/qtwebkit</pkg>:4 support</flag>
     <flag name="sdl-sound">Enable <pkg>media-libs/sdl-mixer</pkg> support</flag>
     <flag name="sdl2">Enable <pkg>media-libs/libsdl2</pkg> support</flag>
   </use>
