@@ -8,6 +8,7 @@ from collections import defaultdict
 
 root_dir = os.path.realpath(os.path.dirname(os.path.realpath(__file__)) + './../')
 os.chdir(root_dir)
+os.environ["PORTDIR_OVERLAY"] = "./"
 
 cats = defaultdict(set)
 
