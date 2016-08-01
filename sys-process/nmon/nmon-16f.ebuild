@@ -1,6 +1,6 @@
 # Copyright 1999-2016 Gentoo Foundation
+# Copyright 2016 Jan Chren (rindeal)
 # Distributed under the terms of the GNU General Public License v2
-# $Id$
 
 EAPI=6
 
@@ -14,7 +14,7 @@ LICENSE="GPL-3"
 SRC_URI="mirror://sourceforge/${PN}/${MY_P}.c"
 
 SLOT="0"
-KEYWORDS="~amd64 ~x86 ~arm ~ppc64"
+KEYWORDS="~amd64 ~arm"
 
 RDEPEND="sys-libs/ncurses:0="
 DEPEND="${RDEPEND}
@@ -32,14 +32,12 @@ src_configure() {
 		## recommended by upstream to be always on
 		-DGETUSER
 		-DJFS
-		-DLARGEMEM
 		-DKERNEL_2_6_18
+		-DLARGEMEM
 
 		## archs
 		$(usex amd64 -DX86 '')
-		$(usex x86 -DX86 '')
 		$(usex arm -DARM '')
-		$(usex ppc64 -DPOWER '')
 	)
 	append-cflags "${cflags[@]}"
 	export LDLIBS="$( $(tc-getPKG_CONFIG) --libs ncurses ) -lm"
@@ -51,4 +49,7 @@ src_compile() {
 
 src_install() {
 	dobin ${PN}
+
+	doman "${FILESDIR}"/${PN}.1
+	newenvd "${FILESDIR}"/${PN}.envd 70${PN}
 }
