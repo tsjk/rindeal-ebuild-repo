@@ -1,1 +1,3 @@
-deluged with sane USE flags and powerful init scripts
+- USE flags for every component (daemon, GUI, ...)
+- powerful systemd/init scripts
+- always up-to-date
