@@ -7,19 +7,17 @@ DESCRIPTION='Sync files to and from Google Drive, S3, Swift, Cloudfiles, Dropbox
 HOMEPAGE='http://rclone.org/'
 LICENSE='MIT'
 
-
 PN_NO_BIN="${PN%-bin}"
 SLOT='0'
 src_uri_base="http://downloads.rclone.org/${PN_NO_BIN}-v${PV}-linux"
 SRC_URI="
 	amd64?	( ${src_uri_base}-amd64.zip )
 	arm?	( ${src_uri_base}-arm.zip )
-	x86?	( ${src_uri_base}-386.zip )
 "
 
-KEYWORDS='-* ~amd64 ~arm ~x86'
+KEYWORDS='-* ~amd64 ~arm'
 
-RDEPEND="!${CATEGORY}/${PN_NO_BIN}"
+RDEPEND="!!${CATEGORY}/${PN_NO_BIN}"
 
 RESTRICT="mirror"
 
