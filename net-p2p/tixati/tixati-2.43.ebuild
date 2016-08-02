@@ -10,14 +10,12 @@ HOMEPAGE="https://www.tixati.com"
 LICENSE="${PN}" # bundled in the binary, available in menu "About -> License Agreement"
 
 SLOT="0"
-
 src_uri_base="${HOMEPAGE}/download/${P}-1.<ARCH>.manualinstall.tar.gz"
 SRC_URI="
-	x86?	( ${src_uri_base//<ARCH>/i686} )
 	amd64?	( ${src_uri_base//<ARCH>/x86_64} )
 "
 
-KEYWORDS="-* ~amd64 ~x86"
+KEYWORDS="-* ~amd64"
 
 RDEPEND="
 	sys-apps/dbus:0
@@ -41,5 +39,5 @@ src_install() {
 
 	# fix invalid `Categories` value
 	sed -e 's|Internet;||' -i -- "${PN}.desktop" || die
-	domenu	"$PN.desktop"
+	domenu	"${PN}.desktop"
 }
