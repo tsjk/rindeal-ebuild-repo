@@ -15,7 +15,7 @@ LICENSE='BSD'
 
 SLOT='0'
 
-KEYWORDS='~amd64 ~arm ~x86'
+KEYWORDS='~amd64 ~arm'
 IUSE='examples test'
 
 ## http://phantomjs.org/build.html - says pretty much nothing
@@ -47,18 +47,16 @@ DEPEND_A=( "${CDEPEND_A[@]}"
 )
 RDEPEND_A=( "${CDEPEND_A[@]}" )
 
-DEPEND="${DEPEND_A[*]}"
-RDEPEND="${RDEPEND_A[*]}"
+inherit arrays
 
 src_prepare() {
-	local PATCHES=(
+	PATCHES=(
 		"${FILESDIR}/${PN}-no-ghostdriver.patch"
 		"${FILESDIR}/${PN}-qt-components.patch"
 		"${FILESDIR}/${PN}-qt55-evaluateJavaScript.patch"
 		"${FILESDIR}/${PN}-qt55-no-websecurity.patch"
 		"${FILESDIR}/${PN}-qt55-print.patch"
 	)
-
 	default
 
 	# c&p from qmake5()
@@ -91,13 +89,13 @@ src_prepare() {
 		-e "s|qmake = qmakePath.*|qmake = \"$(qt5_get_bindir)/qmake\"|"
 		-e "s|command = \[qmake\].*|command = [qmake, $( printf '"%s",' "${qmake_args[@]}" )\"\"]|"
 	)
-	sed -i -r "${sed_args[@]}" -- 'build.py' || die
+	sed -r "${sed_args[@]}" -i -- 'build.py' || die
 
 	sed_args=(
-		# delete check for Qt version as Portage's already taken care of it
+		# delete check for Qt version as Portage has already taken care of it
 		-e '/^if\(!equals\(QT_MAJOR_VERSION/ , /}/d'
 	)
-	sed -i -r "${sed_args[@]}" -- 'src/phantomjs.pro' || die
+	sed -r "${sed_args[@]}" -i -- 'src/phantomjs.pro' || die
 }
 
 src_compile() {
@@ -122,8 +120,8 @@ src_test() {
 src_install() {
 	pax-mark m "bin/${PN}"
 	dobin "bin/${PN}"
-
 	doman "${FILESDIR}/${PN}.1"
+
 	einstalldocs
 
 	if use examples ; then
