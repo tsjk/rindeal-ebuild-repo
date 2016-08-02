@@ -22,12 +22,10 @@ SONAME='8'
 SLOT="0/${SONAME}"
 
 KEYWORDS='amd64 arm'
-RESTRICT+=' test'
 IUSE='+crypt debug +dht doc examples python static-libs test'
-REQUIRED_USE="python? ( ${PYTHON_REQUIRED_USE} )"
 
 RDEPEND="
-	!net-libs/rb_libtorrent
+	!!net-libs/rb_libtorrent
 	>=dev-libs/boost-1.53:=[threads]
 	sys-libs/zlib
 	virtual/libiconv
@@ -39,12 +37,15 @@ RDEPEND="
 DEPEND="${RDEPEND}
 	>=sys-devel/libtool-2.2"
 
+REQUIRED_USE="python? ( ${PYTHON_REQUIRED_USE} )"
+RESTRICT+=' test'
+
 src_prepare() {
 	default
 
 	# make sure lib search dir points to the main `S` dir and not to python copies
-	sed -i "s|-L[^ ]*/src/\.libs|-L${S}/src/.libs|" \
-		-- 'bindings/python/link_flags.in' || die
+	sed -e "s|-L[^ ]*/src/\.libs|-L${S}/src/.libs|" \
+		-i -- 'bindings/python/link_flags.in' || die
 
 	# needed or else eautoreconf fails
 	mkdir build-aux && cp {m4,build-aux}'/config.rpath' || die
@@ -55,10 +56,10 @@ src_prepare() {
 }
 
 src_configure() {
-	local econfargs=(
-		'--disable-silent-rules' # bug 441842
-		'--with-boost-system=mt'
-		'--with-libiconv'
+	local econf_args=(
+		--disable-silent-rules # bug 441842
+		--with-boost-system='mt'
+		--with-libiconv
 		$(use_enable crypt encryption)
 		$(use_enable debug)
 		$(usex debug '--enable-logging=verbose' '')
@@ -67,14 +68,14 @@ src_configure() {
 		$(use_enable static-libs static)
 		$(use_enable test tests)
 	)
-	econf "${econfargs[@]}"
+	econf "${econf_args[@]}"
 
 	python_configure() {
-		local econfargs+=(
-			'--enable-python-binding'
-			'--with-boost-python=yes'
+		local econf_args=( "${econf_args[@]}"
+			--enable-python-binding
+			--with-boost-python='yes'
 		)
-		econf "${econfargs[@]}"
+		econf "${econf_args[@]}"
 	}
 	use python && distutils-r1_src_configure
 }
@@ -83,19 +84,19 @@ src_compile() {
 	default
 
 	python_compile() {
-		cd "${BUILD_DIR}/../bindings/python" || die
+		cd "${BUILD_DIR}"/../bindings/python || die
 		distutils-r1_python_compile
 	}
 	use python && distutils-r1_src_compile
 }
 
 src_install() {
-	use doc && HTML_DOCS+=( "${S}/docs" )
+	use doc && HTML_DOCS+=( "${S}"/docs )
 
 	default
 
 	python_install() {
-		cd "${BUILD_DIR}/../bindings/python" || die
+		cd "${BUILD_DIR}"/../bindings/python || die
 		distutils-r1_python_install
 	}
 	use python && distutils-r1_src_install

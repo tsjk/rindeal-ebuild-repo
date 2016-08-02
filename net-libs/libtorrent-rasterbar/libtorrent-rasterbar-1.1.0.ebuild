@@ -4,7 +4,8 @@
 EAPI=6
 
 PYTHON_COMPAT=( python{2_7,3_{4,5}} )
-PYTHON_REQ_USE='threads'
+PYTHON_REQ_USE="threads"
+
 DISTUTILS_OPTIONAL=true
 DISTUTILS_IN_SOURCE_BUILD=true
 
@@ -59,26 +60,26 @@ src_prepare() {
 }
 
 src_configure() {
-	local econfargs=(
+	local econf_args=(
 		--disable-silent-rules # bug 441842
 		--with-boost-system='mt'
 		--with-libiconv
 		$(use_enable crypt encryption)
 		$(use_enable debug)
-		$(usex debug --enable-logging='verbose' '')
+		$(usex debug '--enable-logging=verbose' '')
 		$(use_enable dht)
 		$(use_enable examples)
 		$(use_enable static-libs static)
 		$(use_enable test tests)
 	)
-	econf "${econfargs[@]}"
+	econf "${econf_args[@]}"
 
 	python_configure() {
-		local econfargs+=(
+		local econf_args=( "${econf_args[@]}"
 			--enable-python-binding
 			--with-boost-python='yes'
 		)
-		econf "${econfargs[@]}"
+		econf "${econf_args[@]}"
 	}
 	use python && distutils-r1_src_configure
 }
