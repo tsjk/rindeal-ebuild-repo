@@ -28,10 +28,11 @@ matrix:
     fast_finish: true
 
 cache:
+    pip: true
     directories:
-        - $HOME/.cache/pip
+        - ${VIRTUAL_ENV}/lib/python${TRAVIS_PYTHON_VERSION}/site-packages/
 before_cache:
-    - rm -f $HOME/.cache/pip/log/debug.log
+    - rm -v -f ${HOME}/.cache/pip/log/debug.log
 
 
 install:
