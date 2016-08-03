@@ -20,17 +20,21 @@ IUSE='examples test'
 
 ## http://phantomjs.org/build.html - says pretty much nothing
 ## https://anonscm.debian.org/cgit/collab-maint/phantomjs.git/tree/debian
-CDEPEND_A=( "${PYTHON_DEPS}"
-	'>=dev-qt/qtcore-5.5:5'
-	'>=dev-qt/qtgui-5.5:5'
-	'>=dev-qt/qtnetwork-5.5:5'
-	'>=dev-qt/qtprintsupport-5.5:5'
-	'>=dev-qt/qtwebkit-5.5:5'
-	'>=dev-qt/qtwidgets-5.5:5'
+CDEPEND_A=(
+	'dev-qt/qtcore:5'
+	'dev-qt/qtgui:5'
+	'dev-qt/qtnetwork:5'
+	'dev-qt/qtprintsupport:5'
+	'dev-qt/qtwebkit:5'
+	'dev-qt/qtwidgets:5'
 
 	'dev-libs/icu:='
 	'dev-libs/openssl:0'
+	'dev-db/sqlite:3'
 	'sys-libs/zlib'
+
+	'x11-libs/libXext'
+	'x11-libs/libX11'
 
 	'media-libs/mesa'
 	'media-libs/fontconfig'
@@ -39,10 +43,11 @@ CDEPEND_A=( "${PYTHON_DEPS}"
 	'virtual/jpeg:0'
 )
 DEPEND_A=( "${CDEPEND_A[@]}"
-	# FIXME: why is this here?
-	'x11-libs/libXext'
-	'x11-libs/libX11'
+	'sys-devel/bison'
+	'sys-devel/flex'
 
+	"${PYTHON_DEPS}"
+	'dev-lang/perl'
 	'test? ( dev-lang/ruby )'
 )
 RDEPEND_A=( "${CDEPEND_A[@]}" )
