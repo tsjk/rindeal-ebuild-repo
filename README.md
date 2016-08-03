@@ -38,7 +38,7 @@ To achieve this goal I'm using several safety guards:
     which means that all merges to _master_ have to be repoman-valid
 
 This all, of course, doesn't prevent build failures, missing dependencies, etc. So, should you find
-some issues, send me a PR (if you know how to fix it), or at least [fill an issue][New issue].
+some issues, send me a PR (if you know how to fix it), or at least [file an issue][New issue].
 
 
 How to install this overlay
