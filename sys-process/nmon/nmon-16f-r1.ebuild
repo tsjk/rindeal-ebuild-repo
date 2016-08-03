@@ -14,10 +14,11 @@ LICENSE="GPL-3"
 SRC_URI="mirror://sourceforge/${PN}/${MY_P}.c"
 
 SLOT="0"
-KEYWORDS="~amd64 ~arm"
+KEYWORDS="amd64 arm"
 
 RDEPEND="sys-libs/ncurses:0="
 DEPEND="${RDEPEND}
+	sys-apps/help2man
 	virtual/pkgconfig
 "
 
@@ -45,11 +46,24 @@ src_configure() {
 
 src_compile() {
 	emake ${PN}
+
+	local help2man=(
+		help2man
+
+		--help-option=-h
+		--no-info
+		--no-discard-stderr
+		--name="Performance Monitor"
+		--version-string=${PV}
+
+		./${PN}
+	)
+	"${help2man[@]}" > ${PN}.1
 }
 
 src_install() {
 	dobin ${PN}
+	doman ${PN}.1
 
-	doman "${FILESDIR}"/${PN}.1
 	newenvd "${FILESDIR}"/${PN}.envd 70${PN}
 }
