@@ -12,6 +12,8 @@ LICENSE="MIT"
 
 SLOT="0"
 
+KEYWORDS="~amd64 ~arm"
+
 src_install() {
 	dobin ${PN}
 	doman ${PN}.1
