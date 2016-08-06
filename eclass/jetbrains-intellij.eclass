@@ -102,6 +102,8 @@ jetbrains-intellij_pkg_preinst() {
 # @ECLASS-VARIABLE: JBIJ_INSTALL_DIR
 : ${JBIJ_INSTALL_DIR:="/opt/${_JBIJ_PN_SLOTTED}"}
 
+: ${_JBIJ_STARTUP_SCRIPT:="${PN%-community}.sh"}
+
 jetbrains-intellij_src_install() {
 	debug-print-function ${FUNCNAME}
 
@@ -110,12 +112,14 @@ jetbrains-intellij_src_install() {
 
 	pushd "${ED}/${JBIJ_INSTALL_DIR}" >/dev/null || die
 	{
-		# globbing doesn't work with `fperms()`'
-		chmod -v a+x bin/{${PN}.sh,fsnotifier*} || die
-		use system-jre		|| { chmod -v a+x jre/jre/bin/*	|| die ;}
+		## fix permissions
+		chmod -v a+x bin/${_JBIJ_STARTUP_SCRIPT} || die
+		chmod -v a+x bin/fsnotifier* || die
+		use system-jre		|| { chmod -v a+x jre/jre/bin/*	|| die ; }
 
-		[ -f "bin/${PN}.sh" ] || die
-		dosym "${JBIJ_INSTALL_DIR}/bin/${PN}.sh" /usr/bin/${_JBIJ_PN_SLOTTED}
+		## install symlink
+		[ -f "bin/${_JBIJ_STARTUP_SCRIPT}" ] || die
+		dosym "${JBIJ_INSTALL_DIR}/bin/${_JBIJ_STARTUP_SCRIPT}" /usr/bin/${_JBIJ_PN_SLOTTED}
 
 		eshopts_push -s nullglob
 		local svg=( bin/*.svg ) png=( bin/*.png )
