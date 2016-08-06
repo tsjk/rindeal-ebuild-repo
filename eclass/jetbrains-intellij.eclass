@@ -47,7 +47,7 @@ jetbrains-intellij_src_unpack() {
 	debug-print-function ${FUNCNAME}
 
 	local A=( $A )
-	[ ${#A[@]} -eq 1 ] || die "Your SRC_URI contains too many archives"
+	(( ${#A[@]} == 1 )) || die "Your SRC_URI contains too many archives"
 	local arch="${DISTDIR}/${A[0]}"
 
 	mkdir -p "${S}" || die
@@ -121,6 +121,7 @@ jetbrains-intellij_src_install() {
 		[ -f "bin/${_JBIJ_STARTUP_SCRIPT}" ] || die
 		dosym "${JBIJ_INSTALL_DIR}/bin/${_JBIJ_STARTUP_SCRIPT}" /usr/bin/${_JBIJ_PN_SLOTTED}
 
+		## install icon
 		eshopts_push -s nullglob
 		local svg=( bin/*.svg ) png=( bin/*.png )
 		if [ ${#svg[@]} -gt 0 ] ; then
@@ -135,6 +136,7 @@ jetbrains-intellij_src_install() {
 	}
 	popd >/dev/null || die
 
+	## generate and install .desktop menu file
 	make_desktop_entry_args=(
 		"${EPREFIX}/usr/bin/${_JBIJ_PN_SLOTTED} %U"	# exec
 		"${JBIJ_PN_PRETTY} ${SLOT}"	# name
@@ -165,6 +167,7 @@ jetbrains-intellij_pkg_postrm() {
 	debug-print-function ${FUNCNAME}
 	xdg_pkg_postrm
 }
+
 
 _JETBRAINS_INTELLIJ_ECLASS=1
 fi
