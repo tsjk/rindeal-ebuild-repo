@@ -1,0 +1,7 @@
+- workaround for a bug which caused a segfault when no backends were selected
+- manpages
+- .desktop menu entries
+- more USE flags
+- EAPI6
+- OpenSuse patches
+- config file
