@@ -71,10 +71,10 @@ jetbrains-intellij_src_unpack() {
 	readonly JBIJ_TAR_EXCLUDE
 
 	einfo "Unpacking '${arch}' to '${S}'"
-	einfo "Excluding: $(printf "'%s' " "${excludes[@]}")"
 
-	local e
-	for e in "${excludes[@]}" ; do tar+=( --exclude="${e}" ) ; done
+	einfo "Excluding: $(printf "'%s' " "${excludes[@]}")"
+	tar+=( "${excludes[@]/#/--exclude=}" )
+
 	einfo "Running: '${tar[@]}'"
 	"${tar[@]}" || die
 }
