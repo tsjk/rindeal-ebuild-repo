@@ -2,7 +2,7 @@
 
 Category | Packages
 --- | ---
-<a id="cat-app-admin"></a>**app-admin** | [lnav](#app-admin-lnav), [logswan](#app-admin-logswan), [monit](#app-admin-monit)
+<a id="cat-app-admin"></a>**app-admin** | [lnav](#app-admin-lnav), [logrotate](#app-admin-logrotate), [logswan](#app-admin-logswan), [monit](#app-admin-monit)
 <a id="cat-app-benchmarks"></a>**app-benchmarks** | [interbench](#app-benchmarks-interbench), [tinymembench](#app-benchmarks-tinymembench)
 <a id="cat-app-dicts"></a>**app-dicts** | [sword-czeb21](#app-dicts-sword-czeb21), [sword-czecep](#app-dicts-sword-czecep), [sword-czecsp](#app-dicts-sword-czecsp), [sword-czekms](#app-dicts-sword-czekms)
 <a id="cat-app-misc"></a>**app-misc** | [ansiweather](#app-misc-ansiweather), [jo](#app-misc-jo)
@@ -17,14 +17,14 @@ Category | Packages
 <a id="cat-dev-qt"></a>**dev-qt** | [qt-telegram-static](#dev-qt-qt-telegram-static)
 <a id="cat-dev-ruby"></a>**dev-ruby** | [descendants_tracker](#dev-ruby-descendants_tracker), [equatable](#dev-ruby-equatable), [github_api](#dev-ruby-github_api), [github_cli](#dev-ruby-github_cli), [jwt](#dev-ruby-jwt), [multi_xml](#dev-ruby-multi_xml), [necromancer](#dev-ruby-necromancer), [oauth2](#dev-ruby-oauth2), [pastel](#dev-ruby-pastel), [rubymine](#dev-ruby-rubymine), [tty](#dev-ruby-tty), [tty-color](#dev-ruby-tty-color), [tty-cursor](#dev-ruby-tty-cursor), [tty-pager](#dev-ruby-tty-pager), [tty-platform](#dev-ruby-tty-platform), [tty-progressbar](#dev-ruby-tty-progressbar), [tty-prompt](#dev-ruby-tty-prompt), [tty-screen](#dev-ruby-tty-screen), [tty-spinner](#dev-ruby-tty-spinner), [tty-table](#dev-ruby-tty-table), [tty-which](#dev-ruby-tty-which), [unicode_utils](#dev-ruby-unicode_utils), [verse](#dev-ruby-verse), [wisper](#dev-ruby-wisper)
 <a id="cat-dev-util"></a>**dev-util** | [amalgamate](#dev-util-amalgamate), [codelite](#dev-util-codelite), [google-breakpad](#dev-util-google-breakpad), [licen](#dev-util-licen), [premake](#dev-util-premake), [simian](#dev-util-simian), [smartgit](#dev-util-smartgit), [universalindentgui](#dev-util-universalindentgui), [webstorm](#dev-util-webstorm), [yuck](#dev-util-yuck)
-<a id="cat-media-libs"></a>**media-libs** | [flac](#media-libs-flac)
+<a id="cat-media-libs"></a>**media-libs** | [flac](#media-libs-flac), [openal](#media-libs-openal)
 <a id="cat-media-video"></a>**media-video** | [fswebcam](#media-video-fswebcam), [makemkv](#media-video-makemkv), [xt7-player-mpv](#media-video-xt7-player-mpv)
 <a id="cat-net-im"></a>**net-im** | [telegram](#net-im-telegram), [telegram-cli](#net-im-telegram-cli)
 <a id="cat-net-libs"></a>**net-libs** | [libtorrent-rasterbar](#net-libs-libtorrent-rasterbar), [telegram-qt](#net-libs-telegram-qt)
 <a id="cat-net-misc"></a>**net-misc** | [miredo](#net-misc-miredo), [rclone-bin](#net-misc-rclone-bin), [resty](#net-misc-resty)
 <a id="cat-net-p2p"></a>**net-p2p** | [deluge](#net-p2p-deluge), [qbittorrent](#net-p2p-qbittorrent), [tixati](#net-p2p-tixati)
 <a id="cat-sys-apps"></a>**sys-apps** | [hwinfo](#sys-apps-hwinfo), [openrc-rfl](#sys-apps-openrc-rfl)
-<a id="cat-sys-process"></a>**sys-process** | [ps_mem](#sys-process-ps_mem)
+<a id="cat-sys-process"></a>**sys-process** | [nmon](#sys-process-nmon), [ps_mem](#sys-process-ps_mem)
 <a id="cat-www-client"></a>**www-client** | [opera](#www-client-opera), [phantomjs](#www-client-phantomjs)
 <a id="cat-x11-themes"></a>**x11-themes** | [libreoffice-breeze-icons](#x11-themes-libreoffice-breeze-icons)
 
@@ -33,6 +33,7 @@ Category | Packages
 Package | Description | :house: | :back:
 --- | --- | --- | ---
 <a id="app-admin-lnav"></a><a href="./app-admin/lnav"><sub><sup>app-admin/</sup></sub><strong>lnav</strong></a> | A curses-based tool for viewing and analyzing log files | [:house:](http://lnav.org) | [:back:](#cat-app-admin)
+<a id="app-admin-logrotate"></a><a href="./app-admin/logrotate"><sub><sup>app-admin/</sup></sub><strong>logrotate</strong></a> | Rotates, compresses, and mails system logs | [:house:](https://github.com/logrotate/logrotate) | [:back:](#cat-app-admin)
 <a id="app-admin-logswan"></a><a href="./app-admin/logswan"><sub><sup>app-admin/</sup></sub><strong>logswan</strong></a> | Web log analyzer using probabilistic data structures | [:house:](https://github.com/fcambus/logswan) | [:back:](#cat-app-admin)
 <a id="app-admin-monit"></a><a href="./app-admin/monit"><sub><sup>app-admin/</sup></sub><strong>monit</strong></a> | Utility for monitoring and managing daemons or similar programs | [:house:](https://mmonit.com/monit/) | [:back:](#cat-app-admin)
 <a id="app-benchmarks-interbench"></a><a href="./app-benchmarks/interbench"><sub><sup>app-benchmarks/</sup></sub><strong>interbench</strong></a> | Con Kolivas' Benchmarking Suite -- Successor to Contest | [:house:](http://users.tpg.com.au/ckolivas/interbench/) | [:back:](#cat-app-benchmarks)
@@ -96,7 +97,8 @@ Package | Description | :house: | :back:
 <a id="dev-util-universalindentgui"></a><a href="./dev-util/universalindentgui"><sub><sup>dev-util/</sup></sub><strong>universalindentgui</strong></a> | Cross platform GUI for several code formatters, beautifiers and indenters | [:house:](http://universalindent.sourceforge.net/) | [:back:](#cat-dev-util)
 <a id="dev-util-webstorm"></a><a href="./dev-util/webstorm"><sub><sup>dev-util/</sup></sub><strong>webstorm</strong></a> | WebStorm is an IDE for complex client-/server-side JavaScript development | [:house:](https://www.jetbrains.com/webstorm) | [:back:](#cat-dev-util)
 <a id="dev-util-yuck"></a><a href="./dev-util/yuck"><sub><sup>dev-util/</sup></sub><strong>yuck</strong></a> | Your Umbrella Command Kit, a command line option parser for C | [:house:](https://github.com/hroptatyr/yuck) | [:back:](#cat-dev-util)
-<a id="media-libs-flac"></a><a href="./media-libs/flac"><sub><sup>media-libs/</sup></sub><strong>flac</strong></a> | free lossless audio encoder and decoder | [:house:](http://flac.sourceforge.net) | [:back:](#cat-media-libs)
+<a id="media-libs-flac"></a><a href="./media-libs/flac"><sub><sup>media-libs/</sup></sub><strong>flac</strong></a> | Free lossless audio encoder and decoder | [:house:](https://xiph.org/flac/) | [:back:](#cat-media-libs)
+<a id="media-libs-openal"></a><a href="./media-libs/openal"><sub><sup>media-libs/</sup></sub><strong>openal</strong></a> | A software implementation of the OpenAL 3D audio API | [:house:](http://kcat.strangesoft.net/openal.html https://github.com/kcat/openal-soft) | [:back:](#cat-media-libs)
 <a id="media-video-fswebcam"></a><a href="./media-video/fswebcam"><sub><sup>media-video/</sup></sub><strong>fswebcam</strong></a> | A neat and simple webcam app | [:house:](http://www.sanslogic.co.uk/fswebcam/) | [:back:](#cat-media-video)
 <a id="media-video-makemkv"></a><a href="./media-video/makemkv"><sub><sup>media-video/</sup></sub><strong>makemkv</strong></a> | Tool for ripping and streaming Blu-ray, HD-DVD and DVD discs | [:house:](http://www.makemkv.com/) | [:back:](#cat-media-video)
 <a id="media-video-xt7-player-mpv"></a><a href="./media-video/xt7-player-mpv"><sub><sup>media-video/</sup></sub><strong>xt7-player-mpv</strong></a> | Xt7-Player-mpv is a graphical interface to mpv, focused on usability | [:house:](http://xt7-player.sourceforge.net/xt7forum/) | [:back:](#cat-media-video)
@@ -112,6 +114,7 @@ Package | Description | :house: | :back:
 <a id="net-p2p-tixati"></a><a href="./net-p2p/tixati"><sub><sup>net-p2p/</sup></sub><strong>tixati</strong></a> | Tixati is a New and Powerful P2P System | [:house:](https://www.tixati.com) | [:back:](#cat-net-p2p)
 <a id="sys-apps-hwinfo"></a><a href="./sys-apps/hwinfo"><sub><sup>sys-apps/</sup></sub><strong>hwinfo</strong></a> | Hardware detection tool used in SuSE Linux | [:house:](https://github.com/openSUSE/hwinfo) | [:back:](#cat-sys-apps)
 <a id="sys-apps-openrc-rfl"></a><a href="./sys-apps/openrc-rfl"><sub><sup>sys-apps/</sup></sub><strong>openrc-rfl</strong></a> | Rindeal's Function Library for OpenRC | [:house:](https://github.com/rindeal/openrc-rfl) | [:back:](#cat-sys-apps)
+<a id="sys-process-nmon"></a><a href="./sys-process/nmon"><sub><sup>sys-process/</sup></sub><strong>nmon</strong></a> | Nigel's performance MONitor for CPU, memory, network, disks, etc... | [:house:](http://nmon.sourceforge.net/) | [:back:](#cat-sys-process)
 <a id="sys-process-ps_mem"></a><a href="./sys-process/ps_mem"><sub><sup>sys-process/</sup></sub><strong>ps_mem</strong></a> | A utility to accurately report the in core memory usage for a program | [:house:](https://github.com/pixelb/ps_mem) | [:back:](#cat-sys-process)
 <a id="www-client-opera"></a><a href="./www-client/opera"><sub><sup>www-client/</sup></sub><strong>opera</strong></a> | A fast and secure web browser | [:house:](https://www.opera.com/) | [:back:](#cat-www-client)
 <a id="www-client-phantomjs"></a><a href="./www-client/phantomjs"><sub><sup>www-client/</sup></sub><strong>phantomjs</strong></a> | A headless WebKit scriptable with a JavaScript API | [:house:](http://phantomjs.org) | [:back:](#cat-www-client)
