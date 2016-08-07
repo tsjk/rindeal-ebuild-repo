@@ -7,7 +7,7 @@ EAPI=6
 GH_URI="github/kcat/openal-soft"
 GH_REF="openal-soft-${PV}"
 
-inherit cmake-utils git-hosting
+inherit cmake-utils git-hosting xdg eutils
 
 DESCRIPTION="A software implementation of the OpenAL 3D audio API"
 HOMEPAGE="http://kcat.strangesoft.net/openal.html ${HOMEPAGE}"
@@ -52,11 +52,14 @@ inherit arrays
 # upstream uses this pre-created dir
 BUILD_DIR="${S}/build"
 
-PATCHES=(
-	"${FILESDIR}"/1.17.2-disable_pulseaudio_auto_spawn.patch
-)
+src_prepare() {
+	eapply "${FILESDIR}"/1.17.2-disable_pulseaudio_auto_spawn.patch
 
-# TODO: when some dependency is not found for examples/utils/tests, build doesn't die
+	# TODO: when some dependency is not found for examples/utils/tests, build doesn't die
+
+	xdg_src_prepare
+	cmake-utils_src_prepare
+}
 
 src_configure() {
 		local mycmakeargs=(
@@ -86,27 +89,26 @@ src_configure() {
 		cmake-utils_src_configure
 }
 
-H2M_BINS=( makehrtf openal-info )
+H2M_BINS=( )
 
 src_compile() {
 	cmake-utils_src_compile
 
 	use tests && H2M_BINS+=( altonegen )
+	use utils && H2M_BINS+=( makehrtf openal-info )
 
-	if use utils ; then
-		local h2m_opts=(
-			--no-discard-stderr
-			--no-info
-			--version-string=${PV}
-		)
+	local h2m_opts=(
+		--no-discard-stderr
+		--no-info
+		--version-string=${PV}
+	)
 
-		local b
-		for b in "${H2M_BINS[@]}" ; do
-			set -- help2man "${h2m_opts[@]}" --output=${b}.1 build/${b}
-			echo "$@"
-			"$@" || die
-		done
-	fi
+	local b
+	for b in "${H2M_BINS[@]}" ; do
+		set -- help2man "${h2m_opts[@]}" --output=${b}.1 build/${b}
+		echo "$@"
+		"$@" || die
+	done
 }
 
 src_install() {
@@ -114,9 +116,17 @@ src_install() {
 
 	cmake-utils_src_install
 
-	use utils && doman "${H2M_BINS[@]/%/.1}"
+	(( ${#H2M_BINS[*]} )) && doman "${H2M_BINS[@]/%/.1}"
 
 	# NOTE: alsoft.conf doesn't support PREFIX, needs patching in ${S}/Alc/alcConfig.c
 	insinto /etc/openal
 	newins alsoftrc.sample alsoft.conf
+
+	if use gui ; then
+		make_desktop_entry \
+			"${EPREFIX}"/usr/bin/alsoft-config \
+			"OpenAL Soft Configuration" \
+			settings-configure \
+			"Settings;HardwareSettings;Audio;AudioVideo;"
+	fi
 }
