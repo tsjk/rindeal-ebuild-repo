@@ -58,7 +58,7 @@ src_compile() {
 
 		./${PN}
 	)
-	"${help2man[@]}" > ${PN}.1
+	"${help2man[@]}" > ${PN}.1 || die
 }
 
 src_install() {
