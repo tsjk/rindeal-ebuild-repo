@@ -16,12 +16,13 @@ esac
 
 for _v in SRC_URI KEYWORDS IUSE {,R,P,C}DEPEND REQUIRED_USE ; do
 	if [[ "$(declare -p ${_v}_A 2>/dev/null)" == "declare -a"* ]] ; then
-		debug-print "Converting ${_v}_A to ${_v}"
+		debug-print "${ECLASS}: Converting ${_v}_A to ${_v}"
 		eval "${_v}+=\" \${${_v}_A[*]}\""
-		debug-print "Unsetting ${_v}_A"
+		debug-print "${ECLASS}: Unsetting ${_v}_A"
 		unset ${_v}_A
 	fi
 done
 unset _v
 
 _ARRAYS_ECLASS=1
+fi
