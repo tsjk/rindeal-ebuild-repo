@@ -31,8 +31,8 @@ CDEPEND_A=(
 	'>=media-video/ffmpeg-3.1[mp3,opus,vorbis,wavpack]'
 )
 RDEPEND_A=( "${CDEPEND_A[@]}"
-	'!net-im/telegram-bin'
-	'!net-im/telegram-desktop'{,-bin}
+	'!net-im/telegram'{,-bin}
+	'!net-im/telegram-desktop-bin'
 )
 DEPEND_A=( "${CDEPEND_A[@]}"
 	'dev-libs/glib:2'
