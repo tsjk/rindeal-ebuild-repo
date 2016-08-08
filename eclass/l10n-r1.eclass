@@ -207,13 +207,11 @@ for _l in "${L10N_LOCALES[@]}" ; do
 		L10N_LOCALES_MAP+=(
 			# values are same as keys by default
 			["${_l}"]="${_l}"
-			# add also variant where all daashes are replaced by underscores
-			# because that is a quite common L10N_LOCALES_MAP member
-			#[[ "${_l}" == *'-'* ]] && ["${_l}"]+=" ${_l//-/_}"
 		)
 	fi
 done
 unset _l
+debug-print "${ECLASS}: generated: $(declare -p L10N_LOCALES_MAP)"
 
 
 # @ECLASS-VARIABLE: L10N_LOCALES_MASK
@@ -243,6 +241,7 @@ IUSE+=" ${L10N_LOCALES[@]/#/l10n_}"
 
 
 _l10n_generate_onoff_lists() {
+	debug-print-function ${FUNCNAME}
 	local v
 
 	# bail out if already set
@@ -269,7 +268,7 @@ _l10n_generate_onoff_lists() {
 	done
 
 	# handle L10N_LOCALES_BACKUP
-	if [[ -n L10N_LOCALES_BACKUP && -z "${_global_locales_on}" ]] ; then
+	if [[ -n "${L10N_LOCALES_BACKUP}" && -z "${_global_locales_on}" ]] ; then
 		# make L10N_LOCALES_BACKUP the only lang that is _on_
 		_global_locales_on="${L10N_LOCALES_BACKUP}"
 		_app_locales_on="${L10N_LOCALES_MAP["${L10N_LOCALES_BACKUP}"]}"
