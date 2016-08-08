@@ -18,7 +18,7 @@ LICENSE='GPL-3' # with OpenSSL exception
 
 SLOT='0'
 
-KEYWORDS='~amd64 ~arm ~x86'
+KEYWORDS="~amd64 ~arm"
 IUSE='proxy'
 
 CDEPEND=(
