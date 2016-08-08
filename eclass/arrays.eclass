@@ -7,9 +7,7 @@
 # @BLURB: <SHORT_DESCRIPTION>
 # @DESCRIPTION:
 
-if [ -n "${_ARRAYS_ECLASS}" ] ; then
-	die "arrays.eclass shouldn't be inheritted multiple times"
-fi
+if [ -z "${_ARRAYS_ECLASS}" ] ; then
 
 case "${EAPI:-0}" in
     6) ;;
