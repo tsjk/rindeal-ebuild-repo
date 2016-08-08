@@ -12,15 +12,17 @@ inherit versionator
 
 	inherit check-reqs eutils qmake-utils qt5-build
 
-	# prevent qttest from being assigned to DEPEND, this is a very dirty hack
+	# WARNING: this is a very dirty hack
+	# prevent qttest from being assigned to DEPEND
 	E_DEPEND="${E_DEPEND/test? \( \~dev-qt\/qttest-* \)}"
 }
 {
 	QT_VER="$(get_version_component_range 1-3)"
 	QT_PATCH_DATE="$(get_version_component_range 4 | tr -d 'p')"
-	SLOT="${QT_VER}-${QT_PATCH_DATE}" ; readonly SLOT
+	SLOT="${QT_VER}-${QT_PATCH_DATE}"
 	# this path must be in sync with net-im/telegram ebuild
-	QT5_PREFIX="${EPREFIX}/opt/${PN}/${QT_VER}/${QT_PATCH_DATE}" ; readonly QT5_PREFIX
+	QT5_PREFIX="${EPREFIX}/opt/${PN}/${QT_VER}/${QT_PATCH_DATE}"
+	readonly QT_VER QT_PATCH_DATE SLOT QT5_PREFIX
 }
 
 GH_REPO="telegramdesktop/tdesktop"
@@ -42,17 +44,17 @@ my_gen_qt_uris() {
 }
 my_gen_qt_uris
 
-KEYWORDS='~amd64 ~arm ~x86'
+KEYWORDS='~amd64 ~arm'
 IUSE='bindist gtkstyle ibus +icu libinput libproxy systemd tslib'
 
-RDEPEND=(
+RDEPEND_A=(
 	## BEGIN - QtCore
 	'dev-libs/glib:2'
 	'>=dev-libs/libpcre-8.38[pcre16,unicode]'
 	'>=sys-libs/zlib-1.2.5'
 	'virtual/libiconv'
 	'icu? ( dev-libs/icu )'
-	# 'systemd? ( sys-apps/systemd )'
+	'systemd? ( sys-apps/systemd )'
 	## END - QtCore
 
 	## BEGIN - QtDbus
@@ -111,16 +113,14 @@ RDEPEND=(
 	'libproxy? ( net-libs/libproxy )'
 	## END - QtNetwork
 )
-DEPEND=("${RDEPEND[@]}"
+DEPEND_A=( "${RDEPEND_A[@]}"
 	'virtual/pkgconfig'
 )
-PDEPEND=(
+PDEPEND_A=(
 	# 'ibus? ( app-i18n/ibus )' # QtGui
 )
 
-DEPEND="${DEPEND[*]}"
-RDEPEND="${RDEPEND[*]}"
-PDEPEND="${PDEPEND[*]}"
+inherit arrays
 
 RESTRICT='test'
 
@@ -163,11 +163,18 @@ CHECKREQS_DISK_BUILD='800M'
 
 S="${WORKDIR}"
 QT5_BUILD_DIR="${S}"
-qtbase_dir="${S}/qtbase"
+QTBASE_DIR="${S}/qtbase"
+
+pkg_setup() {
+	echo
+	einfo "${PN} is going to be installed into '${QT5_PREFIX}'"
+	echo
+}
 
 src_unpack() {
 	qt5-build_src_unpack
 
+	## rename dirs according to the module they contain
 	local m
 	for m in ${QT_MODULES[@]} ; do
 		mv -v "${m}-opensource-src-${QT_VER}" "${m}" || die
@@ -201,11 +208,11 @@ qt5_prepare_env() {
 }
 
 src_prepare() {
-	cd "${qtbase_dir}" || die
+	cd "${QTBASE_DIR}" || die
 
 	eapply "${DISTDIR}/${QT_PATCH_LOCAL_NAME}" # this bitch is why this ebuild exists
 
-	[[ ${#QTBASE_PATCHES[@]} > 0 ]] && eapply "${QTBASE_PATCHES[@]}"
+	(( ${#QTBASE_PATCHES[@]} )) && eapply "${QTBASE_PATCHES[@]}"
 
 	# apply user patches now, because qt5-build_src_prepare() calls default() in a wrong dir
 	pushd "${S}" >/dev/null || die
@@ -224,12 +231,8 @@ src_prepare() {
 # not using this feature
 qt5_symlink_tools_to_build_dir() { : ; }
 
-# customized qt5-build_src_configure()
+## customized qt5-build_src_configure()
 src_configure() {
-	echo
-	einfo "${PN} is going to be installed into '${QT5_PREFIX}'"
-	echo
-
 	local myconf=(
 		-static
 
@@ -255,7 +258,7 @@ src_configure() {
 
 	# This configure will build qmake for use in builds of other modules.
 	# The global qmake will not work.
-	S="${qtbase_dir}" QT5_BUILD_DIR="${qtbase_dir}" \
+	S="${QTBASE_DIR}" QT5_BUILD_DIR="${QTBASE_DIR}" \
 		qt5_base_configure
 
 	# The following round of qmakes will output some warning messages, which look like this:
@@ -265,23 +268,21 @@ src_configure() {
 	# Just ignore them, they're harmless.
 	my_qt5_qmake() {
 		# this ensures that correct qmake will be called
-		local QT5_MODULE= QT5_BINDIR="${qtbase_dir}/bin"
+		local QT5_MODULE= QT5_BINDIR="${QTBASE_DIR}/bin"
 		qt5_qmake
 	}
 	qt5_foreach_target_subdir \
 		my_qt5_qmake
 }
 
-src_compile() {
-	qt5_foreach_target_subdir \
-		emake
-}
-
+## customized qt5-build_src_install()
 src_install() {
 	qt5_foreach_target_subdir \
 		emake INSTALL_ROOT="${D}" install
 
-	emake -C "${qtbase_dir}" INSTALL_ROOT="${D}" install_{qmake,mkspecs}
+	emake -C "${QTBASE_DIR}" INSTALL_ROOT="${D}" install_{qmake,mkspecs}
+
+	prune_libtool_files
 
 	# fix .prl files
 	local sed_args=(
