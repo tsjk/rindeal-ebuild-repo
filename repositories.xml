@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE repositories SYSTEM "https://www.gentoo.org/dtd/repositories.dtd">
 <repositories version="1.0">
-  <repo quality="testing" status="unofficial">
+  <repo quality="stable" status="unofficial">
     <name>rindeal</name>
     <description lang="en">Rindeal's overlay</description>
     <homepage>https://github.com/rindeal/gentoo-overlay</homepage>
     <owner type="person">
       <name>Jan Chren (rindeal)</name>
-      <email>dev.rindeal@gmail.com</email>
+      <email>dev.rindeal+gentoo-overlay@gmail.com</email>
     </owner>
     <source type="git">https://github.com/rindeal/gentoo-overlay.git</source>
     <source type="git">git://git@github.com:rindeal/gentoo-overlay.git</source>
