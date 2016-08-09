@@ -10,36 +10,54 @@ if [ -n "${TELEGRAM_DEBUG}" ] ; then
 	EGIT_CLONE_TYPE=shallow
 fi
 
-inherit flag-o-matic xdg eutils qmake-utils git-hosting versionator
+# xdg: src_prepare, pkg_preinst, pkg_post{inst,rm}
+# git-hosting: src_unpack
+inherit xdg git-hosting eutils flag-o-matic qmake-utils systemd versionator
 
-DESCRIPTION='Official cross-platorm desktop client for Telegram'
+TG_PRETTY_NAME="Telegram Desktop"
+DESCRIPTION='Official desktop client for the Telegram messenger'
 HOMEPAGE="https://desktop.telegram.org/ ${HOMEPAGE}"
 LICENSE='GPL-3' # with OpenSSL exception
 
 SLOT='0'
 
 KEYWORDS="~amd64 ~arm"
-IUSE='proxy'
+IUSE='autostart_generic autostart_plasma_systemd proxy'
 
 CDEPEND_A=(
-	'dev-libs/libappindicator:2'	# pspecific_linux.cpp
-	'>=media-libs/openal-1.17.2'	# Telegram requires shiny new versions
-	'sys-libs/zlib[minizip]'
 	# Telegram requires shiny new versions since v0.10.1 and commit
 	# https://github.com/telegramdesktop/tdesktop/commit/27cf45e1a97ff77cc56a9152b09423b50037cc50
 	# list of required USE flags is taken from `.travis/build.sh`
-	'>=media-video/ffmpeg-3.1[mp3,opus,vorbis,wavpack]'
+	'>=media-video/ffmpeg-3.1:0=[mp3,opus,vorbis,wavpack]'	# 'libav*', 'libsw*'
+	'>=media-libs/openal-1.17.2'	# 'openal', '<AL/*.h>'
+	'dev-libs/openssl:0'
+	'sys-libs/zlib[minizip]'		# replaces the bundled copy in 'Telegram/ThirdParty/minizip/'
+
+	## X libs are taken from 'Telegram/Telegram.pro'
+	'x11-libs/libXext'
+	'x11-libs/libXi'
+	'x11-libs/libxkbcommon'
+	'x11-libs/libX11'
 )
 RDEPEND_A=( "${CDEPEND_A[@]}"
+	# block some alternative names and binary packages
 	'!net-im/telegram'{,-bin}
 	'!net-im/telegram-desktop-bin'
 )
 DEPEND_A=( "${CDEPEND_A[@]}"
+	'=dev-qt/qt-telegram-static-5.6.0*'	# 5.6.0 is required since 0.9.49
+
+	## CXXFLAGS pkg-config from 'Telegram/Telegram.pro'
+	'dev-libs/libappindicator:2'
 	'dev-libs/glib:2'
 	'x11-libs/gtk+:2'
-	'>=dev-qt/qt-telegram-static-5.6.0_p20160510'	# 5.6.0 is required since 0.9.49
-	'virtual/pkgconfig'
+
 	'>=sys-apps/gawk-4.1'	# required for inplace support for .pro files formatter
+	'virtual/pkgconfig'
+)
+
+REQUIRED_USE_A=(
+	'?? ( autostart_generic autostart_plasma_systemd )'
 )
 
 inherit arrays
@@ -54,18 +72,36 @@ inherit check-reqs
 
 TG_DIR="${S}/Telegram"
 TG_PRO="${TG_DIR}/Telegram.pro"
+TG_INST_BIN="/usr/bin/${PN}"
+TG_SHARED_DIR="/usr/share/${PN}"
+TG_AUTOSTART_ARGS=( -startintray )
+TG_SYSTEMD_SERVICE_NAME="${PN}"
 
 # override qt5 path for use with eqmake5
 qt5_get_bindir() { echo "${QT5_PREFIX}/bin" ; }
 
+pkg_setup() {
+	if use autostart_generic || use autostart_plasma_systemd ; then
+		[[ -z "${TELEGRAM_AUTOSTART_USERS}" ]] && \
+			die "You have enabled autostart_* USE flag, but haven't set TELEGRAM_AUTOSTART_USERS variable"
+		for u in ${TELEGRAM_AUTOSTART_USERS} ; do
+			id -u "${u}" >/dev/null || die "Invalid username '${u}' in TELEGRAM_AUTOSTART_USERS"
+		done
+	fi
+}
+
 src_prepare-locales() {
 	local l locales dir='Resources/langs' pre='lang_' post='.strings'
+
 	l10n_find_changes_in_dir "${dir}" "${pre}" "${post}"
+
 	l10n_get_locales locales app off
 	for l in ${locales} ; do
 		rm -v -f "${dir}/${pre}${l}${post}" || die
-		sed -e "\|${pre}${l}${post}|d" \
-			-i -- "${TG_PRO}" 'Resources/telegram.qrc' || die
+		sed -r -e "s|^(.*${pre}${l}${post}.*)|<!-- locales \1 -->|" \
+			-i -- 'Resources/telegram.qrc' || die
+		sed -r -e "s|^(.*${dir}/${pre}${l}${post}.*)|# locales # \1|" \
+			-i -- "${TG_PRO}" || die
 	done
 }
 
@@ -98,6 +134,9 @@ src_prepare-delete_and_modify() {
 	## lzma is not used when TDESKTOP_DISABLE_AUTOUPDATE is defined
 	sed -r -e 's|^(.*<lzma\.h>.*)|// lzma not used // \1|' -i -- SourceFiles/autoupdater.cpp || die
 	sed -r -e 's|^(.*liblzma.*)|# lzma not used # \1|' -i -- "${TG_PRO}" || die
+
+	## opus is used from inside of ffmpeg and not as a dedicated library
+	sed -r -e 's|^(.*opus.*)|# opus lib is not used # \1|' -i -- "${TG_PRO}" || die
 }
 
 src_prepare-appends() {
@@ -125,6 +164,8 @@ src_prepare-appends() {
 }
 
 src_prepare() {
+	eapply "${FILESDIR}"/0.10.1-revert_Round_radius_increased_for_message_bubbles.patch
+
 	xdg_src_prepare
 
 	cd "${TG_DIR}" || die
@@ -137,25 +178,26 @@ src_prepare() {
 		local qtstatic='dev-qt/qt-telegram-static'
 		local qtstatic_PVR="$(best_version "${qtstatic}" | sed "s|.*${qtstatic}-||")"
 		local qtstatic_PV="${qtstatic_PVR%%-*}" # strip revision
-		declare -g QT_VER="${qtstatic_PV%%_p*}" QT_PATCH_DATE="${qtstatic_PV##*_p}"
-		declare -g QT_TELEGRAM_STATIC_SLOT="${QT_VER}-${QT_PATCH_DATE}"
+		declare -g QT_VER="${qtstatic_PV%%_p*}" QT_PATCH_NUM="${qtstatic_PV##*_p}"
+		declare -g QT_TELEGRAM_STATIC_SLOT="${QT_VER}-${QT_PATCH_NUM}"
 	else
 		einfo "Using QT_TELEGRAM_STATIC_SLOT from environment - '${QT_TELEGRAM_STATIC_SLOT}'"
-		declare -g QT_VER="${QT_TELEGRAM_STATIC_SLOT%%-*}" QT_PATCH_DATE="${QT_TELEGRAM_STATIC_SLOT##*-}"
+		declare -g QT_VER="${QT_TELEGRAM_STATIC_SLOT%%-*}" QT_PATCH_NUM="${QT_TELEGRAM_STATIC_SLOT##*-}"
 	fi
 
 	echo
-	einfo "${P} is going to be linked with 'Qt ${QT_VER} (p${QT_PATCH_DATE})'"
+	einfo "${P} is going to be linked with 'Qt ${QT_VER} (p${QT_PATCH_NUM})'"
 	echo
 
 	# WARNING: QT5_PREFIX path depends on what qt-telegram-static ebuild uses
-	declare -g QT5_PREFIX="${EPREFIX}/opt/qt-telegram-static/${QT_VER}/${QT_PATCH_DATE}"
+	declare -g QT5_PREFIX="${EPREFIX}/opt/qt-telegram-static/${QT_VER}/${QT_PATCH_NUM}"
 	[ -d "${QT5_PREFIX}" ] || die "QT5_PREFIX dir doesn't exist: '${QT5_PREFIX}'"
 
-	readonly QT_TELEGRAM_STATIC_SLOT QT_VER  QT_PATCH_DATE QT5_PREFIX
+	readonly QT_TELEGRAM_STATIC_SLOT QT_VER  QT_PATCH_NUM QT5_PREFIX
 
 	# This formatter converts multiline var defines to multiple lines.
 	# Such .pro files are then easier to debug and modify in src_prepare-delete_and_modify().
+	einfo "Formatting .pro files"
 	gawk -f "${FILESDIR}/format_pro.awk" -i inplace -- *.pro || die
 
 	src_prepare-locales
@@ -165,7 +207,7 @@ src_prepare() {
 
 src_configure() {
 	## add flags previously stripped from "${TG_PRO}"
-	append-cxxflags '-fno-strict-aliasing' -std=c++14
+	append-cxxflags '-fno-strict-aliasing'
 	# `append-ldflags '-rdynamic'` was stripped because it's used probably only for GoogleBreakpad
 	# which is not supported anyway
 
@@ -210,6 +252,8 @@ my_eqmake5() {
 src_compile() {
 	local d module
 
+	## NOTE: directory naming follows upstream and is hardcoded in .pro files
+
 	for module in style numbers ; do	# order of modules matters
 		d="${S}/Linux/obj/codegen_${module}/Release"
 		mkdir -v -p "${d}" && cd "${d}" || die
@@ -232,7 +276,7 @@ src_compile() {
 	mkdir -v -p "${d}" && cd "${d}" || die
 
 	elog "Preparing the main build ..."
-	elog "Ignore the warnings/errors below"
+	elog "Note: ignore the warnings/errors below"
 	# this qmake will fail to find "${TG_DIR}/GeneratedFiles/*", but it's required for ...
 	my_eqmake5 "${TG_PRO}"
 	# ... this make, which will generate those files
@@ -246,27 +290,162 @@ src_compile() {
 	emake
 }
 
-src_install() {
-	newbin "${S}/Linux/Release/Telegram" "${PN}"
+HEADER_FOR_GEN_FILES=(
+	"# DO NOT MODIFY: This file is a part of the ${CATEGORY}/${PN} package"
+	"# generated on $(date --utc --iso-8601=minutes)"
+)
 
+my_install_systemd_service() {
+	local tmpfile="$(mktemp)"
+	cat <<-_EOF_ > "${tmpfile}" || die
+		$(printf "%s\n" "${HEADER_FOR_GEN_FILES[@]}")
+		[Unit]
+		Description=${TG_PRETTY_NAME} messaging app
+		# standard targets are not available in user mode, so no deps can be specified
+
+		[Service]
+		ExecStartPre=/bin/sh -c "[ -n \"${DISPLAY}\" ]"
+		# list of all cmdline options is in 'Telegram/SourceFiles/settings.cpp'
+		ExecStart="${EPREFIX}${TG_INST_BIN}" "${TG_AUTOSTART_ARGS[@]}"
+		Restart=on-failure
+		RestartSec=1min
+
+		# no "Install" section as this service can only be started manually or via a script
+		# systemd
+	_EOF_
+	systemd_newuserunit "${tmpfile}" ${TG_SYSTEMD_SERVICE_NAME}.service
+}
+
+my_install_autostart_sh() {
+	local tmpfile="$(mktemp)"
+	cat <<-_EOF_ > "${tmpfile}" || die
+		#!/bin/sh
+		$(printf "%s\n" "${HEADER_FOR_GEN_FILES[@]}")
+		"${EPREFIX}/usr/bin/systemctl" --user start ${TG_SYSTEMD_SERVICE_NAME}.service
+	_EOF_
+	insinto "${TG_SHARED_DIR}"/autostart-scripts
+	newins "${tmpfile}" 10-${PN}.sh
+}
+
+my_install_shutdown_sh() {
+	local tmpfile="$(mktemp)"
+	cat <<-_EOF_ > "${tmpfile}" || die
+		#!/bin/sh
+		$(printf "%s\n" "${HEADER_FOR_GEN_FILES[@]}")
+		"${EPREFIX}/usr/bin/systemctl" --user stop ${TG_SYSTEMD_SERVICE_NAME}.service
+	_EOF_
+	insinto "${TG_SHARED_DIR}"/shutdown
+	newins "${tmpfile}" 10-${PN}.sh
+}
+
+my_install_autostart_desktop() {
+	local tmpfile="$(mktemp)"
+	cat <<-_EOF_ > "${tmpfile}" || die
+		$(printf "%s\n" "${HEADER_FOR_GEN_FILES[@]}")
+		[Desktop Entry]
+		Version=1.0
+
+		Name=${TG_PRETTY_NAME}
+		Type=Application
+
+		Exec="${EPREFIX}${TG_INST_BIN}" "${TG_AUTOSTART_ARGS[@]}"
+		Terminal=false
+	_EOF_
+	insinto "${TG_SHARED_DIR}"/autostart
+	newins "${tmpfile}" ${PN}.desktop
+}
+
+my_install_autostart_howto() {
+	local tmpfile="$(mktemp)"
+	cat <<-_EOF_ > "${tmpfile}" || die
+		You can set it up either automatically using Portage or manually.
+
+		Automatically
+		--------------
+		Enable one of autostart_* USE flags for ${CATEGORY}/${PN} package and
+		set TELEGRAM_AUTOSTART_USERS variable in make.conf to a space-separated list
+		of user names for which you'd like to set it up.
+
+		Manually
+		---------
+
+		If you have KDE Plasma + systemd:
+
+		\`\`\`
+		cp -v "${EPREFIX}${TG_SHARED_DIR}"/autostart-scripts/* ~/.config/autostart-scripts/
+		cp -v "${EPREFIX}${TG_SHARED_DIR}"/shutdown/* ~/.config/plasma-workspace/shutdown/
+		\`\`\`
+
+		otherwise:
+
+		\`\`\`
+		cp -v "${EPREFIX}${TG_SHARED_DIR}"/autostart/* ~/.config/autostart/
+		\`\`\`
+	_EOF_
+	insinto "${TG_SHARED_DIR}"
+	newins "${tmpfile}" autostart-howto.txt
+}
+
+src_install() {
+	newbin "${S}/Linux/Release/Telegram" "${TG_INST_BIN##*/}"
+
+	## docs
+	einstalldocs
+
+	## icons
 	local s
 	for s in 16 32 48 64 128 256 512 ; do
 		newicon -s ${s} "${TG_DIR}/Resources/art/icon${s}.png" "${PN}.png"
 	done
 
+	## .desktop entry -- upstream version at 'lib/xdg/telegramdesktop.desktop'
 	local make_desktop_entry_args
 	make_desktop_entry_args=(
-		"${EPREFIX}/usr/bin/${PN} -- %u"	# exec
-		"Telegram Desktop"	# name
-		"${PN}"		# icon
+		"${EPREFIX}${TG_INST_BIN} -- %u"	# exec
+		"${TG_PRETTY_NAME}"	# name
+		"${TG_INST_BIN##*/}"	# icon
 		'Network;InstantMessaging;Chat;'	# categories
 	)
 	make_desktop_entry_extras=(
 		'MimeType=x-scheme-handler/tg;'
-		'StartupWMClass=Telegram'
+		'StartupWMClass=Telegram'	# this should follow upstream
 	)
 	make_desktop_entry "${make_desktop_entry_args[@]}" \
 		"$( printf '%s\n' "${make_desktop_entry_extras[@]}" )"
 
-	einstalldocs
+	## systemd
+	my_install_systemd_service
+
+	## autostart -- plasma + systemd
+	my_install_autostart_sh
+	my_install_shutdown_sh
+	if use autostart_plasma_systemd ; then
+		local u
+		for u in ${TELEGRAM_AUTOSTART_USERS} ; do
+			local homedir="$(eval "echo ~${u}")"
+
+			install -v --owner="${u}" --mode=700 \
+				-D --target-directory="${D}/${homedir}"/.config/autostart-scripts/ \
+				-- "${ED}"/${TG_SHARED_DIR}/autostart-scripts/* || die
+			install -v --owner="${u}" --mode=700 \
+				-D --target-directory="${D}/${homedir}"/.config/plasma-workspace/shutdown/ \
+				-- "${ED}"/${TG_SHARED_DIR}/shutdown/* || die
+		done
+	fi
+
+	## autostart -- other DEs
+	my_install_autostart_desktop
+	if use autostart_generic ; then
+		local u
+		for u in ${TELEGRAM_AUTOSTART_USERS} ; do
+			local homedir="$(eval "echo ~${u}")"
+
+			install -v --owner="${u}" --mode=600 \
+				-D --target-directory="${D}/${homedir}"/.config/autostart/ \
+				-- "${ED}"/${TG_SHARED_DIR}/autostart/* || die
+		done
+	fi
+
+	## autostart -- tutorial
+	my_install_autostart_howto
 }
