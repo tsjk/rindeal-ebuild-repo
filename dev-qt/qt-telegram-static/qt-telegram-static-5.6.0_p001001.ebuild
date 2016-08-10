@@ -18,23 +18,23 @@ inherit versionator
 }
 {
 	QT_VER="$(get_version_component_range 1-3)"
-	QT_PATCH_DATE="$(get_version_component_range 4 | tr -d 'p')"
-	SLOT="${QT_VER}-${QT_PATCH_DATE}"
+	QT_PATCH_NUM="$(get_version_component_range 4 | tr -d 'p')"
+	SLOT="${QT_VER}-${QT_PATCH_NUM}"
 	# this path must be in sync with net-im/telegram ebuild
-	QT5_PREFIX="${EPREFIX}/opt/${PN}/${QT_VER}/${QT_PATCH_DATE}"
-	readonly QT_VER QT_PATCH_DATE SLOT QT5_PREFIX
+	QT5_PREFIX="${EPREFIX}/opt/${PN}/${QT_VER}/${QT_PATCH_NUM}"
+	readonly QT_VER QT_PATCH_NUM SLOT QT5_PREFIX
 }
 
 GH_REPO="telegramdesktop/tdesktop"
 DESCRIPTION='Patched Qt for net-im/telegram'
 HOMEPAGE="https://github.com/${GH_REPO} https://www.qt.io"
 
-# convert date to ISO8601 and format it properly as a git rev
-_qt_patch_rev="master@{${QT_PATCH_DATE:0:4}-${QT_PATCH_DATE:4:2}-${QT_PATCH_DATE:6:2}}"
+# convert Qt patch number to a tag corresponding to a Telegram version
+_qt_patch_tag="v$(( ${QT_PATCH_NUM:0:2} )).$(( ${QT_PATCH_NUM:2:2} )).$(( ${QT_PATCH_NUM:4:2} ))"
 _qt_patch_uri_path="Telegram/Patches/qtbase_${QT_VER//./_}.diff"
 QT_PATCH_LOCAL_NAME="${P}-qtbase.patch"
 
-SRC_URI="https://github.com/${GH_REPO}/raw/${_qt_patch_rev}/${_qt_patch_uri_path} -> ${QT_PATCH_LOCAL_NAME}"
+SRC_URI="https://github.com/${GH_REPO}/raw/${_qt_patch_tag}/${_qt_patch_uri_path} -> ${QT_PATCH_LOCAL_NAME}"
 my_gen_qt_uris() {
 	local m qt_submodules_base_uri="
 		https://download.qt-project.org/official_releases/qt/${QT_VER%.*}/${QT_VER}/submodules"
