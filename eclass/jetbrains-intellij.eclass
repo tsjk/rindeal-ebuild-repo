@@ -16,7 +16,7 @@ esac
 
 inherit eutils versionator xdg
 
-HOMEPAGE="https://www.jetbrains.com/${PN}"
+HOMEPAGE="https://www.jetbrains.com/${PN%"-community"}"
 LICENSE="IDEA || ( IDEA_Academic IDEA_Classroom IDEA_OpenSource IDEA_Personal )"
 
 SLOT="$(get_version_component_range 1-2)"
