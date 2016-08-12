@@ -12,5 +12,8 @@ Windows are also available.
 </longdescription>
   <use>
     <flag name="autoupdate">Install opera_autoupdate executable</flag>
+    <!-- TODO: locale flags should be pushed to the Gentoo l10n.desc file -->
+    <flag name="l10n_en-US">English locale for United States of America</flag>
+    <flag name="l10n_fr-CA">French locale for Canada</flag>
   </use>
 </pkgmetadata>
