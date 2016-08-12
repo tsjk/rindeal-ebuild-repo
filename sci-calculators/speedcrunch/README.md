@@ -1,0 +1,4 @@
+- bitbucket SRC_URI provider
+- fixed dependencies
+- make-based cmake instead of ninja
+- nifty features of my eclasses
