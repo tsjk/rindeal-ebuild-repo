@@ -8,6 +8,8 @@
   <use>
     <flag name="autostart_generic">Enable autostart for a generic DE; requires TELEGRAM_AUTOSTART_USERS variable to be set</flag>
     <flag name="autostart_plasma_systemd">Enable autostart for KDE Plasma DE + systemd; requires TELEGRAM_AUTOSTART_USERS variable to be set</flag>
+    <flag name="pch">Use precompiled headers, which should speedup compilation,
+      but prevent ccache from working (https://ccache.samba.org/manual.html#_precompiled_headers)</flag>
     <flag name="proxy">Enable proxy support</flag>
   </use>
 </pkgmetadata>

@@ -22,7 +22,7 @@ LICENSE='GPL-3' # with OpenSSL exception
 SLOT='0'
 
 KEYWORDS="~amd64 ~arm"
-IUSE='autostart_generic autostart_plasma_systemd proxy'
+IUSE='autostart_generic autostart_plasma_systemd +pch proxy'
 
 CDEPEND_A=(
 	# Telegram requires shiny new versions since v0.10.1 and commit
@@ -137,6 +137,11 @@ src_prepare-delete_and_modify() {
 
 	## opus is used from inside of ffmpeg and not as a dedicated library
 	sed -r -e 's|^(.*opus.*)|# opus lib is not used # \1|' -i -- "${TG_PRO}" || die
+
+	if ! use pch ; then
+		# https://ccache.samba.org/manual.html#_precompiled_headers
+		sed -r -e 's|^(.*PRECOMPILED_HEADER.*)|# USE=-pch # \1|' -i -- "${TG_PRO}" || die
+	fi
 }
 
 src_prepare-appends() {
@@ -161,6 +166,11 @@ src_prepare-appends() {
 	for i in "${includes[@]}" ; do
 		printf 'QMAKE_CXXFLAGS += `%s %s`\n' '$$PKG_CONFIG --cflags-only-I' "${i}" >>"${TG_PRO}" || die
 	done
+
+	if ! use pch ; then
+		# https://ccache.samba.org/manual.html#_precompiled_headers
+		echo "QMAKE_CXXFLAGS += -include \"${TG_DIR}/SourceFiles/stdafx.h\"" >>"${TG_PRO}" || die
+	fi
 }
 
 src_prepare() {
