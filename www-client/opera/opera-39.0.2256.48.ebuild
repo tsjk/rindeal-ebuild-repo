@@ -18,10 +18,9 @@ SLOT="0"
 SRC_URI_BASE="https://get.geo.opera.com/pub/${PN}/desktop/${PV}/linux/${PN}-stable_${PV}"
 SRC_URI="
 	amd64? ( ${SRC_URI_BASE}_amd64.deb )
-	x86? ( ${SRC_URI_BASE}_i386.deb )
 "
 
-KEYWORDS="~amd64 ~x86"
+KEYWORDS="~amd64"
 IUSE="autoupdate libressl"
 
 RDEPEND="
