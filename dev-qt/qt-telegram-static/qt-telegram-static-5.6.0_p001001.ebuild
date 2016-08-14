@@ -156,7 +156,9 @@ QT5_TARGET_SUBDIRS=(
 	## END - QtWidgets
 )
 
-QTBASE_PATCHES=( "${FILESDIR}"/qtdbus-5.6.0-deadlock.patch )
+QTBASE_PATCHES=(
+	"${FILESDIR}"/qtdbus-5.6.0-deadlock.patch
+	"${FILESDIR}"/qtcore-5.5.1-libsystemd.patch )
 
 # size varies between 400M-1100M depending on compiler flags
 CHECKREQS_DISK_BUILD='800M'
