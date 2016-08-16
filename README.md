@@ -60,7 +60,7 @@ How to install this overlay
 
 ### Manually (preferred)
 
-#### 1. Add an entry to `/etc/portage/repos.conf`:
+#### 1. Add an entry to [`/etc/portage/repos.conf`](https://wiki.gentoo.org/wiki//etc/portage/repos.conf):
 
 ```ini
 [rindeal]
