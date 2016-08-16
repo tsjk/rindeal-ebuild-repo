@@ -4,10 +4,12 @@
 EAPI=6
 
 GH_URI='github/telegramdesktop/tdesktop'
-GH_REF="v${PV}"
-if [ -n "${TELEGRAM_DEBUG}" ] ; then
-	GH_FETCH_TYPE=live
-	EGIT_CLONE_TYPE=shallow
+if [[ "${PV}" != *9999* ]] ; then
+	GH_REF="v${PV}"
+	if [ -n "${TELEGRAM_DEBUG}" ]  ; then
+		GH_FETCH_TYPE=live
+		EGIT_CLONE_TYPE=shallow
+	fi
 fi
 
 # xdg: src_prepare, pkg_preinst, pkg_post{inst,rm}
