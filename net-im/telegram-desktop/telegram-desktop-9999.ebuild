@@ -41,11 +41,6 @@ CDEPEND_A=(
 	'x11-libs/libxkbcommon'
 	'x11-libs/libX11'
 )
-RDEPEND_A=( "${CDEPEND_A[@]}"
-	# block some alternative names and binary packages
-	'!net-im/telegram'{,-bin}
-	'!net-im/telegram-desktop-bin'
-)
 DEPEND_A=( "${CDEPEND_A[@]}"
 	'=dev-qt/qt-telegram-static-5.6.0*'	# 5.6.0 is required since 0.9.49
 
@@ -56,6 +51,11 @@ DEPEND_A=( "${CDEPEND_A[@]}"
 
 	'>=sys-apps/gawk-4.1'	# required for inplace support for .pro files formatter
 	'virtual/pkgconfig'
+)
+RDEPEND_A=( "${CDEPEND_A[@]}"
+	# block some alternative names and binary packages
+	'!net-im/telegram'{,-bin}
+	'!net-im/telegram-desktop-bin'
 )
 
 REQUIRED_USE_A=(
