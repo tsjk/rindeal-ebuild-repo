@@ -85,6 +85,9 @@ if [ -z "${SRC_URI}" ] && [ "${GH_FETCH_TYPE}" == 'snapshot' ] ; then
 			SRC_URI="${_GH_BASE_URI}/repository/archive.tar.gz?ref=${GH_REF} -> ${GH_DISTFILE}.tar.gz" ;;
 		*) die "Unsupported provider '${_GH_PROVIDER}'" ;;
 	esac
+
+	# if ${GH_DISTFILE} != ${P}, destdir wouldn't match ${S}, thus override it via a template
+	VCS_SNAPSHOT_DESTDIR_TMPL="@S@"
 fi
 
 if [ -z "${EGIT_REPO_URI}" ] ; then
