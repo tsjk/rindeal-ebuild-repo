@@ -61,7 +61,12 @@ jetbrains-intellij_src_unpack() {
 		--directory="${S}"
 	)
 
-	local excludes=( 'license'  )
+	local excludes=(
+		'license'
+		# This plugins has several QA violations, eg. https://github.com/rindeal/gentoo-overlay/issues/67.
+		# If someone needs it, it can be installed separately from JetBrains plugin repo.
+		'plugins/tfsIntegration'
+	)
 	use system-jre	 && excludes+=( 'jre' )
 	use amd64	|| excludes+=( bin/{fsnotifier64,libbreakgen64.so,libyjpagent-linux64.so,LLDBFrontend} )
 	use arm		|| excludes+=( bin/fsnotifier-arm )
