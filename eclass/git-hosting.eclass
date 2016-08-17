@@ -56,6 +56,12 @@ if [ -z "${GH_REF}" ] ; then
 	esac
 fi
 
+# @ECLASS-VARIABLE: GH_DISTFILE
+# @DEFAULT: ${P}
+# @DESCRIPTION:
+# Name of the distfile (without any extensions).
+: ${GH_DISTFILE:="${P}"}
+
 
 case "${_GH_PROVIDER}" in
 	'bitbucket')
@@ -72,11 +78,11 @@ _GH_BASE_URI="https://${_GH_DOMAIN}/${_GH_USER}/${_GH_REPO}"
 if [ -z "${SRC_URI}" ] && [ "${GH_FETCH_TYPE}" == 'snapshot' ] ; then
 	case "${_GH_PROVIDER}" in
 		'bitbucket')
-			SRC_URI="${_GH_BASE_URI}/get/${GH_REF}.tar.bz2 -> ${P}.tar.bz2" ;;
+			SRC_URI="${_GH_BASE_URI}/get/${GH_REF}.tar.bz2 -> ${GH_DISTFILE}.tar.bz2" ;;
 		'github')
-			SRC_URI="${_GH_BASE_URI}/archive/${GH_REF}.tar.gz -> ${P}.tar.gz" ;;
+			SRC_URI="${_GH_BASE_URI}/archive/${GH_REF}.tar.gz -> ${GH_DISTFILE}.tar.gz" ;;
 		'gitlab')
-			SRC_URI="${_GH_BASE_URI}/repository/archive.tar.gz?ref=${GH_REF} -> ${P}.tar.gz" ;;
+			SRC_URI="${_GH_BASE_URI}/repository/archive.tar.gz?ref=${GH_REF} -> ${GH_DISTFILE}.tar.gz" ;;
 		*) die "Unsupported provider '${_GH_PROVIDER}'" ;;
 	esac
 fi
