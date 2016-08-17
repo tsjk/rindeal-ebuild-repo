@@ -13,6 +13,7 @@ HOMEPAGE="http://www.qbittorrent.org/ ${HOMEPAGE}"
 LICENSE="GPL-2"
 
 SLOT="0"
+SRC_URI="https://sourceforge.net/projects/${PN}/files/${PN}/${P}/${P}.tar.xz/download -> ${P}.tar.xz"
 
 KEYWORDS="~amd64 ~arm"
 IUSE="+dbus debug +qt5 webui +X"
