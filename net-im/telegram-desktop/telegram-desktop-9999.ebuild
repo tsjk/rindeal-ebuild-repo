@@ -23,7 +23,7 @@ LICENSE='GPL-3' # with OpenSSL exception
 
 SLOT='0'
 
-KEYWORDS="~amd64 ~arm"
+[[ "${PV}" == *9999* ]] || KEYWORDS="~amd64 ~arm"
 IUSE='autostart_generic autostart_plasma_systemd +pch proxy'
 
 CDEPEND_A=(
