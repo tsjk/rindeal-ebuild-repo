@@ -1,10 +1,10 @@
 # Copyright 1999-2016 Gentoo Foundation
+# Copyright 2016 Jan Chren (rindeal)
 # Distributed under the terms of the GNU General Public License v2
-# $Id$
 
 # @ECLASS: vcs-snapshot.eclass
 # @MAINTAINER:
-# mgorny@gentoo.org
+# dev.rindeal+gentoo-overlay@gmail.com
 # @BLURB: support eclass for unpacking VCS snapshot tarballs
 # @DESCRIPTION:
 # This eclass provides a convenience src_unpack() which does unpack all
@@ -39,12 +39,36 @@
 # and however the tarballs were originally packed, all files will appear
 # in ${WORKDIR}/${P} and ${WORKDIR}/${P}-otherstuff respectively.
 
+if [ -z "${_VCS_SNAPSHOT_ECLASS}" ] ; then
+
 case ${EAPI:-0} in
-	0|1|2|3|4|5|6) ;;
+	5|6) ;;
 	*) die "vcs-snapshot.eclass API in EAPI ${EAPI} not yet established."
 esac
 
+
+# @ECLASS-VARIABLE: VCS_SNAPSHOT_DESTDIR_TMPL
+# @DEFAULT: @WORKDIR@/@AN@
+# @DESCRIPTION:
+# Name of the destdir. May include template vars.
+: ${VCS_SNAPSHOT_DESTDIR_TMPL:="@WORKDIR@/@AN@"}
+
+
+_vcs-snapshot_get_destdir() {
+	local template="${1:-"${VCS_SNAPSHOT_DESTDIR_TMPL}"}"
+	local v vars=( $(printf '%s\n' "${template}" | grep -Po "@.*?@" | tr -d '@') )
+
+	for v in "${vars[@]}" ; do
+		[ -v "${v}" ] || die "Variable '${v}' is not defined, but was used in a template"
+		template="${template//"@${v}@"/${!v}}"
+	done
+
+	printf "%s\n" "${template}"
+}
+
+
 EXPORT_FUNCTIONS src_unpack
+
 
 # @FUNCTION: vcs-snapshot_src_unpack
 # @DESCRIPTION:
@@ -53,26 +77,27 @@ EXPORT_FUNCTIONS src_unpack
 # local names. Other archive types will be passed down to regular
 # unpack.
 vcs-snapshot_src_unpack() {
-	debug-print-function ${FUNCNAME} "${@}"
+	debug-print-function ${FUNCNAME}
 
 	local f
 
-	for f in ${A}
-	do
+	for f in ${A} ; do
 		case "${f}" in
 			*.tar|*.tar.gz|*.tar.bz2|*.tar.xz)
-				local destdir=${WORKDIR}/${f%.tar*}
+				local AN="${f%.tar*}"
+
+				local destdir="$(_vcs-snapshot_get_destdir)"
 
 				debug-print "${FUNCNAME}: unpacking ${f} to ${destdir}"
 
-				# XXX: check whether the directory structure inside is
+				# TODO: check whether the directory structure inside is
 				# fine? i.e. if the tarball has actually a parent dir.
-				mkdir "${destdir}" || die
-				tar -C "${destdir}" -x --strip-components 1 \
-					-f "${DISTDIR}/${f}" || die
+				mkdir -p "${destdir}" || die
+				tar --extract --file="${DISTDIR}/${f}" --directory="${destdir}" \
+					--strip-components=1  || die
 				;;
 			*)
-				debug-print "${FUNCNAME}: falling back to unpack for ${f}"
+				debug-print "${FUNCNAME}: falling back to unpack() for ${f}"
 
 				# fall back to the default method
 				unpack "${f}"
@@ -80,3 +105,6 @@ vcs-snapshot_src_unpack() {
 		esac
 	done
 }
+
+_VCS_SNAPSHOT_ECLASS=1
+fi
