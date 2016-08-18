@@ -11,6 +11,10 @@
     process to be killed with the arrow keys instead of by typing its process id.
   </longdescription>
   <use>
+    <flag name="cgroup">Enable cgroup support</flag>
+    <flag name="hwloc">enable <pkg>sys-apps/hwloc</pkg> support for CPU affinity</flag>
+    <flag name="linux-affinity">Enable Linux sched_setaffinity() and sched_getaffinity() for affinity support, disables hwloc</flag>
+    <flag name="taskstats">Enable per-task IO Stats (taskstats kernel support required)</flag>
     <flag name="openvz">Enable openvz support</flag>
     <flag name="vserver">Enable vserver support</flag>
   </use>

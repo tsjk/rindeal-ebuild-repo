@@ -1,0 +1,2 @@
+- Github SRC_URI provider
+- some more USE flags
