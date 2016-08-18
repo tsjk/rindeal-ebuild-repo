@@ -359,7 +359,7 @@ l10n_find_changes_in_dir() {
 	# Note: using assoc array to allow instant lookup
 	declare -A _found _known
 
-	elog "Looking in '${_dir}' for changes in locales ..."
+	einfo "Looking in '${_dir}' for changes in locales ..."
 	pushd "${_dir}" >/dev/null || die "Cannot access '${_dir}'"
 	for _l in "${_pre}"*"${_post}" ; do
 		_l="${_l#"${_pre}"}"
@@ -386,15 +386,15 @@ l10n_find_changes_in_dir() {
 	done
 
 	if [[ $(( ${#_added[@]} + ${#_removed[@]} )) > 0 ]] ; then
-		einfo "There are changes in locales!"
+		elog "There are changes in locales!"
 		if [[ ${#_added[@]} > 0 ]] ; then
-			einfo "Locales added: '${_added[*]}'"
+			elog "Locales added: '${_added[*]}'"
 		fi
 		if [[ ${#_removed[@]} > 0 ]] ; then
-			einfo "Locales removed: '${_removed[*]}'"
+			elog "Locales removed: '${_removed[*]}'"
 		fi
 	else
-		elog "No changes found"
+		einfo "No changes found"
 	fi
 }
 
