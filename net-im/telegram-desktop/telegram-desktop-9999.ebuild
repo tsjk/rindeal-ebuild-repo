@@ -270,7 +270,7 @@ src_compile() {
 		d="${S}/Linux/obj/codegen_${module}/Release"
 		mkdir -v -p "${d}" && cd "${d}" || die
 
-		elog "Building: ${PWD/${S}\/}"
+		einfo "Building: ${PWD/${S}\/}"
 		my_eqmake5 "${TG_DIR}/build/qmake/codegen_${module}/codegen_${module}.pro"
 		emake
 	done
@@ -279,7 +279,7 @@ src_compile() {
 		d="${S}/Linux/ReleaseIntermediate${module}"
 		mkdir -v -p "${d}" && cd "${d}" || die
 
-		elog "Building: ${PWD/${S}\/}"
+		einfo "Building: ${PWD/${S}\/}"
 		my_eqmake5 "${TG_DIR}/Meta${module}.pro"
 		emake
 	done
@@ -287,8 +287,8 @@ src_compile() {
 	d="${S}/Linux/ReleaseIntermediate"
 	mkdir -v -p "${d}" && cd "${d}" || die
 
-	elog "Preparing the main build ..."
-	elog "Note: ignore the warnings/errors below"
+	einfo "Preparing the main build ..."
+	einfo "Note: ignore the warnings/errors below"
 	# this qmake will fail to find "${TG_DIR}/GeneratedFiles/*", but it's required for ...
 	my_eqmake5 "${TG_PRO}"
 	# ... this make, which will generate those files
@@ -297,7 +297,7 @@ src_compile() {
 	emake ${targets[@]}
 
 	# now we have everything we need, so let's begin!
-	elog "Building Telegram ..."
+	einfo "Building Telegram ..."
 	my_eqmake5 "${TG_PRO}"
 	emake
 }
