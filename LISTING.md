@@ -25,7 +25,7 @@ Category | Packages
 <a id="cat-net-p2p"></a>**net-p2p** | [deluge](#net-p2p-deluge), [qbittorrent](#net-p2p-qbittorrent), [tixati](#net-p2p-tixati)
 <a id="cat-sci-calculators"></a>**sci-calculators** | [speedcrunch](#sci-calculators-speedcrunch)
 <a id="cat-sys-apps"></a>**sys-apps** | [hdparm](#sys-apps-hdparm), [hwinfo](#sys-apps-hwinfo), [openrc-rfl](#sys-apps-openrc-rfl)
-<a id="cat-sys-process"></a>**sys-process** | [nmon](#sys-process-nmon), [ps_mem](#sys-process-ps_mem)
+<a id="cat-sys-process"></a>**sys-process** | [htop](#sys-process-htop), [nmon](#sys-process-nmon), [ps_mem](#sys-process-ps_mem)
 <a id="cat-www-client"></a>**www-client** | [opera](#www-client-opera), [phantomjs](#www-client-phantomjs)
 <a id="cat-x11-themes"></a>**x11-themes** | [libreoffice-breeze-icons](#x11-themes-libreoffice-breeze-icons)
 
@@ -117,6 +117,7 @@ Package | Description | :house: | :back:
 <a id="sys-apps-hdparm"></a><a href="./sys-apps/hdparm"><sub><sup>sys-apps/</sup></sub><strong>hdparm</strong></a> | Utility to change hard drive performance parameters | [:house:](https://sourceforge.net/projects/hdparm/) | [:back:](#cat-sys-apps)
 <a id="sys-apps-hwinfo"></a><a href="./sys-apps/hwinfo"><sub><sup>sys-apps/</sup></sub><strong>hwinfo</strong></a> | Hardware detection tool used in SuSE Linux | [:house:](https://github.com/openSUSE/hwinfo) | [:back:](#cat-sys-apps)
 <a id="sys-apps-openrc-rfl"></a><a href="./sys-apps/openrc-rfl"><sub><sup>sys-apps/</sup></sub><strong>openrc-rfl</strong></a> | Rindeal's Function Library for OpenRC | [:house:](https://github.com/rindeal/openrc-rfl) | [:back:](#cat-sys-apps)
+<a id="sys-process-htop"></a><a href="./sys-process/htop"><sub><sup>sys-process/</sup></sub><strong>htop</strong></a> | Interactive text-mode process viewer for Unix systems aiming to be a better top | [:house:](https://hisham.hm/htop/) | [:back:](#cat-sys-process)
 <a id="sys-process-nmon"></a><a href="./sys-process/nmon"><sub><sup>sys-process/</sup></sub><strong>nmon</strong></a> | Nigel's performance MONitor for CPU, memory, network, disks, etc... | [:house:](http://nmon.sourceforge.net/) | [:back:](#cat-sys-process)
 <a id="sys-process-ps_mem"></a><a href="./sys-process/ps_mem"><sub><sup>sys-process/</sup></sub><strong>ps_mem</strong></a> | A utility to accurately report the in core memory usage for a program | [:house:](https://github.com/pixelb/ps_mem) | [:back:](#cat-sys-process)
 <a id="www-client-opera"></a><a href="./www-client/opera"><sub><sup>www-client/</sup></sub><strong>opera</strong></a> | A fast and secure web browser | [:house:](https://www.opera.com/) | [:back:](#cat-www-client)
