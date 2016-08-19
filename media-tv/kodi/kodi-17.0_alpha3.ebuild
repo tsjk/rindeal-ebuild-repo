@@ -32,11 +32,16 @@ SLOT="0"
 
 [[ ${PV} == *9999* ]] || KEYWORDS="~amd64 ~x86"
 IUSE_A=(
-	airplay alsa avahi bluetooth bluray caps cec dbus debug gles java midi mysql nfs
+	airplay
+	airtunes
+
+	alsa avahi bluetooth bluray caps cec dbus debug gles java midi mysql nfs
 	# recommended by upstream to be on (`docs/README.linux`)
 	+opengl
 	profile pulseaudio +samba sftp test +texturepacker udisks upnp upower
 	+usb vaapi vdpau webserver +X
+
+	+non-free # disable components with non-compliant licenses
 )
 
 CDEPEND_A=( "${PYTHON_DEPS}"
@@ -78,41 +83,53 @@ CDEPEND_A=( "${PYTHON_DEPS}"
 
 	">=media-video/ffmpeg-3.0:=[encode,vdpau?]"
 
-	"airplay? ( app-pda/libplist )"
-	"cec? ( >=dev-libs/libcec-3.0 )"
-	"alsa? ( media-libs/alsa-lib )"
-	"bluray? ( >=media-libs/libbluray-0.7.0 )"
-	"avahi? ( net-dns/avahi )"
-	"nfs? ( net-fs/libnfs:= )"
-	"webserver? ( net-libs/libmicrohttpd[messages] )"
-	"sftp? ( net-libs/libssh[sftp] )"
 	"net-misc/curl"
-	"samba? ( >=net-fs/samba-3.4.6[smbclient(+)] )"
-	"bluetooth? ( net-wireless/bluez )"
-	"dbus? ( sys-apps/dbus )"
-	"caps? ( sys-libs/libcap )"
-
 	"virtual/jpeg:0="
-	"usb? ( virtual/libusb:1 )"
+
+	"airplay? ( app-pda/libplist:= )"
+	"airtunes? ( net-misc/shairplay:= )"
+	"alsa? ( media-libs/alsa-lib )"
+	"avahi? ( net-dns/avahi )"
+	"bluetooth? ( net-wireless/bluez )"
+	"bluray? ( >=media-libs/libbluray-0.7.0 )"
+	"caps? ( sys-libs/libcap )"
+	"cec? ( >=dev-libs/libcec-3.0 )"
+	"dbus? ( sys-apps/dbus )"
+
+	# mdnsembedded? ( net-misc/mDNSResponder )
+
+	# "midi? ( sdl2[midi] )" # bundled
 	"mysql? ( virtual/mysql )"
+	"nfs? ( net-fs/libnfs:= )"
+
+	"gles? ( media-libs/mesa[egl,gles2] )"
 	"opengl? ("
 		"virtual/glu"
 		"virtual/opengl"
-		">=media-libs/glew-1.5.6"
+		# ">=media-libs/glew-1.5.6"
 	")"
-	"gles? ("
-		"media-libs/mesa[gles2]"
-	")"
-	"vaapi? ( x11-libs/libva[opengl] )"
+	"!gles? ( !opengl? ( media-libs/sdl2-gfx ) )"
+	"openmax? ( media-libs/libomxil-bellagio )"
+	"omxplayer? ( media-video/raspberrypi-omxplayer )"
+	"vaapi? ( x11-libs/libva[X] )"
 	"vdpau? ("
-		"|| ( >=x11-libs/libvdpau-1.1 >=x11-drivers/nvidia-drivers-180.51 )"
+		"|| (
+			>=x11-libs/libvdpau-1.1
+			>=x11-drivers/nvidia-drivers-180.51 )"
 	")"
+
+	"samba? ( >=net-fs/samba-3.4.6[smbclient(+)] )"
+	"sftp? ( net-libs/libssh[sftp] )"
+	# "upnp? (  )" # bundled
+	"usb? ( virtual/libusb:1 )"
+
+	"webserver? ( net-libs/libmicrohttpd[messages] )"
 	"X? ("
-		"x11-apps/xdpyinfo"
-		"x11-apps/mesa-progs"
-		"x11-libs/libXinerama"
+		"x11-libs/libX11"
+		"x11-libs/libXext"
 		"x11-libs/libXrandr"
-		"x11-libs/libXrender"
+		"x11-libs/libdrm"
+		"media-libs/mesa[egl]"
 	")"
 )
 DEPEND_A=( "${CDEPEND_A[@]}"
@@ -121,6 +138,7 @@ DEPEND_A=( "${CDEPEND_A[@]}"
 	"dev-libs/crossguid"
 	"dev-util/gperf"
 	"virtual/pkgconfig"
+	"sys-apps/help2man"
 
 	"texturepacker? ( media-libs/giflib )"
 	"X? ( x11-proto/xineramaproto )"
@@ -137,33 +155,31 @@ RDEPEND_A=( "${CDEPEND_A[@]}"
 )
 
 REQUIRED_USE_A=(
-	"|| ( gles opengl )"
+	# "GLES overwrites GL if both set to yes."
+	"?? ( gles opengl )"
 	# http://trac.kodi.tv/ticket/10552
 	# https://bugs.gentoo.org/show_bug.cgi?id=464306
 	"?? ( gles vaapi )"
+	"openmax? ( gles )"
 	"udisks? ( dbus )"
 	"upower? ( dbus )"
 )
 
+inherit arrays
+
 pkg_setup() {
 	CONFIG_CHECK="~IP_MULTICAST"
 	ERROR_IP_MULTICAST="
-		In some cases Kodi needs to access multicast addresses.
-		Please consider enabling IP_MULTICAST under Networking options.
-	"
+In some cases Kodi needs to access multicast addresses.
+Please consider enabling IP_MULTICAST under Networking options.
+"
 
 	check_extra_config
 	python-single-r1_pkg_setup
 }
 
-src_prepare() {
-	local PATCHES=(
-		"${FILESDIR}"/${PN}-9999-no-arm-flags.patch #400618887
-		"${FILESDIR}"/${PN}-9999-texturepacker.patch
-	)
-	default
-
-	# some dirs ship generated autotools, some dont
+my_eautoreconf() {
+	# some dirs ship generated autotools, some don't
 	multijob_init
 	local d dirs=(
 		tools/depends/native/TexturePacker/src/configure
@@ -177,67 +193,111 @@ src_prepare() {
 		popd >/dev/null || die
 	done
 	multijob_finish
-	elibtoolize
+}
 
-	# https://bugs.gentoo.org/show_bug.cgi?id=558798
-	tc-env_build emake -f codegenerator.mk
+src_prepare() {
+	default
 
-	# Disable internal func checks as our USE/DEPEND
-	# stuff handles this just fine already #408395
-	export ac_cv_lib_avcodec_ff_vdpau_vc1_decode_picture=yes
+	# Do not force any particular ABI or FPU or SIMD compiler flags for arm
+	# targets. Let the toolchain and user CFLAGS control that.
+	# https://bugs.gentoo.org/400617
+	sed -e 's|elif test "$use_arch" = "arm"; then|elif false; then|' \
+		-i -- configure.ac || die
 
-	# Fix the final version string showing as "exported"
-	# instead of the SVN revision number.
-	export HAVE_GIT=no GIT_REV=${EGIT_VERSION:-exported}
+	sed -e 's|--enable-static||g' \
+		-i -- tools/depends/native/TexturePacker/Makefile || die
 
 	# avoid long delays when powerkit isn't running #348580
-	sed -i \
-		-e '/dbus_connection_send_with_reply_and_block/s:-1:3000:' \
-		xbmc/linux/*.cpp || die
+	sed -e '/dbus_connection_send_with_reply_and_block/s:-1:3000:' \
+		-i -- xbmc/linux/*.cpp || die
+
+	# respect MAKE and MAKEOPTS
+	sed -e 's|make |${MAKE:-make} ${MAKEOPTS} |g' \
+		-i -- bootstrap || die
+
+	my_eautoreconf
+	elibtoolize
+
+	# bootstrap manually
+	# https://bugs.gentoo.org/show_bug.cgi?id=558798
+	tc-env_build emake -f codegenerator.mk || die
 
 	# Tweak autotool timestamps to avoid regeneration
 	find . -type f -exec touch -r configure {} + || die
 }
 
 src_configure() {
+	# Fix the final version string showing as "exported"
+	# instead of the git commit hash.
+	export HAVE_GIT=no GIT_REV=${EGIT_VERSION:-exported}
+
+	# Disable internal func checks as our USE/DEPEND
+	# stuff handles this just fine already #408395
+	export ac_cv_lib_avcodec_ff_vdpau_vc1_decode_picture=yes
 	# Disable documentation generation
 	export ac_cv_path_LATEX=no
-	# Avoid help2man
-	export HELP2MAN=$(type -P help2man || echo true)
 	# No configure flage for this #403561
 	export ac_cv_lib_bluetooth_hci_devid=$(usex bluetooth)
-	# Requiring java is asine #434662
-	[[ ${PV} != "9999" ]] && export ac_cv_path_JAVA_EXE=$(which $(usex java java true))
+	# https://bugs.gentoo.org/show_bug.cgi?id=434662
+	export ac_cv_path_JAVA_EXE=$(which java)
 
 	local myeconfargs=(
+		# Portage sets it up itself
 		--disable-ccache
+		# use only optimizations specified by user
 		--disable-optimizations
+
 		--with-ffmpeg=shared
+
+
+		$(use_enable debug)
+		$(use_enable profile profiling)
+		$(use_enable non-free)
+
 		$(use_enable alsa)
+		$(use_enable pulseaudio pulse)
+
 		$(use_enable airplay)
+		$(use_enable airtunes)
 		$(use_enable avahi)
+		$(use_enable upnp)
+
+
 		$(use_enable bluray libbluray)
 		$(use_enable caps libcap)
 		$(use_enable cec libcec)
+
 		$(use_enable dbus)
-		$(use_enable debug)
-		$(use_enable gles)
-		$(use_enable midi mid)
+
+
+		$(use_enable midi mid)	# MIDI (.mid) fies support
+
 		$(use_enable mysql)
-		$(use_enable nfs)
-		$(use_enable opengl gl)
-		$(use_enable profile profiling)
-		$(use_enable pulseaudio pulse)
+
+
+		$(use_enable opengl gl)	# enable OpenGL rendering
+		$(use_enable vaapi)	# enable VDPAU decoding
+		$(use_enable vdpau)	# enable VAAPI decoding
+		$(use_enable gles)		# enable OpenGLES rendering
+		$(use_enable openmax)	# enable OpenMax decoding, requires OpenGLES
+		$(use_enable omxplayer player omxplayer)
+
+
 		$(use_enable samba)
+		$(use_enable nfs)
+
 		$(use_enable sftp ssh)
 		$(use_enable usb libusb)
 		$(use_enable test gtest)
 		$(use_enable texturepacker)
-		$(use_enable upnp)
-		$(use_enable vaapi)
-		$(use_enable vdpau)
+
+
 		$(use_enable webserver)
+
 		$(use_enable X x11)
+
+
+		# $(use_enable mdnsembedded)
 	)
 
 	econf "${myeconfargs[@]}"
