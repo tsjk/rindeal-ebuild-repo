@@ -3,7 +3,7 @@
 
 EAPI=6
 
-inherit qmake-utils xdg eutils
+inherit qmake-utils xdg eutils qt-pro-formatter
 
 DESCRIPTION="SQLiteStudio3 is a powerful cross-platform SQLite database manager"
 HOMEPAGE="http://sqlitestudio.pl"
@@ -18,7 +18,6 @@ IUSE="cli cups nls tcl test"
 CDEPEND_A=(
 	"dev-db/sqlite:3"
 
-	"dev-qt/designer:5"
 	dev-qt/qt{core,gui,network,script,svg,widgets,xml}:5
 
 	"cups? ( dev-qt/qtprintsupport:5 )"
@@ -26,6 +25,7 @@ CDEPEND_A=(
 	"tcl? ( dev-lang/tcl:* )"
 )
 DEPEND_A=( "${CDEPEND_A[@]}"
+	"dev-qt/designer:5"
 	"test? ( dev-qt/qttest:5 )"
 )
 RDEPEND_A=( "${CDEPEND_A[@]}" )
@@ -58,6 +58,11 @@ pkg_setup() {
 src_prepare() {
 	xdg_src_prepare
 
+	eshopts_push -s globstar
+	local pro_files=( **/*.pro )
+	format_qt_pro "${pro_files[@]}"
+	eshopts_pop
+
 	# fix wrong portable conditional
 	# it should be: `portable { ... ; linux { ... } ; }`
 	sed -e 's@linux|portable@portable@' \
@@ -77,12 +82,14 @@ src_prepare() {
 		>> "${MY_PLUGINS_SRC_DIR}"/DbSqliteCipher/DbSqliteCipher.pro || die
 
 	if ! use nls ; then
-		# TODO: improve this sed to `/^TRANSLATIONS/d` as soon as pro-formatter.eclass hits the tree
-		find -type f -name "*.pro" -print0 | xargs -0 sed -e '\|translations/.*\.ts|d' -i --
+		# delete all files with translations
+		find -type f \( -name "*.ts" -o -name "*.qm" \) -delete || die
+		# delete refs in project files
+		find -type f -name "*.pro" -print0 | xargs -0 sed -e '/^TRANSLATIONS/d' -i --
 		assert
-		find -type f -name "*.qrc" -print0 | xargs -0 sed -e '/<file>translations/d' -i --
+		# delete refs in resource files
+		find -type f -name "*.qrc" -print0 | xargs -0 sed -e '\|\.qm</file>|d' -i --
 		assert
-		find -type f -name "*.ts" -delete || die
 	fi
 
 	disable_modules() {
@@ -93,13 +100,10 @@ src_prepare() {
 		# skip if no modules specified
 		(( ${#modules[@]} )) || return 0
 
-		# make sure regex matching line endings will work
-		edos2unix "${file}"
-
 		# build regex simply looking like this: `module1(\|$)|module2(\|$)`
 		local m regex=""
 		for m in "${modules[@]}" ; do
-			regex+="\b${m}\b( \\\\|\$)|"
+			regex+="\b${m}\b[ \t]*(\\\\|\r?\$)|"
 		done
 		regex="${regex%"|"}"
 
