@@ -3,18 +3,20 @@
 
 EAPI=6
 
-inherit git-r3
+GH_URI="github/vysheng/tg"
+
+inherit git-hosting
 
 DESCRIPTION="Command line interface client for Telegram"
-HOMEPAGE="https://github.com/vysheng/tg"
 LICENSE="GPL-2"
-EGIT_REPO_URI="https://github.com/vysheng/tg.git"
 
 SLOT="0"
-KEYWORDS="~amd64 ~arm"
+
+[[ ${PV} == *9999* ]] || KEYWORDS="~amd64 ~arm"
 IUSE="lua json python"
 
-DEPEND="sys-libs/zlib
+DEPEND="
+	sys-libs/zlib
 	sys-libs/readline:*
 	dev-libs/libconfig
 	dev-libs/openssl:=
