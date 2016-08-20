@@ -5,7 +5,7 @@
 
 source tests-common.sh
 
-inherit flag-o-matic
+inherit flag-o-matic-patched
 
 CFLAGS="-a -b -c=1"
 CXXFLAGS="-x -y -z=2"

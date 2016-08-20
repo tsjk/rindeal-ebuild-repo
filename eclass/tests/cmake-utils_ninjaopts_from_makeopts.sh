@@ -6,7 +6,7 @@ source tests-common.sh
 
 EAPI=6
 
-inherit cmake-utils
+inherit cmake-utils-patched
 
 # --------------------------------------------------------------------------------------------------
 
