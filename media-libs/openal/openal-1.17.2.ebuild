@@ -7,7 +7,7 @@ EAPI=6
 GH_URI="github/kcat/openal-soft"
 GH_REF="openal-soft-${PV}"
 
-inherit cmake-utils git-hosting xdg eutils
+inherit cmake-utils-patched git-hosting xdg eutils
 
 DESCRIPTION="A software implementation of the OpenAL 3D audio API"
 HOMEPAGE="http://kcat.strangesoft.net/openal.html ${HOMEPAGE}"

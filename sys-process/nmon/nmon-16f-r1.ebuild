@@ -4,7 +4,7 @@
 
 EAPI=6
 
-inherit flag-o-matic toolchain-funcs
+inherit flag-o-matic-patched toolchain-funcs
 
 MY_P="lmon${PV}"
 

@@ -6,7 +6,7 @@ EAPI=6
 
 GH_URI="github"
 
-inherit git-hosting autotools flag-o-matic eutils toolchain-funcs systemd
+inherit git-hosting autotools flag-o-matic-patched eutils toolchain-funcs systemd
 
 DESCRIPTION="Rotates, compresses, and mails system logs"
 LICENSE="GPL-2"

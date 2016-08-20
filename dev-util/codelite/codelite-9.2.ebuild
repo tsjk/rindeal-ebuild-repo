@@ -7,7 +7,7 @@ WX_GTK_VER="3.0"
 
 GH_URI='github/eranif'
 
-inherit cmake-utils wxwidgets git-hosting
+inherit cmake-utils-patched wxwidgets git-hosting
 
 DESCRIPTION="A Free, open source, cross platform C,C++,PHP and Node.js IDE"
 HOMEPAGE="http://www.codelite.org"

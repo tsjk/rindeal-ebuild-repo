@@ -6,7 +6,7 @@ EAPI=6
 GH_URI='github/ssvb'
 GH_REF="v${PV}"
 
-inherit flag-o-matic git-hosting
+inherit flag-o-matic-patched git-hosting
 
 DESCRIPTION="Simple benchmark for memory throughput and latency"
 LICENSE="MIT"

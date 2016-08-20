@@ -3,7 +3,7 @@
 
 EAPI="6"
 
-inherit autotools eutils fdo-mime flag-o-matic
+inherit autotools eutils fdo-mime flag-o-matic-patched
 
 DESCRIPTION="Gambas is a free development environment based on a Basic interpreter"
 HOMEPAGE="http://gambas.sourceforge.net/en/main.html"

@@ -3,7 +3,7 @@
 
 EAPI=6
 
-inherit eutils flag-o-matic
+inherit eutils flag-o-matic-patched
 
 MY_PV="${PV//_/-}"
 MY_P="${PN}-${MY_PV}"

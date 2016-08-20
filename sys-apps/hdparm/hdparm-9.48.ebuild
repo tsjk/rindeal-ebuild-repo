@@ -4,7 +4,7 @@
 
 EAPI=6
 
-inherit flag-o-matic eutils
+inherit flag-o-matic-patched eutils
 
 DESCRIPTION="Utility to change hard drive performance parameters"
 HOMEPAGE="https://sourceforge.net/projects/hdparm/"

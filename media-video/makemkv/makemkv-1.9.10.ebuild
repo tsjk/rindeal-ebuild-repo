@@ -3,7 +3,7 @@
 
 EAPI=6
 
-inherit eutils gnome2-utils multilib flag-o-matic
+inherit eutils gnome2-utils multilib flag-o-matic-patched
 
 DESCRIPTION="Tool for ripping and streaming Blu-ray, HD-DVD and DVD discs"
 HOMEPAGE="http://www.makemkv.com/"

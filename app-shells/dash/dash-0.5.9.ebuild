@@ -4,7 +4,7 @@
 
 EAPI="6"
 
-inherit flag-o-matic toolchain-funcs
+inherit flag-o-matic-patched toolchain-funcs
 
 DESCRIPTION="POSIX compliant shell, a direct descendant of the NetBSD version of ash"
 HOMEPAGE="http://gondor.apana.org.au/~herbert/dash/"
