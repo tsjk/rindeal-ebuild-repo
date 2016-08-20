@@ -1,3 +1,5 @@
+#!/bin/bash
+
 EAPI=6
 
 . ./tests-common.sh
