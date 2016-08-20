@@ -9,7 +9,7 @@ mkdir -v -p "${PORTAGE_ROOT}"
 # die on failure
 set -e
 
-. "$(dirname "${BASH_SOURCE[0]}")/travis-functions.sh"
+source "$(dirname "${BASH_SOURCE[0]}")/travis-functions.sh" || exit 1
 
 get_archive() {
     local url="${1?}" dir="${2?}"
