@@ -11,7 +11,9 @@ PYTHON_REQ_USE='ncurses,sqlite,ssl,threads' # TODO: why?
 # will resolve to 2.13, newer don't work (https://bugzilla.mozilla.org/show_bug.cgi?id=104642)
 WANT_AUTOCONF="2.1"
 
-inherit gnome2-utils check-reqs flag-o-matic python-any-r1 autotools rindeal firefox eclass-patches pax-utils
+# check-reqs: pkg_pretend, pkg_setup
+# python-any-r1: pkg_setup
+inherit flag-o-matic-patched check-reqs python-any-r1 firefox autotools rindeal gnome2-utils pax-utils
 
 DESCRIPTION="Firefox Web Browser"
 HOMEPAGE='https://www.mozilla.com/firefox'
@@ -216,6 +218,7 @@ my_check_reqs() {
 	# Ensure we have enough disk space to compile
 	if use pgo || use debug || use test ; then
 		#! CHECKREQS_DISK_BUILD="9G" # FIXME
+		:
 	fi
 
 	check-reqs_pkg_setup
