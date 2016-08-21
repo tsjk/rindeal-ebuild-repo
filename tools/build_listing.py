@@ -47,6 +47,7 @@ for c in sorted(cats):
     for p in cats[c]:
         pkg = portage_db.xmatch("match-all", '{0}/{1}::rindeal'.format(c,p))[0]
         desc, home = portage_db.aux_get(pkg, ['DESCRIPTION', 'HOMEPAGE'])
+        home = home.split()[0] # get only the first homepage
         print('<a id="{0}-{1}"></a><a href="./{0}/{1}"><sub><sup>{0}/</sup></sub><strong>{1}</strong></a> | {2} | [:house:]({3}) | [:back:](#cat-{0})'.format(c, p, desc, home))
 
 # insert vertical space so that clicking on a reference scrolls down nicely
