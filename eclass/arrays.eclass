@@ -14,7 +14,7 @@ case "${EAPI:-0}" in
     *) die "Unsupported EAPI='${EAPI}' for '${ECLASS}'" ;;
 esac
 
-for _v in SRC_URI KEYWORDS IUSE {,R,P,C}DEPEND REQUIRED_USE ; do
+for _v in {,R,P,C}DEPEND IUSE KEYWORDS LICENSE REQUIRED_USE SRC_URI ; do
 	if [[ "$(declare -p ${_v}_A 2>/dev/null)" == "declare -a"* ]] ; then
 		debug-print "${ECLASS}: Converting ${_v}_A to ${_v}"
 		eval "${_v}+=\" \${${_v}_A[*]}\""
