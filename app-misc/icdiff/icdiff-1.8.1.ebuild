@@ -5,11 +5,13 @@
 EAPI=6
 PYTHON_COMPAT=(python2_7 python3_4 python3_5)
 
-inherit distutils-r1
+GH_URI="github/jeffkaufman"
+GH_REF="release-${PV}"
+
+inherit distutils-r1 git-hosting
 
 DESCRIPTION="Colourized diff that supports side-by-side diffing"
-HOMEPAGE="http://www.jefftk.com/icdiff"
-SRC_URI="https://github.com/jeffkaufman/${PN}/archive/release-${PV}.tar.gz -> ${P}.tar.gz"
+HOMEPAGE="https://www.jefftk.com/icdiff ${HOMEPAGE}"
 
 LICENSE="PSF-2"
 SLOT="0"
@@ -20,8 +22,6 @@ PATCHES=(
 )
 
 DOCS=(README.md ChangeLog)
-
-S="${WORKDIR}/${PN}-release-${PV}"
 
 python_test() {
 	./test.sh "${EPYTHON%.*}" || die "Tests failed"
