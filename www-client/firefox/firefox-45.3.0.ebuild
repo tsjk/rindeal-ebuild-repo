@@ -11,9 +11,12 @@ PYTHON_REQ_USE='ncurses,sqlite,ssl,threads' # TODO: why?
 # will resolve to 2.13, newer don't work (https://bugzilla.mozilla.org/show_bug.cgi?id=104642)
 WANT_AUTOCONF="2.1"
 
+inherit flag-o-matic-patched
 # check-reqs: pkg_pretend, pkg_setup
 # python-any-r1: pkg_setup
-inherit flag-o-matic-patched check-reqs python-any-r1 firefox autotools rindeal gnome2-utils pax-utils
+# firefox:
+inherit check-reqs python-any-r1 firefox
+inherit autotools rindeal gnome2-utils pax-utils
 
 DESCRIPTION="Firefox Web Browser"
 HOMEPAGE='https://www.mozilla.com/firefox'
@@ -29,7 +32,7 @@ SRC_URI="https://archive.mozilla.org/pub/firefox/releases/${MOZ_PV}/source/${MOZ
 KEYWORDS='~amd64 ~arm'
 IUSE_A=(
 	## since v46 gtk3 is default, but we're now on 45.x branch
-	+X +gtk2 gtk3 -qt5 +pango
+	+X +pango +gtk2 -gtk3 -qt5
 
 	## compiler options
 	ccache custom-optimization debug hardened pgo rust +yasm
@@ -50,8 +53,8 @@ IUSE_A=(
 	+system-{icu,jpeg,libevent,libvpx}
 	-system-cairo	# buggy, rather use the bundled and patched version
 	-system-sqlite	# requires non-standard USE flags
-	-system-jemalloc # requires new and currently unstable jemalloc version
-	-system-harfbuzz -system-graphite2 # nonstandard options, added via patch
+	-system-jemalloc	# requires new and currently unstable jemalloc version
+	-system-harfbuzz -system-graphite2	# nonstandard options, added via patch
 
 	-test -ipdl-tests
 
