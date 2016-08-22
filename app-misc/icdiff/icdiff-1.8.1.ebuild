@@ -19,10 +19,6 @@ SLOT="0"
 
 KEYWORDS="~amd64 ~arm"
 
-PATCHES=(
-	"${FILESDIR}/${PN}-1.7.3-dont-check-changelog.patch"
-)
-
 python_test() {
 	./test.sh "${EPYTHON%.*}" || die "Tests failed"
 }
