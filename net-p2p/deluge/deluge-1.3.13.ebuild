@@ -53,31 +53,33 @@ REQUIRED_USE="
 
 inherit arrays
 
-PLOCALES=( af ar ast be bg bn bs ca cs cy da de el en_AU en_CA en_GB eo es et eu fa fi fo fr fy ga gl
+L10N_LOCALES=( af ar ast be bg bn bs ca cs cy da de el en_AU en_CA en_GB eo es et eu fa fi fo fr fy ga gl
 	he hi hr hu id is it ja ka kk km kn ko ku ky la lb lt lv mk ml ms nb nds nl nn oc pl pt pt_BR ro
 	ru si sk sl sr sv ta te th tl tlh tr uk ur vi zh_CN zh_HK zh_TW )
-PLOCALES_MASK=( nap pms iu )
-inherit l10n
+L10N_LOCALES_MASK=( nap pms iu )
+inherit l10n-r1
+
+src_prepare-locales() {
+	local l locales dir='deluge/i18n' pre='' post='.po'
+
+	l10n_find_changes_in_dir "${dir}" "${pre}" "${post}"
+
+	l10n_get_locales locales app off
+	for l in ${locales} ; do
+		rm -v -f "${dir}/${pre}${l}${post}" || die
+	done
+}
 
 python_prepare_all() {
-	local args
-
 	# disable libtorrent checks
-	args=(
-		-e 's|build_libtorrent = True|build_libtorrent = False|'
-		-e "/Compiling po file/a \\\tuptoDate = False" )
-	sed "${args[@]}" \
+	sed -e 's|build_libtorrent = True|build_libtorrent = False|' \
+		-e "/Compiling po file/a \\\tuptoDate = False" \
         -i -- 'setup.py' || die
 	# disable new release checks
 	sed -e 's|"new_release_check": True|"new_release_check": False|' \
         -i -- 'deluge/core/preferencesmanager.py' || die
 
-	local loc_dir='deluge/i18n' loc_pre='' loc_post='.po'
-	l10n_find_plocales_changes "${loc_dir}" "${loc_pre}" "${loc_post}"
-	rm_loc() {
-		rm -vf "${loc_dir}/${loc_pre}${1}${loc_post}" || die
-	}
-	l10n_for_each_disabled_locale_do rm_loc
+	src_prepare-locales
 
 	distutils-r1_python_prepare_all
 }
