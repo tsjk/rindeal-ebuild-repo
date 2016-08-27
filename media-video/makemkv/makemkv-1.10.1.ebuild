@@ -43,7 +43,7 @@ RDEPEND="${DEPEND}
 
 REQUIRED_USE="?? ( qt4 qt5 )"
 
-declare -A PLOCALES_MAP=(
+declare -A L10N_LOCALES_MAP=(
 	['zh']='chi'
 	['da']='dan'
 	['de']='deu'
@@ -58,8 +58,8 @@ declare -A PLOCALES_MAP=(
 	['es']='spa'
 	['sv']='swe'
 )
-PLOCALES=( ${!PLOCALES_MAP[@]} )
-inherit l10n
+L10N_LOCALES=( ${!L10N_LOCALES_MAP[@]} )
+inherit l10n-r1
 
 S="${WORKDIR}/${MY_P}"
 
@@ -78,8 +78,8 @@ src_prepare() {
 	fi
 
 	# make these vars global as they're used in src_install()
-	loc_dir="${WORKDIR}/${MY_PB}"/src/share loc_pre='makemkv_' loc_post='.mo.gz'
-	l10n_find_plocales_changes "${loc_dir}" "${loc_pre}" "${loc_post}"
+	declare -g loc_dir="${WORKDIR}/${MY_PB}"/src/share loc_pre='makemkv_' loc_post='.mo.gz'
+	l10n_find_changes_in_dir "${loc_dir}" "${loc_pre}" "${loc_post}"
 
 	default
 }
@@ -142,9 +142,13 @@ src_install() {
 	doins src/share/*.xml
 
 	## install locales
+	local l locales
+	l10n_get_locales locales app on
+
 	insinto /usr/share/MakeMKV
-	ins_loc() { doins "${loc_dir}/${loc_pre}${1}${loc_post}" ; }
-	l10n_for_each_locale_do ins_loc
+	for l in ${locales} ; do
+		doins "${loc_dir}/${loc_pre}${l}${loc_post}"
+	done
 }
 
 pkg_preinst() { gnome2_icon_savelist ; }
