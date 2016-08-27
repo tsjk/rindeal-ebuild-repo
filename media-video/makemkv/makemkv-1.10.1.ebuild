@@ -13,8 +13,8 @@ SLOT="0"
 MY_P="makemkv-oss-${PV}"
 MY_PB="makemkv-bin-${PV}"
 SRC_URI="
-	http://www.makemkv.com/download/${MY_P}.tar.gz
-	http://www.makemkv.com/download/${MY_PB}.tar.gz"
+	https://www.makemkv.com/download/${MY_P}.tar.gz
+	https://www.makemkv.com/download/${MY_PB}.tar.gz"
 
 KEYWORDS="-* ~amd64 ~x86"
 IUSE="libav multilib qt4 qt5"
