@@ -3,7 +3,7 @@
 
 EAPI=6
 
-inherit eutils gnome2-utils multilib flag-o-matic-patched
+inherit eutils multilib flag-o-matic-patched xdg
 
 DESCRIPTION="Tool for ripping and streaming Blu-ray, HD-DVD and DVD discs"
 HOMEPAGE="http://www.makemkv.com/"
@@ -81,7 +81,7 @@ src_prepare() {
 	declare -g loc_dir="${WORKDIR}/${MY_PB}"/src/share loc_pre='makemkv_' loc_post='.mo.gz'
 	l10n_find_changes_in_dir "${loc_dir}" "${loc_pre}" "${loc_post}"
 
-	default
+	xdg_src_prepare
 }
 
 src_configure() {
@@ -151,10 +151,8 @@ src_install() {
 	done
 }
 
-pkg_preinst() { gnome2_icon_savelist ; }
-
 pkg_postinst() {
-	gnome2_icon_cache_update
+	xdg_pkg_postinst
 
 	elog "While MakeMKV is in beta mode, upstream has provided a license"
 	elog "to use if you do not want to purchase one."
@@ -175,5 +173,3 @@ pkg_postinst() {
 	elog "the following variables when launching the player:"
 	elog "LIBAACS_PATH=libmmbd LIBBDPLUS_PATH=libmmbd"
 }
-
-pkg_postrm() { gnome2_icon_cache_update ; }
