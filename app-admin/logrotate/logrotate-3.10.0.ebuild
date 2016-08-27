@@ -35,7 +35,6 @@ src_prepare() {
 		"${FILESDIR}"/3.9.2-configure_ac_lfs.patch
 		"${FILESDIR}"/3.9.2-ignore_hidden_files_in_conf_dir.patch
 		"${FILESDIR}"/3.9.2-atomic-createOutputFile.patch
-		"${FILESDIR}"/3.9.2-Destination_already_exists_message_should_be_output_at_error_level.patch
 		"${FILESDIR}"/3.9.2-manpage_config_clarification.patch
 	)
 	default
