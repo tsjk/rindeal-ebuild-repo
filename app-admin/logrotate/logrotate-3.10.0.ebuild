@@ -6,7 +6,7 @@ EAPI=6
 
 GH_URI="github"
 
-inherit git-hosting autotools flag-o-matic-patched eutils toolchain-funcs systemd
+inherit flag-o-matic-patched git-hosting autotools systemd
 
 DESCRIPTION="Rotates, compresses, and mails system logs"
 LICENSE="GPL-2"
@@ -28,6 +28,7 @@ RDEPEND="${CDEPEND}
 "
 REQUIRED_USE="?? ( cron systemd )"
 
+# https://bugs.gentoo.org/show_bug.cgi?id=357275
 STATEFILE="${EPREFIX}/var/lib/${PN}/${PN}.status"
 
 src_prepare() {
