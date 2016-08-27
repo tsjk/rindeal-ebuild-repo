@@ -99,11 +99,11 @@ if (( EAPI <= 6 )) ; then
 		declare -g -a L10N_LOCALES_MASK=( "${PLOCALES_MASK[@]}" )
 	fi
 
-	if [[ -v PLOCALES_MAP ]] ; then
-		_eqawarn_once "PLOCALES_MAP is deprecated, please rename it to L10N_LOCALES_MAP array"
+	if [[ -v PLOCALES_MAP || -v PLOCALES_MAP[@] ]] ; then
+		_eqawarn_once "PLOCALES_MAP is deprecated, please rename it to L10N_LOCALES_MAP associative array"
 		# copy assoc array it - https://stackoverflow.com/a/8881121/2566213
 		_a="$(declare -p PLOCALES_MAP)"
-		eval "declare -g -A L10N_LOCALES_MAP="${_a#*=}
+		eval eval declare -g -A L10N_LOCALES_MAP="${_a#*=}"
 		unset _a
 	fi
 
@@ -194,7 +194,7 @@ fi
 # L10N_LOCALES_MAP+=( ['en']='eng' ['de']='ger german' )
 # @CODE
 
-if [[ ! -v L10N_LOCALES_MAP ]] ; then
+if [[ ! -v L10N_LOCALES_MAP[@] ]] ; then
 	declare -g -A L10N_LOCALES_MAP=()
 fi
 debug-print "${ECLASS}: $(declare -p L10N_LOCALES_MAP)"
