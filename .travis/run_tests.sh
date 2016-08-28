@@ -23,8 +23,8 @@ run_shellcheck() {
     # run in a subshell to prevent shopt from leaking
     (
     shopt -s globstar
-    echo \$ shellcheck "${sc_opts[@]}" "eclass/*.eclass" "./**/*.ebuild"
-    shellcheck "${sc_opts[@]}" eclass/*.eclass ./**/*.ebuild
+    echo \$ shellcheck "${sc_opts[@]}" "eclass/*.eclass" "./**/*.ebuild" "./.travis/*.sh"
+    shellcheck "${sc_opts[@]}" eclass/*.eclass ./**/*.ebuild ./.travis/*.sh
     )
 }
 
