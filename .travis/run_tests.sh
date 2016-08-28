@@ -8,10 +8,12 @@ run_repoman() {
 
 run_shellcheck() {
     local sc_exclude=(
-        SC2034  # unused vars
-        SC2086  # double quote
-        SC2046  # quote to prevent word splitting
+        SC1007  # Remove space after = if trying to assign a value (for empty string, use var='' ... ).
         SC2016  # expressions don't expand in single quotes
+        SC2034  # unused vars
+        SC2046  # quote to prevent word splitting
+        SC2086  # double quote
+        SC2128  # Expanding an array without an index only gives the first element.
     )
     local sc_opts=(
         --shell=bash
