@@ -1,0 +1,2 @@
+- env.d file to use makemkv instead of libaacs+libbdplus
+- locales support
