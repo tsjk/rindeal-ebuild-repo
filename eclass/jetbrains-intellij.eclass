@@ -105,7 +105,7 @@ jetbrains-intellij_pkg_preinst() {
 # @ECLASS-VARIABLE: JBIJ_DESKTOP_EXTRAS=()
 
 # @ECLASS-VARIABLE: JBIJ_INSTALL_DIR
-: ${JBIJ_INSTALL_DIR:="/opt/${_JBIJ_PN_SLOTTED}"}
+: ${JBIJ_INSTALL_DIR:="/opt/jetbrains/${_JBIJ_PN_SLOTTED}"}
 
 : ${_JBIJ_STARTUP_SCRIPT:="${PN%-community}.sh"}
 
