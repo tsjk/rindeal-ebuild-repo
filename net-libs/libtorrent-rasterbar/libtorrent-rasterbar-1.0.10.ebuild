@@ -51,7 +51,7 @@ src_prepare() {
 }
 
 src_configure() {
-	local econf_args=(
+	local myeconfargs=(
 		--disable-silent-rules # bug 441842
 		--with-boost-system='mt'
 		--with-libiconv
@@ -63,26 +63,30 @@ src_configure() {
 		$(use_enable static-libs static)
 		$(use_enable test tests)
 	)
-	econf "${econf_args[@]}"
+	econf "${myeconfargs[@]}"
 
-	python_configure() {
-		local econf_args=( "${econf_args[@]}"
-			--enable-python-binding
-			--with-boost-python='yes'
-		)
-		econf "${econf_args[@]}"
-	}
-	use python && distutils-r1_src_configure
+	if use python ; then
+		python_configure() {
+			local myeconfargs=( "${myeconfargs[@]}"
+				--enable-python-binding
+				--with-boost-python
+			)
+			econf "${myeconfargs[@]}"
+		}
+		distutils-r1_src_configure
+	fi
 }
 
 src_compile() {
 	default
 
-	python_compile() {
-		cd "${BUILD_DIR}"/../bindings/python || die
-		distutils-r1_python_compile
-	}
-	use python && distutils-r1_src_compile
+	if use python ; then
+		python_compile() {
+			cd "${BUILD_DIR}"/../bindings/python || die
+			distutils-r1_python_compile
+		}
+		distutils-r1_src_compile
+	fi
 }
 
 src_install() {
@@ -90,9 +94,11 @@ src_install() {
 
 	default
 
-	python_install() {
-		cd "${BUILD_DIR}"/../bindings/python || die
-		distutils-r1_python_install
-	}
-	use python && distutils-r1_src_install
+	if use python ; then
+		python_install() {
+			cd "${BUILD_DIR}"/../bindings/python || die
+			distutils-r1_python_install
+		}
+		distutils-r1_src_install
+	fi
 }
