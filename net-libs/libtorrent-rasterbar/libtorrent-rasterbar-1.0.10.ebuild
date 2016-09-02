@@ -10,16 +10,16 @@ DISTUTILS_OPTIONAL=true
 DISTUTILS_IN_SOURCE_BUILD=true
 
 GH_URI='github/arvidn/libtorrent'
-GH_REF="libtorrent-${PV//./_}"
 
-inherit autotools git-hosting distutils-r1
+inherit git-hosting distutils-r1
 
 DESCRIPTION='C++ BitTorrent implementation focusing on efficiency and scalability'
-HOMEPAGE='http://libtorrent.org'
+HOMEPAGE="http://libtorrent.org ${HOMEPAGE}"
 LICENSE='BSD'
 
 SONAME='8'
 SLOT="0/${SONAME}"
+SRC_URI="https://github.com/arvidn/libtorrent/releases/download/libtorrent-${PV//./_}/${P}.tar.gz"
 
 KEYWORDS='amd64 arm'
 IUSE='+crypt debug +dht doc examples python static-libs test'
@@ -46,11 +46,6 @@ src_prepare() {
 	# make sure lib search dir points to the main `S` dir and not to python copies
 	sed -e "s|-L[^ ]*/src/\.libs|-L${S}/src/.libs|" \
 		-i -- 'bindings/python/link_flags.in' || die
-
-	# needed or else eautoreconf fails
-	mkdir build-aux && cp {m4,build-aux}'/config.rpath' || die
-
-	eautoreconf
 
 	use python && distutils-r1_src_prepare
 }
