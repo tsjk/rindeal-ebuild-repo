@@ -21,7 +21,7 @@ SONAME='8'
 SLOT="0/${SONAME}"
 SRC_URI="https://github.com/arvidn/libtorrent/releases/download/libtorrent-${PV//./_}/${P}.tar.gz"
 
-KEYWORDS='amd64 arm'
+KEYWORDS='~amd64 ~arm'
 IUSE='+crypt debug +dht doc examples python static-libs test'
 
 RDEPEND="
