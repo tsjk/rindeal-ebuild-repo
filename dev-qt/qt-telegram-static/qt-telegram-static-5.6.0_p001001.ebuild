@@ -30,7 +30,7 @@ GH_REPO="telegramdesktop/tdesktop"
 HOMEPAGE="https://github.com/${GH_REPO} https://www.qt.io"
 
 # convert Qt patch number to a tag corresponding to a Telegram version
-_qt_patch_tag="v$(( ${QT_PATCH_NUM:0:2} )).$(( ${QT_PATCH_NUM:2:2} )).$(( ${QT_PATCH_NUM:4:2} ))"
+_qt_patch_tag="v$(( 10#${QT_PATCH_NUM:0:2} )).$(( 10#${QT_PATCH_NUM:2:2} )).$(( 10#${QT_PATCH_NUM:4:2} ))"
 _qt_patch_uri_path="Telegram/Patches/qtbase_${QT_VER//./_}.diff"
 QT_PATCH_LOCAL_NAME="${P}-qtbase.patch"
 
