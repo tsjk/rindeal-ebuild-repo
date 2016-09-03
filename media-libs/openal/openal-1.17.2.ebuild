@@ -15,7 +15,7 @@ LICENSE="LGPL-2+"
 
 SLOT="0"
 
-KEYWORDS="~amd64 ~arm"
+KEYWORDS="amd64 ~arm"
 backends=( alsa coreaudio jack oss portaudio pulseaudio )
 IUSE_A=(
 	${backends[@]}
