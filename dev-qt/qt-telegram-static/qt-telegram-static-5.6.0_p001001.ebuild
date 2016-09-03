@@ -20,13 +20,13 @@ inherit versionator
 	QT_VER="$(get_version_component_range 1-3)"
 	QT_PATCH_NUM="$(get_version_component_range 4 | tr -d 'p')"
 	SLOT="${QT_VER}-${QT_PATCH_NUM}"
-	# this path must be in sync with net-im/telegram ebuild
+	# this path must be in sync with net-im/telegram-desktop ebuild
 	QT5_PREFIX="${EPREFIX}/opt/${PN}/${QT_VER}/${QT_PATCH_NUM}"
 	readonly QT_VER QT_PATCH_NUM SLOT QT5_PREFIX
 }
 
-GH_REPO="telegramdesktop/tdesktop"
 DESCRIPTION='Patched Qt for net-im/telegram'
+GH_REPO="telegramdesktop/tdesktop"
 HOMEPAGE="https://github.com/${GH_REPO} https://www.qt.io"
 
 # convert Qt patch number to a tag corresponding to a Telegram version
