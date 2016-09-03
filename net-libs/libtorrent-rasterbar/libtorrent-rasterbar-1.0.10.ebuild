@@ -1,3 +1,4 @@
+# Copyright 1999-2016 Gentoo Foundation
 # Copyright 2016 Jan Chren (rindeal)
 # Distributed under the terms of the GNU General Public License v2
 
@@ -11,8 +12,7 @@ DISTUTILS_IN_SOURCE_BUILD=true
 
 GH_URI='github/arvidn/libtorrent'
 
-inherit git-hosting distutils-r1
-
+inherit git-hosting distutils-r1 eutils
 DESCRIPTION='C++ BitTorrent implementation focusing on efficiency and scalability'
 HOMEPAGE="http://libtorrent.org ${HOMEPAGE}"
 LICENSE='BSD'
@@ -26,26 +26,31 @@ IUSE='+crypt debug +dht doc examples python static-libs test'
 
 RDEPEND="
 	!!net-libs/rb_libtorrent
-	>=dev-libs/boost-1.53:=[threads]
-	sys-libs/zlib
+	dev-libs/boost:=[threads]
 	virtual/libiconv
+
 	crypt? ( dev-libs/openssl:0= )
 	examples? ( !net-p2p/mldonkey )
 	python? ( ${PYTHON_DEPS}
 		dev-libs/boost:=[python,${PYTHON_USEDEP}]
 	)"
 DEPEND="${RDEPEND}
-	>=sys-devel/libtool-2.2"
+	sys-devel/libtool"
 
 REQUIRED_USE="python? ( ${PYTHON_REQUIRED_USE} )"
-RESTRICT+=' test'
+RESTRICT+=" test"
 
 src_prepare() {
 	default
 
+	# https://github.com/rindeal/gentoo-overlay/issues/28
 	# make sure lib search dir points to the main `S` dir and not to python copies
 	sed -e "s|-L[^ ]*/src/\.libs|-L${S}/src/.libs|" \
-		-i -- 'bindings/python/link_flags.in' || die
+		-i -- bindings/python/link_flags.in || die
+
+	# respect optimization flags
+	sed -e '/FLAGS *=/ s|-Os||' \
+		-i configure CMakeLists.txt || die
 
 	use python && distutils-r1_src_prepare
 }
@@ -53,12 +58,16 @@ src_prepare() {
 src_configure() {
 	local myeconfargs=(
 		--disable-silent-rules # bug 441842
+		# hardcode boost system to skip "lookup heuristic"
 		--with-boost-system='mt'
 		--with-libiconv
+
 		$(use_enable crypt encryption)
 		$(use_enable debug)
-		$(usex debug '--enable-logging=verbose' '')
-		$(use_enable dht)
+		$(use_enable debug disk-stats)
+		$(use_enable debug logging verbose)
+		$(use_enable debug statistics)
+		$(use_enable dht dht $(usex debug logging yes))
 		$(use_enable examples)
 		$(use_enable static-libs static)
 		$(use_enable test tests)
@@ -90,7 +99,7 @@ src_compile() {
 }
 
 src_install() {
-	use doc && HTML_DOCS+=( "${S}"/docs )
+	use doc && local HTML_DOCS+=( ./docs )
 
 	default
 
@@ -101,4 +110,6 @@ src_install() {
 		}
 		distutils-r1_src_install
 	fi
+
+	prune_libtool_files
 }
