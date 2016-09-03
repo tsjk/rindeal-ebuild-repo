@@ -18,7 +18,7 @@ DESCRIPTION='C++ BitTorrent implementation focusing on efficiency and scalabilit
 HOMEPAGE="http://libtorrent.org ${HOMEPAGE}"
 LICENSE='BSD'
 
-SONAME='8'
+SONAME='9'
 SLOT="0/${SONAME}"
 SRC_URI="https://github.com/arvidn/libtorrent/releases/download/libtorrent-${PV//./_}/${P}.tar.gz"
 
