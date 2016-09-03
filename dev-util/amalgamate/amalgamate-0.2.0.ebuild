@@ -12,11 +12,11 @@ LICENSE="MIT"
 
 SLOT="0"
 
-KEYWORDS="~amd64 ~arm"
+[[ "${PV}" == *9999* ]] || KEYWORDS="~amd64 ~arm"
 
 src_install() {
-	dobin ${PN}
-	doman ${PN}.1
+	dobin "${PN}"
+	doman "${PN}.1"
 
 	einstalldocs
 }
