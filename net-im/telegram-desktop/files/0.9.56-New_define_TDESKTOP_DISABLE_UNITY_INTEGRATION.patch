@@ -1,0 +1,164 @@
+From bd8bb426bef022b4fba9640c22dd50334fb1259c Mon Sep 17 00:00:00 2001
+From: eegorov <egor.y.egorov@gmail.com>
+Date: Wed, 29 Jun 2016 08:38:42 +0600
+Subject: [PATCH] New define: TDESKTOP_DISABLE_UNITY_INTEGRATION Signed-off-by:
+ Egor Y. Egorov <egor.y.egorov@gmail.com> (github: eegorov)
+
+---
+ .travis.yml                                               | 1 +
+ .travis/build.sh                                          | 4 ++++
+ Telegram/SourceFiles/platform/linux/linux_libs.cpp        | 4 ++++
+ Telegram/SourceFiles/platform/linux/linux_libs.h          | 4 ++++
+ Telegram/SourceFiles/platform/linux/main_window_linux.cpp | 8 ++++++++
+ 5 files changed, 21 insertions(+)
+
+diff --git a/.travis.yml b/.travis.yml
+index 1f53338..7083bfe 100644
+--- a/.travis.yml
++++ b/.travis.yml
+@@ -9,6 +9,7 @@ env:
+   - BUILD_VERSION="disable_crash_reports"
+   - BUILD_VERSION="disable_network_proxy"
+   - BUILD_VERSION="disable_desktop_file_generation"
++  - BUILD_VERSION="disable_unity_integration"
+ 
+ arch:
+   packages:
+diff --git a/.travis/build.sh b/.travis/build.sh
+index b312628..99ca6d4 100755
+--- a/.travis/build.sh
++++ b/.travis/build.sh
+@@ -83,6 +83,10 @@ prepare() {
+ 		options+="\nDEFINES += TDESKTOP_DISABLE_DESKTOP_FILE_GENERATION"
+ 	fi
+ 
++	if [[ $BUILD_VERSION == *"disable_unity_integration"* ]]; then
++		options+="\nDEFINES += TDESKTOP_DISABLE_UNITY_INTEGRATION"
++	fi
++
+ 	options+='\nINCLUDEPATH += "/usr/lib/glib-2.0/include"'
+ 	options+='\nINCLUDEPATH += "/usr/lib/gtk-2.0/include"'
+ 	options+='\nINCLUDEPATH += "/usr/include/opus"'
+diff --git a/Telegram/SourceFiles/platform/linux/linux_libs.cpp b/Telegram/SourceFiles/platform/linux/linux_libs.cpp
+index 63bbf96..4d1ba3d 100644
+--- a/Telegram/SourceFiles/platform/linux/linux_libs.cpp
++++ b/Telegram/SourceFiles/platform/linux/linux_libs.cpp
+@@ -118,9 +118,11 @@ f_gtk_get_current_event_time gtk_get_current_event_time = nullptr;
+ f_g_object_ref_sink g_object_ref_sink = nullptr;
+ f_g_object_unref g_object_unref = nullptr;
+ f_g_idle_add g_idle_add = nullptr;
++#ifndef TDESKTOP_DISABLE_UNITY_INTEGRATION
+ f_unity_launcher_entry_set_count unity_launcher_entry_set_count = nullptr;
+ f_unity_launcher_entry_set_count_visible unity_launcher_entry_set_count_visible = nullptr;
+ f_unity_launcher_entry_get_for_desktop_id unity_launcher_entry_get_for_desktop_id = nullptr;
++#endif // TDESKTOP_DISABLE_UNITY_INTEGRATION
+ 
+ void start() {
+ 	DEBUG_LOG(("Loading libraries"));
+@@ -174,6 +176,7 @@ void start() {
+ 		LOG(("Could not load gtk-x11-2.0!"));
+ 	}
+ 
++#ifndef TDESKTOP_DISABLE_UNITY_INTEGRATION
+ 	if (QString(getenv("XDG_CURRENT_DESKTOP")).toLower() == qstr("unity")) {
+ 		QLibrary lib_unity(qstr("unity"), 9, 0);
+ 		loadLibrary(lib_unity, "unity", 9);
+@@ -182,6 +185,7 @@ void start() {
+ 		load(lib_unity, "unity_launcher_entry_set_count", unity_launcher_entry_set_count);
+ 		load(lib_unity, "unity_launcher_entry_set_count_visible", unity_launcher_entry_set_count_visible);
+ 	}
++#endif // TDESKTOP_DISABLE_UNITY_INTEGRATION
+ }
+ 
+ } // namespace Libs
+diff --git a/Telegram/SourceFiles/platform/linux/linux_libs.h b/Telegram/SourceFiles/platform/linux/linux_libs.h
+index 459d666..3376f69 100644
+--- a/Telegram/SourceFiles/platform/linux/linux_libs.h
++++ b/Telegram/SourceFiles/platform/linux/linux_libs.h
+@@ -27,7 +27,9 @@ extern "C" {
+ #define signals public
+ } // extern "C"
+ 
++#ifndef TDESKTOP_DISABLE_UNITY_INTEGRATION
+ #include <unity/unity/unity.h>
++#endif // TDESKTOP_DISABLE_UNITY_INTEGRATION
+ 
+ namespace Platform {
+ namespace Libs {
+@@ -167,6 +169,7 @@ extern f_g_object_unref g_object_unref;
+ typedef guint (*f_g_idle_add)(GSourceFunc function, gpointer data);
+ extern f_g_idle_add g_idle_add;
+ 
++#ifndef TDESKTOP_DISABLE_UNITY_INTEGRATION
+ typedef void (*f_unity_launcher_entry_set_count)(UnityLauncherEntry* self, gint64 value);
+ extern f_unity_launcher_entry_set_count unity_launcher_entry_set_count;
+ 
+@@ -175,6 +178,7 @@ extern f_unity_launcher_entry_set_count_visible unity_launcher_entry_set_count_v
+ 
+ typedef UnityLauncherEntry* (*f_unity_launcher_entry_get_for_desktop_id)(const gchar* desktop_id);
+ extern f_unity_launcher_entry_get_for_desktop_id unity_launcher_entry_get_for_desktop_id;
++#endif // TDESKTOP_DISABLE_UNITY_INTEGRATION
+ 
+ } // namespace Libs
+ } // namespace Platform
+diff --git a/Telegram/SourceFiles/platform/linux/main_window_linux.cpp b/Telegram/SourceFiles/platform/linux/main_window_linux.cpp
+index dfc4b74..8971a49 100644
+--- a/Telegram/SourceFiles/platform/linux/main_window_linux.cpp
++++ b/Telegram/SourceFiles/platform/linux/main_window_linux.cpp
+@@ -181,7 +181,9 @@ static gboolean _trayIconCheck(gpointer/* pIn*/) {
+     return FALSE;
+ }
+ 
++#ifndef TDESKTOP_DISABLE_UNITY_INTEGRATION
+ UnityLauncherEntry *_psUnityLauncherEntry = nullptr;
++#endif // TDESKTOP_DISABLE_UNITY_INTEGRATION
+ 
+ } // namespace
+ 
+@@ -319,6 +321,7 @@ void MainWindow::psUpdateCounter() {
+ 	int32 counter = App::histories().unreadBadge();
+ 
+ 	setWindowTitle((counter > 0) ? qsl("Telegram (%1)").arg(counter) : qsl("Telegram"));
++#ifndef TDESKTOP_DISABLE_UNITY_INTEGRATION
+ 	if (_psUnityLauncherEntry) {
+ 		if (counter > 0) {
+ 			Libs::unity_launcher_entry_set_count(_psUnityLauncherEntry, (counter > 9999) ? 9999 : counter);
+@@ -327,6 +330,7 @@ void MainWindow::psUpdateCounter() {
+ 			Libs::unity_launcher_entry_set_count_visible(_psUnityLauncherEntry, FALSE);
+ 		}
+ 	}
++#endif // TDESKTOP_DISABLE_UNITY_INTEGRATION
+ 
+ 	if (noQtTrayIcon) {
+ 		if (useAppIndicator) {
+@@ -416,12 +420,14 @@ void MainWindow::LibsLoaded() {
+ 		DEBUG_LOG(("Status icon api loaded!"));
+ 	}
+ 
++#ifndef TDESKTOP_DISABLE_UNITY_INTEGRATION
+ 	useUnityCount = (Libs::unity_launcher_entry_get_for_desktop_id != nullptr)
+ 			&& (Libs::unity_launcher_entry_set_count != nullptr)
+ 			&& (Libs::unity_launcher_entry_set_count_visible != nullptr);
+ 	if (useUnityCount) {
+ 		DEBUG_LOG(("Unity count api loaded!"));
+ 	}
++#endif // TDESKTOP_DISABLE_UNITY_INTEGRATION
+ }
+ 
+ void MainWindow::psUpdateDelegate() {
+@@ -598,6 +604,7 @@ void MainWindow::psCreateTrayIcon() {
+ void MainWindow::psFirstShow() {
+ 	psCreateTrayIcon();
+ 
++#ifndef TDESKTOP_DISABLE_UNITY_INTEGRATION
+ 	if (useUnityCount) {
+ 		_psUnityLauncherEntry = Libs::unity_launcher_entry_get_for_desktop_id("telegramdesktop.desktop");
+ 		if (_psUnityLauncherEntry) {
+@@ -613,6 +620,7 @@ void MainWindow::psFirstShow() {
+ 	} else {
+ 		LOG(("Not using Unity Launcher count."));
+ 	}
++#endif // TDESKTOP_DISABLE_UNITY_INTEGRATION
+ 
+ 	psUpdateMargins();
+ 
