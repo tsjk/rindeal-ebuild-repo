@@ -73,16 +73,19 @@ case "${_GH_PROVIDER}" in
 	*) die "Unsupported provider '${_GH_PROVIDER}'" ;;
 esac
 
-_GH_BASE_URI="https://${_GH_DOMAIN}/${_GH_USER}/${_GH_REPO}"
+# @ECLASS-VARIABLE: GH_BASE_URI
+# @DESCRIPTION:
+# Base uri of the repo
+declare -g -r GH_BASE_URI="https://${_GH_DOMAIN}/${_GH_USER}/${_GH_REPO}"
 
 if [ -z "${SRC_URI}" ] && [ "${GH_FETCH_TYPE}" == 'snapshot' ] ; then
 	case "${_GH_PROVIDER}" in
 		'bitbucket')
-			SRC_URI="${_GH_BASE_URI}/get/${GH_REF}.tar.bz2 -> ${GH_DISTFILE}.tar.bz2" ;;
+			SRC_URI="${GH_BASE_URI}/get/${GH_REF}.tar.bz2 -> ${GH_DISTFILE}.tar.bz2" ;;
 		'github')
-			SRC_URI="${_GH_BASE_URI}/archive/${GH_REF}.tar.gz -> ${GH_DISTFILE}.tar.gz" ;;
+			SRC_URI="${GH_BASE_URI}/archive/${GH_REF}.tar.gz -> ${GH_DISTFILE}.tar.gz" ;;
 		'gitlab')
-			SRC_URI="${_GH_BASE_URI}/repository/archive.tar.gz?ref=${GH_REF} -> ${GH_DISTFILE}.tar.gz" ;;
+			SRC_URI="${GH_BASE_URI}/repository/archive.tar.gz?ref=${GH_REF} -> ${GH_DISTFILE}.tar.gz" ;;
 		*) die "Unsupported provider '${_GH_PROVIDER}'" ;;
 	esac
 
@@ -92,7 +95,7 @@ fi
 
 if [ -z "${EGIT_REPO_URI}" ] ; then
 	EGIT_REPO_URI="
-		${_GH_BASE_URI}.git
+		${GH_BASE_URI}.git
 		git@${_GH_DOMAIN}:${_GH_USER}/${_GH_REPO}.git"
 fi
 
@@ -112,7 +115,7 @@ case "${GH_FETCH_TYPE}" in
 	*) die "Unsupported fetch type: '${GH_FETCH_TYPE}'" ;;
 esac
 
-: ${HOMEPAGE:="${_GH_BASE_URI}"}
+: ${HOMEPAGE:="${GH_BASE_URI}"}
 
 # prefer their CDN over Gentoo mirrors
 RESTRICT="${RESTRICT} primaryuri"
