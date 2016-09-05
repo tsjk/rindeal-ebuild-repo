@@ -31,13 +31,13 @@ DEPEND="${RDEPEND}
 REQUIRED_USE="?? ( hwloc linux-affinity )"
 
 pkg_setup() {
-	if ! has_version dev-util/strace ; then
-		ewarn "To use strace features in htop (what processes are calling"
-		ewarn "what syscalls), you must have dev-util/strace installed."
-	fi
 	if ! has_version sys-process/lsof ; then
-		ewarn "To use lsof features in htop (what processes are accessing"
-		ewarn "what files), you must have sys-process/lsof installed."
+		einfo "To use lsof features in htop (what processes are accessing"
+		einfo "what files), you must have sys-process/lsof installed."
+	fi
+	if ! has_version dev-util/strace ; then
+		einfo "To use strace features in htop (what processes are calling"
+		einfo "what syscalls), you must have dev-util/strace installed."
 	fi
 
 	CONFIG_CHECK="
@@ -54,7 +54,7 @@ src_prepare() {
 	# improve .desktop file
 	sed -e 's|\(Categories=\).*|\1System;Monitor;ConsoleOnly;|' \
 		-e 's|\(Keywords=\).*|\1system;process;task;|' \
-		-i -- ${PN}.desktop || die
+		-i -- "${PN}.desktop" || die
 
 	eautoreconf
 }
@@ -77,6 +77,9 @@ src_configure() {
 
 src_install() {
 	default
+
+	insinto /etc
+	newins "${FILESDIR}"/2.0.2-htoprc htoprc
 
 	doicon -s 128 ${PN}.png
 }
