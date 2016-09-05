@@ -5,4 +5,9 @@
     <email>dev.rindeal+gentoo-overlay@gmail.com</email>
     <name>Jan Chren (rindeal)</name>
   </maintainer>
+  <use>
+    <flag name="opencv">Add support for OpenCV (<pkg>media-libs/opencv</pkg>)</flag>
+    <flag name="plugins">Add support for plugins + build some default ones</flag>
+    <flag name="zip">Enable opening .zip archives</flag>
+  </use>
 </pkgmetadata>
