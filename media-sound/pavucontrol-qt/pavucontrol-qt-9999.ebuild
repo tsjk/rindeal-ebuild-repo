@@ -30,7 +30,7 @@ RDEPEND="${CDEPEND}"
 src_configure() {
 	local mycmakeargs=(
 		# workaround for missing cmake modules
-		# TODO: is this fixed in liblxqt master?
+		# TODO: remove this once lxqt-base/liblxqt>10.0 hits the tree
 		-DCMAKE_MODULE_PATH="${FILESDIR}/cmake-find-modules"
 	)
 	cmake-utils_src_configure
