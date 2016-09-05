@@ -23,9 +23,15 @@ esac
 # Default <user_name> and <repository_name> is ${PN}
 [ -z "${GH_URI}" ] && die "GH_URI must be set"
 _GH_URI_A=( ${GH_URI//\// } )
-_GH_PROVIDER="${_GH_URI_A[0]}"
-_GH_USER="${_GH_URI_A[1]:-"${PN}"}"
-_GH_REPO="${_GH_URI_A[2]:-"${PN}"}"
+# @ECLASS-VARIABLE: GH_PROVIDER
+# @DESCRIPTION:
+declare -g -r GH_PROVIDER="${_GH_URI_A[0]}"
+# @ECLASS-VARIABLE: GH_USER
+# @DESCRIPTION:
+declare -g -r GH_USER="${_GH_URI_A[1]:-"${PN}"}"
+# @ECLASS-VARIABLE: GH_REPO
+# @DESCRIPTION:
+declare -g -r GH_REPO="${_GH_URI_A[2]:-"${PN}"}"
 unset _GH_URI_A
 
 # @ECLASS-VARIABLE: GH_FETCH_TYPE
@@ -63,30 +69,30 @@ fi
 : ${GH_DISTFILE:="${P}"}
 
 
-case "${_GH_PROVIDER}" in
+case "${GH_PROVIDER}" in
 	'bitbucket')
 		_GH_DOMAIN='bitbucket.org' ;;
 	'github')
 		_GH_DOMAIN='github.com' ;;
 	'gitlab')
 		_GH_DOMAIN='gitlab.com' ;;
-	*) die "Unsupported provider '${_GH_PROVIDER}'" ;;
+	*) die "Unsupported provider '${GH_PROVIDER}'" ;;
 esac
 
 # @ECLASS-VARIABLE: GH_BASE_URI
 # @DESCRIPTION:
 # Base uri of the repo
-declare -g -r GH_BASE_URI="https://${_GH_DOMAIN}/${_GH_USER}/${_GH_REPO}"
+declare -g -r GH_BASE_URI="https://${_GH_DOMAIN}/${GH_USER}/${GH_REPO}"
 
 if [ -z "${SRC_URI}" ] && [ "${GH_FETCH_TYPE}" == 'snapshot' ] ; then
-	case "${_GH_PROVIDER}" in
+	case "${GH_PROVIDER}" in
 		'bitbucket')
 			SRC_URI="${GH_BASE_URI}/get/${GH_REF}.tar.bz2 -> ${GH_DISTFILE}.tar.bz2" ;;
 		'github')
 			SRC_URI="${GH_BASE_URI}/archive/${GH_REF}.tar.gz -> ${GH_DISTFILE}.tar.gz" ;;
 		'gitlab')
 			SRC_URI="${GH_BASE_URI}/repository/archive.tar.gz?ref=${GH_REF} -> ${GH_DISTFILE}.tar.gz" ;;
-		*) die "Unsupported provider '${_GH_PROVIDER}'" ;;
+		*) die "Unsupported provider '${GH_PROVIDER}'" ;;
 	esac
 
 	# if ${GH_DISTFILE} != ${P}, destdir wouldn't match ${S}, thus override it via a template
@@ -96,7 +102,7 @@ fi
 if [ -z "${EGIT_REPO_URI}" ] ; then
 	EGIT_REPO_URI="
 		${GH_BASE_URI}.git
-		git@${_GH_DOMAIN}:${_GH_USER}/${_GH_REPO}.git"
+		git@${_GH_DOMAIN}:${GH_USER}/${GH_REPO}.git"
 fi
 
 
