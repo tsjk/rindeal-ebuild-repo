@@ -63,10 +63,10 @@ if [ -z "${GH_REF}" ] ; then
 fi
 
 # @ECLASS-VARIABLE: GH_DISTFILE
-# @DEFAULT: ${P}
+# @DEFAULT: ${P}-${GH_PROVIDER}
 # @DESCRIPTION:
 # Name of the distfile (without any extensions).
-: ${GH_DISTFILE:="${P}"}
+: ${GH_DISTFILE:="${P}-${GH_PROVIDER}"}
 
 
 case "${GH_PROVIDER}" in
@@ -122,6 +122,8 @@ esac
 
 # prefer their CDN over Gentoo mirrors
 RESTRICT="${RESTRICT} primaryuri"
+
+S="${WORKDIR}/${GH_DISTFILE}"
 
 
 EXPORT_FUNCTIONS src_unpack
