@@ -5,8 +5,6 @@
 EAPI=6
 
 GH_URI="github/hishamhm"
-# prevent clashes with 'hisham.hm' SRC_URI provider
-GH_DISTFILE="${PN}-${PV}-github"
 
 # linux-info: pkg_setup
 # git-hosting: src_unpack
