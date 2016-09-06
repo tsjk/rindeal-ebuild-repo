@@ -1,11 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE pkgmetadata SYSTEM "http://www.gentoo.org/dtd/metadata.dtd">
 <pkgmetadata>
-	<use>
-		<flag name="clang">Prefer <pkg>sys-devel/clang</pkg> C++ backend over legacy</flag>
-		<flag name="cmake">Enable support for CMake build system</flag>
-		<flag name="ninja">Enable support for Ninja build system</flag>
-		<flag name="qmake">Enable support for QMake build system</flag>
-		<flag name="qthelp">Enable support for QtHelp documentation browsing</flag>
-	</use>
+  <maintainer type="person">
+    <email>dev.rindeal+gentoo-overlay@gmail.com</email>
+    <name>Jan Chren (rindeal)</name>
+  </maintainer>
+  <use>
+    <flag name="clang">Prefer <pkg>sys-devel/clang</pkg> C++ backend over legacy</flag>
+    <flag name="cmake">Enable support for CMake build system</flag>
+    <flag name="ninja">Enable support for Ninja build system</flag>
+    <flag name="qmake">Enable support for QMake build system</flag>
+    <flag name="qthelp">Enable support for QtHelp documentation browsing</flag>
+  </use>
 </pkgmetadata>
