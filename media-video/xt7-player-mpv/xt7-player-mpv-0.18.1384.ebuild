@@ -6,10 +6,10 @@ EAPI=6
 GH_URI='github/kokoko3k'
 GH_REF="${PV}"
 
-inherit eutils git-hosting
+inherit git-hosting eutils xdg
 
-DESCRIPTION="Xt7-Player-mpv is a graphical interface to mpv, focused on usability"
-HOMEPAGE="http://xt7-player.sourceforge.net/xt7forum/"
+DESCRIPTION="Graphical interface to mpv, focused on usability"
+HOMEPAGE="http://xt7-player.sourceforge.net/xt7forum/ ${HOMEPAGE}"
 LICENSE="GPL-3"
 
 SLOT="0"
@@ -19,10 +19,10 @@ IUSE="taglib global-hotkeys dvb youtube" # FIXME
 
 DEPEND="
 	dev-lang/gambas:3[libxml,qt4,dbus,x11,net,curl]
-	dev-qt/qtcore:4
-	media-video/mpv:0
+	media-video/mpv
 "
-RDEPEND="${DEPEND}"
+RDEPEND="${DEPEND}
+	x11-misc/xbindkeys"
 
 src_compile() {
 	local gbc_args=(
@@ -38,9 +38,10 @@ src_compile() {
 }
 
 src_install() {
-	newbin ${PN}*.gambas "$PN"
+	newbin ${PN}*.gambas "${PN}"
 
-	sed "s|${PN}.*\.gambas|${PN}|" \
+	# fix bin name
+	sed -e "s|${PN}.*\.gambas|${PN}|" \
         -i -- "${PN}.desktop" || die
 	domenu "${PN}.desktop"
 
