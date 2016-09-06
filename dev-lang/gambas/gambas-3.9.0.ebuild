@@ -1,27 +1,29 @@
 # Copyright 1999-2016 Gentoo Foundation
+# Copyright 2016 Jan Chren (rindeal)
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI="6"
 
-inherit autotools eutils fdo-mime flag-o-matic-patched
+inherit flag-o-matic-patched
+inherit autotools eutils xdg
 
 DESCRIPTION="Gambas is a free development environment based on a Basic interpreter"
 HOMEPAGE="http://gambas.sourceforge.net/en/main.html"
 LICENSE="GPL-2"
 
 SLOT="3"
-MY_PN="${PN}${SLOT}"
-SRC_URI="mirror://sourceforge/${PN}/${MY_PN}-${PV}.tar.bz2"
+PN_SLOTTED="${PN}${SLOT}"
+MY_P="${PN_SLOTTED}-${PV}"
+SRC_URI="mirror://sourceforge/${PN}/${MY_P}.tar.bz2"
 
 KEYWORDS="~amd64"
-IUSE=(
+IUSE_A=(
 	'+curl' '+net' '+qt4' '+x11'
 	'bzip2' 'cairo' 'crypt' 'dbus' 'examples' 'gmp' 'gnome' 'gsl' 'gstreamer' 'gtk2' 'gtk3'
 	'httpd' 'image-imlib' 'image-io' 'jit' 'libxml' 'mime' 'mysql' 'ncurses' 'odbc' 'openal'
 	'opengl' 'openssl' 'pcre' 'pdf' 'pop3' 'postgres' 'qt4-opengl' 'qt4-webkit' 'qt5' 'sdl'
 	'sdl-sound' 'sdl2' 'sqlite' 'v4l' 'xml' 'zlib'
 )
-IUSE="${IUSE[@]}"
 
 # gambas3 have the only one gui. it is based on qt4.
 # these use flags (modules/plugins) require this qt4 gui to be present at the system to work properly:
@@ -105,11 +107,14 @@ RDEPEND="
 "
 DEPEND="${RDEPEND}
 	virtual/libintl
+	virtual/pkgconfig
 "
 
 RESTRICT="mirror"
 
-S="${WORKDIR}/${MY_PN}-${PV}"
+inherit arrays
+
+S="${WORKDIR}/${MY_P}"
 
 autocrap_cleanup() {
 	sed -e "/^\(AC\|GB\)_CONFIG_SUBDIRS(${1}[,)]/d" \
@@ -119,10 +124,19 @@ autocrap_cleanup() {
 }
 
 src_prepare() {
-	# funtoo-ism
-	epatch "${FILESDIR}/xdgutils.patch"
+	xdg_src_prepare
 
-	eapply_user
+	# do not call xdg-* utils
+	find . -name "Makefile.am" | xargs \
+		sed -r -e 's|^[ \t]*xdg-.*\\|\\|' -i --
+	assert
+
+	local sedargs=(
+		# respect C(XX)FLAGS
+		-e '/C(XX)?FLAGS=""/d'
+		-e '/CX*FLAGS[_A-Z]*=/ s:(-O[a-z0-9]*|-g[a-z0-9]*|-fno-omit-[a-z-]*)::g'
+	)
+	sed -r "${sedargs[@]}" -i -- acinclude.m4 || die
 
 	# deprecated
 	autocrap_cleanup sqlite2
@@ -170,7 +184,6 @@ src_prepare() {
 }
 
 src_configure() {
-	append-cppflags -std=gnu++11
 	append-cxxflags -std=gnu++11
 
 	local args=()
@@ -240,27 +253,19 @@ src_install() {
 	use pcre && newdoc gb.pcre/src/README gb.pcre-README
 
 	if use qt4 ; then
-		doicon "${S}/app/desktop/${MY_PN}.svg"
-		domenu "${S}/app/desktop/${MY_PN}.desktop"
+		doicon -s scalable "${S}/app/desktop/${PN_SLOTTED}.svg"
+		domenu "${S}/app/desktop/${PN_SLOTTED}.desktop"
 
 		doicon -s 64 -c mimetypes \
 			"${S}/app/mime/application-x-gambasscript.png" \
 			"${S}/app/mime/application-x-gambasserverpage.png" \
-			"${S}/main/mime/application-x-gambas3.png"
+			"${S}/main/mime/application-x-${PN_SLOTTED}.png"
 
 		insinto /usr/share/mime/application
 		doins "${S}/app/mime/application-x-gambasscript.xml" \
 			"${S}/app/mime/application-x-gambasserverpage.xml" \
-			"${S}/main/mime/application-x-gambas3.xml"
+			"${S}/main/mime/application-x-${PN_SLOTTED}.xml"
 	fi
-}
 
-pkg_postinst() {
-	fdo-mime_desktop_database_update
-	fdo-mime_mime_database_update
-}
-
-pkg_postrm() {
-	fdo-mime_desktop_database_update
-	fdo-mime_mime_database_update
+	prune_libtool_files --modules
 }
