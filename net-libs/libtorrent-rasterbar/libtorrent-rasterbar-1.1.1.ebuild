@@ -10,17 +10,17 @@ PYTHON_REQ_USE="threads"
 DISTUTILS_OPTIONAL=true
 DISTUTILS_IN_SOURCE_BUILD=true
 
-GH_URI='github/arvidn/libtorrent'
+gh_repo='arvidn/libtorrent'
 
-inherit git-hosting distutils-r1 eutils
+inherit vcs-snapshot distutils-r1 eutils
 
 DESCRIPTION='C++ BitTorrent implementation focusing on efficiency and scalability'
-HOMEPAGE="http://libtorrent.org ${HOMEPAGE}"
+HOMEPAGE="http://libtorrent.org https://github.com/${gh_repo}"
 LICENSE='BSD'
 
 SONAME='9'
 SLOT="0/${SONAME}"
-SRC_URI="https://github.com/arvidn/libtorrent/releases/download/libtorrent-${PV//./_}/${P}.tar.gz"
+SRC_URI="https://github.com/${gh_repo}/releases/download/libtorrent-${PV//./_}/${P}.tar.gz"
 
 KEYWORDS='~amd64 ~arm'
 IUSE='+crypt debug +dht doc examples python static-libs test'
