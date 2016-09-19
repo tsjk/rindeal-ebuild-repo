@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "http://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+  <maintainer type="person">
+    <email>dev.rindeal+gentoo-overlay@gmail.com</email>
+    <name>Jan Chren (rindeal)</name>
+  </maintainer>
+  <use>
+    <flag name="builtin-mjpg">Use the internal mjpeg decoder over libavcodec</flag>
+    <flag name="gsl">Use the GNU scientific library for filters</flag>
+    <flag name="sdl2">Use libsdl2 instead of libsdl</flag>
+  </use>
+</pkgmetadata>
