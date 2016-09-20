@@ -12,24 +12,18 @@ LICENSE='GPL-2'
 
 SLOT='0'
 
-KEYWORDS='~amd64 ~arm ~x86'
-
+KEYWORDS='~amd64 ~arm'
 IUSE='doc examples'
 
-CDEPEND="
-	amd64? ( dev-libs/libx86emu )
-	x86? ( dev-libs/libx86emu )
-"
+CDEPEND="amd64? ( dev-libs/libx86emu )"
 DEPEND="${CDEPEND}
 	sys-devel/flex
 	>=sys-kernel/linux-headers-2.6.17
 	virtual/pkgconfig
-	doc? ( app-doc/doxygen )
-"
+	doc? ( app-doc/doxygen )"
 RDEPEND="${CDEPEND}
 	dev-perl/XML-Parser
-	virtual/udev
-"
+	virtual/udev"
 
 src_prepare() {
 	default
@@ -56,8 +50,8 @@ src_prepare() {
 		# respect LD
 		-e 's|LD[ \t]*=|LD ?=|'
 	)
-	sed  -i "${sed_args[@]}" \
-		-- Makefile.common || die
+	sed "${sed_args[@]}" \
+		-i -- Makefile.common || die
 }
 
 src_configure() {
