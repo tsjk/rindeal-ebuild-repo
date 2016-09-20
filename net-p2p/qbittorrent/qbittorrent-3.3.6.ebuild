@@ -5,6 +5,7 @@ EAPI=6
 
 GH_URI="github/qbittorrent/qBittorrent"
 GH_REF="release-${PV}"
+GH_FETCH_TYPE="none"
 
 inherit flag-o-matic-patched qmake-utils git-hosting
 
