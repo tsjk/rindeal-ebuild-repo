@@ -3,9 +3,9 @@
 
 EAPI=6
 
-inherit eutils fdo-mime
+inherit eutils xdg
 
-MY_PN="${PN%-bin}"
+PN_NOBIN="${PN%-bin}"
 
 DESCRIPTION="Free universal database manager and SQL client"
 HOMEPAGE="http://dbeaver.jkiss.org/"
@@ -14,47 +14,41 @@ LICENSE="GPL-2"
 SLOT="0"
 src_uri_base="https://github.com/serge-rider/dbeaver/releases/download/${PV}/dbeaver-ce-${PV}-linux.gtk"
 SRC_URI="
-	amd64? ( ${src_uri_base}.x86_64.tar.gz )
-	x86? ( ${src_uri_base}.x86.tar.gz )"
+	amd64? ( ${src_uri_base}.x86_64.tar.gz )"
 RESTRICT="mirror strip test"
 
-KEYWORDS="-* ~amd64 ~x86"
+KEYWORDS="-* ~amd64"
 
 RDEPEND="
 	|| ( >=virtual/jdk-1.7 >=virtual/jre-1.7 )
-	!dev-db/dbeaver
-"
+	!dev-db/dbeaver"
 
-S="${WORKDIR}/${MY_PN}"
+S="${WORKDIR}/${PN_NOBIN}"
 
 src_compile() { : ;}
 
 src_install (){
-	local install_dir="${EPREFIX}/opt/${MY_PN}"
-	local bin="${EPREFIX}/usr/bin/${MY_PN}"
+	local install_dir="/opt/${PN_NOBIN}"
+	local bin="/usr/bin/${PN_NOBIN}"
 
 	insinto "${install_dir}"
 	doins -r *
 
-	fperms a+x "${install_dir}/${MY_PN}"
-	dosym "${install_dir}/${MY_PN}" "${bin}"
+	fperms a+x "${install_dir}/${PN_NOBIN}"
+	dosym "${install_dir}/${PN_NOBIN}" "${bin}"
 
-	newicon -s 256 "icon.xpm" "${MY_PN}.xpm"
+	newicon -s 256 "icon.xpm" "${PN_NOBIN}.xpm"
 
-	make_desktop_entry_args=(
-		"${bin} %U"				# exec
-		"DBeaver"				# name
-		"${MY_PN}"				# icon
+	local make_desktop_entry_args=(
+		"${EPREFIX}${bin} %U" # exec
+		"DBeaver"	# name
+		"${PN_NOBIN}"	# icon
 		"Development;Database"	# categories
 	)
-	make_desktop_entry_extras=(
+	local make_desktop_entry_extras=(
 		"MimeType=application/x-sqlite3;"	# MUST end with semicolon
 	)
 	make_desktop_entry \
 		"${make_desktop_entry_args[@]}" \
 		"$( printf '%s\n' "${make_desktop_entry_extras[@]}" )"
-}
-
-pkg_postinst() {
-	fdo-mime_desktop_database_update
 }
