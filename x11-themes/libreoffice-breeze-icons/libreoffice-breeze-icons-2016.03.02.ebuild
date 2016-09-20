@@ -4,13 +4,15 @@
 EAPI=6
 
 DESCRIPTION="Breeze dark icons set for Libreoffice"
-HOMEPAGE="https://github.com/NitruxSA/plasma-next-icons"
+HOMEPAGE="
+	https://github.com/DarkknightAK/breeze-icon-theme
+	https://github.com/aitorpazos/archlinux-libreoffice-breeze-icons"
 LICENSE="LGPL-3"
 
 SLOT="0"
 SRC_URI="https://github.com/aitorpazos/archlinux-libreoffice-breeze-icons/releases/download/${PV}/${P}.tar.gz"
 
-KEYWORDS="~amd64 ~arm ~arm64 ~x86"
+KEYWORDS="~amd64 ~arm"
 
 S="${WORKDIR}"
 
