@@ -27,14 +27,14 @@ src_unpack() {
 	S="${PWD}"
 }
 
-inst_d='opt/${PN_NO_BIN}'
-QA_PRESTRIPPED="${inst_d}/bin/${PN_NO_BIN}"
+inst_d="/opt/${PN_NO_BIN}"
+QA_PRESTRIPPED="${inst_d#/}/bin/${PN_NO_BIN}"
 
 src_install() {
-	into "/${inst_d}"
-	dobin ${PN_NO_BIN}
-	dosym "/${inst_d}"/bin/${PN_NO_BIN} /usr/bin/${PN_NO_BIN}
+	into "${inst_d}"
+	dobin "${PN_NO_BIN}"
+	dosym "${inst_d}/bin/${PN_NO_BIN}" "/usr/bin/${PN_NO_BIN}"
 
-	doman ${PN_NO_BIN}.1
+	doman "${PN_NO_BIN}.1"
 	dodoc README.*
 }
