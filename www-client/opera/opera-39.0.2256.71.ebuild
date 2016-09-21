@@ -6,7 +6,7 @@ EAPI=6
 CHROMIUM_LANGS="
 	af az be bg bn ca cs da de el en-GB en-US es-419 es fil fi fr-CA fr fy gd
 	he hi hr hu id it ja kk ko lt lv me mk ms nb nl nn pa pl pt-BR pt-PT ro ru
-	sk sr sv sw ta te th tr uk uz vi zh-CN zh-TW zu
+	sk sr sr-ME sv sw ta te th tr uk uz vi zh-CN zh-TW zu
 "
 inherit chromium-2 unpacker pax-utils
 
