@@ -60,15 +60,15 @@ RDEPEND="
 S="${WORKDIR}"
 
 QA_PREBUILT="*"
-OPERA_HOME="opt/${PN}"
+OPERA_HOME="/opt/${PN}"
 
 src_prepare() {
 	eapply_user
 
-	mkdir -p "${OPERA_HOME}" || die
+	mkdir -p "${OPERA_HOME#/}" || die
 
 	# fix libdir
-	mv -v -T "usr/lib/x86_64-linux-gnu/${PN}" "${OPERA_HOME}" || die
+	mv -v -T "usr/lib/x86_64-linux-gnu/${PN}" "${OPERA_HOME#/}" || die
 	rm -r -v "usr/lib" || die
 
 	# delete debian-specific files
@@ -81,9 +81,9 @@ src_prepare() {
 	mv -v "usr/share/doc/opera-stable" "usr/share/doc/${PF}" || die
 
 	# delete autoupdater
-	use autoupdate || rm -v "${OPERA_HOME}/opera_autoupdate" || die
+	use autoupdate || rm -v "${OPERA_HOME#/}/opera_autoupdate" || die
 
-	pushd "${OPERA_HOME}/localization" >/dev/null || die
+	pushd "${OPERA_HOME#/}/localization" >/dev/null || die
 	chromium_remove_language_paks
 	popd >/dev/null || die
 
@@ -97,12 +97,12 @@ src_install() {
 	doins -r *
 
 	# fix broken symlink
-	rm -v "${ED}"/usr/bin/${PN} || die
-	dosym "/${OPERA_HOME}"/${PN} /usr/bin/${PN}
+	rm -v "${ED}/usr/bin/${PN}" || die
+	dosym "${OPERA_HOME}/${PN}" "/usr/bin/${PN}"
 
 	# fix permissions and pax-mark binaries
-	use autoupdate && fperms a+x "/${OPERA_HOME}"/opera_autoupdate
-	fperms a+x "/${OPERA_HOME}"/${PN}
-	fperms 4711 "/${OPERA_HOME}"/opera_sandbox
-	pax-mark -m "/${OPERA_HOME}"/{opera,opera_sandbox}
+	fperms a+x "${OPERA_HOME}/${PN}"
+	fperms 4711 "${OPERA_HOME}/opera_sandbox"
+	use autoupdate && fperms a+x "${OPERA_HOME}/opera_autoupdate"
+	pax-mark -m "${ED}/${OPERA_HOME}"/{opera,opera_sandbox}
 }
