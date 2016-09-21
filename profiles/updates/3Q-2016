@@ -1,1 +1,2 @@
 move net-im/telegram net-im/telegram-desktop
+slotmove dev-util/smartgit 0 7.1
