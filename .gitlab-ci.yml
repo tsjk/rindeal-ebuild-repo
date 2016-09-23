@@ -1,6 +1,8 @@
 image: gentoo/stage3-amd64-hardened:latest
 
 before_script:
+  - wget https://ftp.uni-erlangen.de/gentoo/snapshots/squashfs/gentoo-current.lzo.sqfs -O /tmp/gentoo.sqfs
+  - mount /tmp/gentoo.sqfs /usr/portage
   - emerge --ask=n repoman
 
 repoman:
