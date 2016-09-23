@@ -10,4 +10,4 @@ cat <<-'_EOF_' >> /etc/portage/package.accept_keywords
     =app-portage/repoman-2.3.0-r1 ~amd64
 _EOF_
 
-emerge --ask=n '>=sys-apps/portage-2.3.0_rc1' repoman
+emerge --ask=n '>=sys-apps/portage-2.3.0' repoman
