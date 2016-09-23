@@ -3,15 +3,7 @@ image: gentoo/stage3-amd64-hardened:latest
 before_script:
   - mkdir -p /usr/portage
   - wget -O - https://github.com/gentoo-mirror/gentoo/archive/stable.tar.gz | tar -xz -C /usr/portage --strip-components=1
-  - >
-    echo '
-      # required by app-portage/repoman-2.3.0-r1::gentoo
-      # required by repoman (argument)
-      =dev-python/lxml-3.6.4 ~amd64
-      # # required by repoman (argument)
-      =app-portage/repoman-2.3.0-r1 ~amd64
-    ' >> /etc/portage/package.accepted_keywords
-  - emerge --ask=n repoman
+  - bash .gitlab-ci/install_repoman.sh
 
 repoman:
   script:
