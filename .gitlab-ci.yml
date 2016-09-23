@@ -3,5 +3,6 @@ image: gentoo:stage3-amd64-hardened
 before_script:
   - emerge --ask=n repoman
 
-build:
-  - repoman full --include-dev --verbose .
+repoman:
+  script:
+    - repoman full --include-dev --verbose .
