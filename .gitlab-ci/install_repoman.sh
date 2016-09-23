@@ -14,5 +14,8 @@ cat <<-'_EOF_' >> /etc/portage/package.accept_keywords
 _EOF_
 
 eselect profile set default/linux/amd64/13.0/systemd
+eselect python set python3.4
 
-emerge --ask=n portage repoman
+pwd
+
+emerge --ask=n --jobs=$(($(nproc)+1)) portage repoman
