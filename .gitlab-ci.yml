@@ -1,4 +1,4 @@
-image: gentoo:stage3-amd64-hardened
+image: gentoo/stage3-amd64-hardened:latest
 
 before_script:
   - emerge --ask=n repoman
