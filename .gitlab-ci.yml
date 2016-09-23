@@ -1,6 +1,7 @@
 image: gentoo/stage3-amd64-hardened:latest
 
 before_script:
+  - mkdir -p /usr/portage
   - wget -O - https://github.com/gentoo-mirror/gentoo/archive/stable.tar.gz | tar -xz -C /usr/portage --strip-components=1
   - emerge --ask=n repoman
 
