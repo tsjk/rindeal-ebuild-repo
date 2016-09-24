@@ -64,7 +64,7 @@ unset _GH_URI_A
 # @DEFAULT: 'snapshot', for versions containing '9999' defaults to 'live'
 # @DESCRIPTION:
 # Defines if fetched from git ("live") or archive ("snapshot") or eclass
-# shouldn't handle fetching at all ("none").
+# shouldn't handle fetching at all ("manual").
 ##
 if [[ -z "${GH_FETCH_TYPE}" ]] ; then
 	if [[ "${PV}" == *9999* ]] ; then
@@ -89,7 +89,7 @@ if [[ -z "${GH_REF}" ]] ; then
 			# - `v` prefix: 350
 			# - no prefix: 192
 			GH_REF="${PV}" ;;
-		'live' | 'none') : ;;
+		'live' | 'manual') : ;;
 		*) die "Unsupported fetch type: '${GH_FETCH_TYPE}'" ;;
 	esac
 fi
@@ -157,7 +157,7 @@ case "${GH_FETCH_TYPE}" in
 	'snapshot')
 		inherit vcs-snapshot
 		;;
-	'none') : ;;
+	'manual') : ;;
 	*) die "Unsupported fetch type: '${GH_FETCH_TYPE}'" ;;
 esac
 
@@ -205,7 +205,7 @@ git-hosting_src_unpack() {
 				mv -v "${GH_DISTFILE}" "${P}" || die
 			fi
 			;;
-		'none') default ;;
+		'manual') default ;;
 		*) die ;;
 	esac
 }
