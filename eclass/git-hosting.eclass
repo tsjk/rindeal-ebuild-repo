@@ -125,17 +125,30 @@ esac
 ##
 declare -g -r GH_BASE_URI="https://${_GH_DOMAIN}/${GH_USER}/${GH_REPO}"
 
+
 # set SRC_URI only for 'snapshot' GH_FETCH_TYPE
+declare -g -- _GH_SNAPSHOT_SRC_URI=''
 if [[ "${GH_FETCH_TYPE}" == 'snapshot' ]] ; then
 	case "${GH_PROVIDER}" in
 		'bitbucket')
-			SRC_URI="${GH_BASE_URI}/get/${GH_REF}.tar.bz2 -> ${GH_DISTFILE}.tar.bz2" ;;
+			_GH_SNAPSHOT_EXT=".tar.bz2"
+			_GH_SNAPSHOT_URI_PATH="get/${GH_REF}${_GH_SNAPSHOT_EXT}"
+			;;
 		'github')
-			SRC_URI="${GH_BASE_URI}/archive/${GH_REF}.tar.gz -> ${GH_DISTFILE}.tar.gz" ;;
+			_GH_SNAPSHOT_EXT=".tar.gz"
+			_GH_SNAPSHOT_URI_PATH="archive/${GH_REF}${_GH_SNAPSHOT_EXT}"
+			;;
 		'gitlab')
-			SRC_URI="${GH_BASE_URI}/repository/archive.tar.gz?ref=${GH_REF} -> ${GH_DISTFILE}.tar.gz" ;;
+			_GH_SNAPSHOT_EXT=".tar.gz"
+			_GH_SNAPSHOT_URI_PATH="repository/archive${_GH_SNAPSHOT_EXT}?ref=${GH_REF}"
+			;;
 		*) die "Unsupported provider '${GH_PROVIDER}'" ;;
 	esac
+
+	_GH_SNAPSHOT_FILENAME="${GH_DISTFILE}${_GH_SNAPSHOT_EXT}"
+	_GH_SNAPSHOT_SRC_URI="${GH_BASE_URI}/${_GH_SNAPSHOT_URI_PATH} -> ${_GH_SNAPSHOT_FILENAME}"
+	SRC_URI="${_GH_SNAPSHOT_SRC_URI}"
+	readonly _GH_SNAPSHOT_FILENAME _GH_SNAPSHOT_SRC_URI
 fi
 
 if [[ -z "${EGIT_REPO_URI}" ]] ; then
