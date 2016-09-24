@@ -147,7 +147,7 @@ fi
 
 case "${GH_FETCH_TYPE}" in
 	'live')
-		[[ -n "${GH_REF}" ]] && [[ -z "${EGIT_COMMIT}" ]] && \
+		[[ -n "${GH_REF}" && -z "${EGIT_COMMIT}" ]] && \
 			EGIT_COMMIT="${GH_REF}"
 		[[ -z "${EGIT_CLONE_TYPE}" ]] && \
 			EGIT_CLONE_TYPE="shallow"
@@ -169,10 +169,10 @@ RESTRICT="${RESTRICT} primaryuri"
 
 
 # debug-print summary
-if [[ -n "${EBUILD_PHASE_FUNC}" ]] && [[ "${EBUILD_PHASE_FUNC}" == 'pkg_setup' ]] ; then
+if [[ -n "${EBUILD_PHASE_FUNC}" && "${EBUILD_PHASE_FUNC}" == 'pkg_setup' ]] ; then
 	debug-print "${ECLASS}: -- vardump --"
 	for _v in $(compgen -A variable) ; do
-		if [[ "${_v}" == "GH_"* ]] || [[ "${_v}" == "EGIT_"* ]] ; then
+		if [[ "${_v}" == "GH_"* || "${_v}" == "EGIT_"* ]] ; then
 			debug-print "${ECLASS}: ${_v}='${!_v}'"
 		fi
 	done
@@ -201,7 +201,7 @@ git-hosting_src_unpack() {
 			# it's unpacked to a dir of the same name. By moving it back to "${P}" we ensure
 			# that "${S}" will work as expected.
 			if [[ -d "${GH_DISTFILE}" ]] && [[ ! -d "${P}" ]]; then
-				echo "${FUNCNAME}: fixing \${S}"
+				printf '%s: fixing ${S}: ' "${FUNCNAME}"
 				mv -v "${GH_DISTFILE}" "${P}" || die
 			fi
 			;;
