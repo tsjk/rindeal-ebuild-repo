@@ -59,6 +59,7 @@ S="${S}/ImageLounge"
 
 src_unpack() {
 	git-hosting_src_unpack
+	default
 
 	[[ -d "${S}"/plugins ]] && die
 	mv "${WORKDIR}"/*plugins* "${S}/plugins" || die
