@@ -5,19 +5,18 @@ EAPI=6
 
 GH_URI="github/qbittorrent/qBittorrent"
 GH_REF="release-${PV}"
-GH_FETCH_TYPE="manual"
 
-inherit flag-o-matic-patched qmake-utils git-hosting xdg
+inherit flag-o-matic-patched qmake-utils git-hosting xdg autotools
 
 DESCRIPTION="BitTorrent client in C++/Qt based on libtorrent-rasterbar"
 HOMEPAGE="http://www.qbittorrent.org/ ${HOMEPAGE}"
 LICENSE="GPL-2"
 
 SLOT="0"
-SRC_URI="https://sourceforge.net/projects/${PN}/files/${PN}/${P}/${P}.tar.xz/download -> ${P}.tar.xz"
 
 KEYWORDS="~amd64 ~arm"
-IUSE="+dbus debug +qt5 webui +X"
+# TODO: rename 'X' to 'gui'
+IUSE="+dbus debug nls +qt5 webui +X"
 
 CDEPEND_A=(
 	"dev-libs/boost:="
@@ -29,8 +28,10 @@ CDEPEND_A=(
 		"dev-libs/qjson[qt4(+)]"
 		"dev-qt/qtcore:4[ssl]"
 		"dev-qt/qtsingleapplication[qt4,X?]"
-		"dbus? ( dev-qt/qtdbus:4 )"
-		"X? ( dev-qt/qtgui:4 )"
+		"X? ("
+			"dev-qt/qtgui:4"
+			"dbus? ( dev-qt/qtdbus:4 )"
+		")"
 	")"
 	"qt5? ("
 		"dev-qt/qtconcurrent:5"
@@ -38,22 +39,18 @@ CDEPEND_A=(
 		"dev-qt/qtnetwork:5[ssl]"
 		"dev-qt/qtsingleapplication[qt5,X?]"
 		"dev-qt/qtxml:5"
-		"dbus? ( dev-qt/qtdbus:5 )"
 		"X? ("
 			"dev-qt/qtgui:5"
 			"dev-qt/qtwidgets:5"
+			"dbus? ( dev-qt/qtdbus:5 )"
 		")"
 	")"
 )
 DEPEND_A=( "${CDEPEND_A[@]}"
-	"qt5? ( dev-qt/linguist-tools:5 )"
+	"qt5? ( nls? ( dev-qt/linguist-tools:5 ) )"
 	"virtual/pkgconfig"
 )
 RDEPEND_A=( "${CDEPEND_A[@]}" )
-
-REQUIRED_USE="
-	dbus? ( X )
-"
 
 inherit arrays
 
@@ -70,7 +67,7 @@ src_prepare() {
 
 	local l locales loc_dir='src/lang' loc_pre='qbittorrent_' loc_post='.ts'
 	l10n_find_changes_in_dir "${loc_dir}" "${loc_pre}" "${loc_post}"
-	l10n_get_locales locales app off
+	l10n_get_locales locales app $(usex nls off all)
 	for l in ${locales} ; do
 		rm -vf "${loc_dir}/${loc_pre}${l}${loc_post}" || die
 		sed -e "/qbittorrent_${l}.qm/d" -i -- src/lang.qrc || die
@@ -79,6 +76,14 @@ src_prepare() {
 	# make build verbose
 	sed -r -e 's|(CONFIG .*)silent||' \
 		-i -- src/src.pro || die
+
+	# disable AUTOMAKE as no Makefile.am is present
+	sed '/^AM_INIT_AUTOMAKE/d' -i -- configure.ac || die
+
+	# disable qmake call inside ./configure script
+	sed '/^$QT_QMAKE/ s|^|echo |' -i -- configure.ac || die
+
+	eautoreconf
 }
 
 src_configure() {
@@ -100,11 +105,7 @@ src_configure() {
 	)
 	econf "${econf_args[@]}"
 
-	eqmake$(usex qt5 5 4)
-
-	# disable stripping
-	# TODO: find a way to do it in src_prepare()
-	sed -e '/-$(STRIP)/d' -i -- 'src/Makefile' || die
+	eqmake$(usex qt5 5 4) -r ./qbittorrent.pro
 }
 
 src_install() {
