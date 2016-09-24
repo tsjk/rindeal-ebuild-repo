@@ -193,6 +193,12 @@ PORTAGE_TMPDIR="$(mktemp -d --suffix=-PORTAGE_TMPDIR)"
 RPMDIR="$(mktemp -d --suffix=-RPMDIR)"
 _EOF_
 
-ln -v -s "${PORTAGE_REPOS_DIR}/gentoo/profiles/base" "${PORTAGE_CONF_DIR}/make.profile"
+mkdir -p "${PORTAGE_CONF_DIR}/make.profile"
+announce tee "${PORTAGE_CONF_DIR}/make.profile/parent" << _EOF_
+gentoo:base
+gentoo:default/linux
+gentoo:targets/systemd
+rindeal:
+_EOF_
 
 fold_end configuration
