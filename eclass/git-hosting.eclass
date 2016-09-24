@@ -167,9 +167,7 @@ case "${GH_FETCH_TYPE}" in
 
 		inherit git-r3
 		;;
-	'snapshot')
-		inherit vcs-snapshot
-		;;
+	'snapshot') : ;;
 	'manual') : ;;
 	*) die "Unsupported fetch type: '${GH_FETCH_TYPE}'" ;;
 esac
@@ -201,22 +199,36 @@ EXPORT_FUNCTIONS src_unpack
 # @FUNCTION: git-hosting_src_unpack
 # @DESCRIPTION:
 # Handles unpacking of special source files, like git snapshots, live git repos, ...
+#
+# Please note that if GH_FETCH_TYPE=~(live|snapshot) this function won't unpack files from SRC_URI
+# other than those it added itself, additionally, upon execution it filters them out of '${A}' variable, so
+# that you can than loop through '${A}' safely and unpack the rest yourself or just call default().
 ##
 git-hosting_src_unpack() {
-	debug-print-function ${FUNCNAME} "$@"
+	debug-print-function "${FUNCNAME}"
 
 	case "${GH_FETCH_TYPE}" in
 		'live') git-r3_src_unpack ;;
 		'snapshot')
-			vcs-snapshot_src_unpack
+			# do not use '${S}' for 'unpack_to' as user might overwrite 'S' leading to a wrong behaviour
+			local unpack_from="${DISTDIR}/${_GH_SNAPSHOT_FILENAME}" unpack_to="${WORKDIR}/${P}"
 
-			# Handle default distfile which has "-${GH_PROVIDER}" appended and thus
-			# it's unpacked to a dir of the same name. By moving it back to "${P}" we ensure
-			# that "${S}" will work as expected.
-			if [[ -d "${GH_DISTFILE}" ]] && [[ ! -d "${P}" ]]; then
-				printf '%s: fixing ${S}: ' "${FUNCNAME}"
-				mv -v "${GH_DISTFILE}" "${P}" || die
-			fi
+			## extract snapshot to 'S'
+			printf ">>> Unpacking '%s' to '%s'\n" "${unpack_from##*/}" "${unpack_to}"
+			mkdir -p "${unpack_to}" || die "Failed to create S='${unpack_to}' directory"
+			tar --extract \
+				--strip-components=1 \
+				--file="${unpack_from}" --directory="${unpack_to}" \
+				|| die "Failed to extract '${unpack_from}' archive"
+
+			## filter 'unpack_from' from 'A'
+			local f new_a_a=()
+			for f in ${A} ; do
+				if [[ "${f}" != "${unpack_from##*/}" ]] ; then
+					new_a_a+=( "${f}" )
+				fi
+			done
+			A="${new_a_a[@]}"
 			;;
 		'manual') default ;;
 		*) die ;;
