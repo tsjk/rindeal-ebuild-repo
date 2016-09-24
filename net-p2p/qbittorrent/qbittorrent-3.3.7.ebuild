@@ -7,7 +7,7 @@ GH_URI="github/qbittorrent/qBittorrent"
 GH_REF="release-${PV}"
 GH_FETCH_TYPE="manual"
 
-inherit flag-o-matic-patched qmake-utils git-hosting
+inherit flag-o-matic-patched qmake-utils git-hosting xdg
 
 DESCRIPTION="BitTorrent client in C++/Qt based on libtorrent-rasterbar"
 HOMEPAGE="http://www.qbittorrent.org/ ${HOMEPAGE}"
