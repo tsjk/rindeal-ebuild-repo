@@ -139,7 +139,7 @@ if [[ "${GH_FETCH_TYPE}" == 'snapshot' ]] ; then
 			_GH_SNAPSHOT_URI_PATH="archive/${GH_REF}${_GH_SNAPSHOT_EXT}"
 			;;
 		'gitlab')
-			_GH_SNAPSHOT_EXT=".tar.gz"
+			_GH_SNAPSHOT_EXT=".tar.bz2"
 			_GH_SNAPSHOT_URI_PATH="repository/archive${_GH_SNAPSHOT_EXT}?ref=${GH_REF}"
 			;;
 		*) die "Unsupported provider '${GH_PROVIDER}'" ;;
