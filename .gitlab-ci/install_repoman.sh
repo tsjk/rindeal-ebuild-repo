@@ -18,4 +18,4 @@ eselect python set python3.4
 
 pwd
 
-emerge --ask=n --jobs=$(($(nproc)+1)) portage repoman git
+emerge --ask=n --jobs=$(($(nproc)+1)) portage repoman dev-vcs/git
