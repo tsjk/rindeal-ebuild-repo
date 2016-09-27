@@ -8,7 +8,7 @@ CHROMIUM_LANGS="
 	he hi hr hu id it ja kk ko lt lv me mk ms nb nl nn pa pl pt-BR pt-PT ro ru
 	sk sr sr-ME sv sw ta te th tr uk uz vi zh-CN zh-TW zu
 "
-inherit rindeal chromium-2 unpacker pax-utils versionator
+inherit rindeal chromium-2 unpacker pax-utils versionator xdg
 
 DESCRIPTION="A fast and secure web browser"
 HOMEPAGE="https://www.opera.com/"
@@ -63,6 +63,7 @@ OPERA_HOME="/opt/${PN}/${PN_SLOTTED}"
 
 src_prepare() {
 	eapply_user
+    xdg_src_prepare
 
 	mkdir -p "${OPERA_HOME#/}" || die
 
@@ -96,9 +97,11 @@ src_prepare() {
 
 	local sedargs=(
 		# delete invalid and "unity shell"-specific lines
-		-e '/^TargetEnvironment/d'
+		-e '/^TargetEnvironment=/d'
 		# fix paths in *Exec lines
-		-e "/Exec=/ s@${PN}( |$)@${EPREFIX}${OPERA_HOME}/${PN}\1@"
+		-e "/Exec=${PN}/ s@${PN}( |$)@${EPREFIX}${OPERA_HOME}/${PN}\1@"
+		# add slot to Name
+		-e "s|^Name=${PN}.*|& ${SLOT}|I"
 	)
 	sed -r "${sedargs[@]}" \
 		-i -- "applications/${PN}.desktop" || die
