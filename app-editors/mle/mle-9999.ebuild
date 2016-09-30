@@ -10,8 +10,8 @@ inherit git-hosting
 
 DESCRIPTION="Small but powerful console text editor written in C"
 # - Troy D. Hanson's code is licenced under BSD-2 without the second clause
-# - other code is not yet licenced
-LICENSE="BSD-1"
+# - other code is Apache-2.0
+LICENSE="Apache-2.0 BSD-1"
 
 SLOT="0"
 
