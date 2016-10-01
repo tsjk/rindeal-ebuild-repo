@@ -21,7 +21,7 @@ LICENSE="MIT"
 SLOT="0"
 
 KEYWORDS="~amd64 ~arm"
-IUSE="examples python +static-libs"
+IUSE="examples python static-libs"
 
 CDEPEND="python? ( ${PYTHON_DEPS} )"
 DEPEND="${CDEPEND}
