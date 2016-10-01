@@ -26,7 +26,8 @@ src_prepare() {
 	default
 
 	# use global utlist.h instead of bundled copy
-	sed -r -e 's|(#include *)"utlist.h"|\1<utlist.h>|g' -i -- *.{c,h} || die
+	sed -r -e 's|(#include *)"utlist.h"|\1<utlist.h>|g' \
+		-i -- *.{c,h} || die
 
 	sed \
 		-e '/CFLAGS/ s| -g||' \
@@ -35,9 +36,9 @@ src_prepare() {
 }
 
 src_install() {
-	dolib.so lib${PN}.so
+	dolib.so "lib${PN}.so"
 	use static-libs && \
-		dolib.a lib${PN}.a
+		dolib.a "lib${PN}.a"
 
 	doheader "${PN}.h"
 }
