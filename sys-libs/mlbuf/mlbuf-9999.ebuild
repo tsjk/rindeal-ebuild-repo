@@ -8,8 +8,7 @@ GH_URI="github/adsr"
 inherit git-hosting
 
 DESCRIPTION="Multiline buffer library"
-# no licence so far - https://github.com/adsr/mle/issues/2
-LICENSE="GPL-2"
+LICENSE="Apache-2.0"
 
 SLOT="0"
 
