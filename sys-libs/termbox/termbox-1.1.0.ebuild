@@ -13,7 +13,7 @@ PYTHON_REQ_USE="threads"
 ## distutils-r1.eclass
 DISTUTILS_OPTIONAL=TRUE
 
-inherit git-hosting python-r1 waf-utils distutils-r1
+inherit git-hosting python-r1 distutils-r1 waf-utils
 
 DESCRIPTION="Library for writing text-based user interfaces"
 LICENSE="MIT"
@@ -38,12 +38,15 @@ src_prepare() {
 	default
 
 	# respect flags
-	sed -e '/CFLAGS/ s|-O[0-9]||' -i wscript || die
+	sed -e '/CFLAGS/ s@-O[0-9]@@' \
+		-i -- wscript || die
 	# fix compiler error
 	# https://github.com/nsf/termbox/issues/89
-	sed -e 's|extra_compile_args=\["|&-D_XOPEN_SOURCE", "|' -i setup.py || die
+	sed -e 's@extra_compile_args=\["@&-D_XOPEN_SOURCE", "@' \
+		-i -- setup.py || die
 	# do not build examples
-	sed -e '/bld.recurse("demo")/d' -i src/wscript || die
+	sed -e '/bld.recurse("demo")/d' \
+		-i -- src/wscript || die
 
 	use python && \
 		distutils-r1_src_prepare
