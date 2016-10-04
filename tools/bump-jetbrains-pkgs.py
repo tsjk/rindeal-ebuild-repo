@@ -8,6 +8,10 @@ from terminaltables import AsciiTable
 from multiprocessing import Process
 import subprocess
 
+DEBUG=0
+if 'DEBUG' in os.environ:
+    DEBUG = os.environ['DEBUG']
+
 PORTDIR_OVERLAY=os.path.realpath(os.path.dirname(os.path.realpath(__file__)) + "/../")
 os.chdir(PORTDIR_OVERLAY)
 os.environ["PORTDIR_OVERLAY"] = PORTDIR_OVERLAY
@@ -48,6 +52,8 @@ for pn, code in codes.items():
     pkg = pdb.xmatch('bestmatch-visible', '{}/{}::rindeal'.format(cat, pn))
     old_ver = portage.pkgsplit(pkg)[1]
     new_ver = versions[code]
+    if DEBUG:
+        print("Comparing '{}' v{} vs v{}".format(pn, old_ver, new_ver))
     if portage.vercmp(old_ver, new_ver) < 0:
         table.append([cat, pn, old_ver, new_ver])
 
@@ -66,7 +72,6 @@ def update_pkg(cat, pn, from_v, to_v):
         if err:
             print("{}/{}: command '{}' failed with code {}".format(cat, pn, cmd, err))
             return 1
-print("cwd={}".format(os.getcwd()))
 
 y = input("Press 'y' to proceed with the update\n")
 if y != "y":
