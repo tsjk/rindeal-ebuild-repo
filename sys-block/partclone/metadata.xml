@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "http://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+  <maintainer type="person">
+    <email>dev.rindeal+gentoo-overlay@gmail.com</email>
+    <name>Jan Chren (rindeal)</name>
+  </maintainer>
+  <use>
+    <flag name="btrfs">Enable btrfs file system</flag>
+    <flag name="exfat">Enable EXFAT file system</flag>
+    <flag name="extfs">Enable ext2/3/4 file system</flag>
+    <flag name="fat">Enable FAT file system</flag>
+    <flag name="f2fs">Enable f2fs file system</flag>
+    <flag name="jfs">Enable jfs file system</flag>
+    <flag name="minix">Enable minix file system</flag>
+    <flag name="nilfs2">Enable nilfs2 file system</flag>
+    <flag name="ntfs">Enable NTFS file system</flag>
+    <flag name="reiser4">Enable Reiser4 file system</flag>
+    <flag name="reiserfs">Enable REISERFS 3.6/3.6 file system</flag>
+    <flag name="tui">Enable terminal UI</flag>
+    <flag name="xfs">Enable XFS file system</flag>
+  </use>
+</pkgmetadata>
