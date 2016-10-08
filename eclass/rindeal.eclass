@@ -36,6 +36,16 @@ else
 	debug-print "${ECLASS}: command_not_found_handle() already registered"
 fi
 
+
+epushd() {
+	pushd "$@" >/dev/null || die
+}
+
+epopd() {
+	popd "$@" >/dev/null || die
+}
+
+
 erm() {
 	debug-print-function "${FUNCNAME}" "$@"
 	local verbose="-v"
@@ -48,6 +58,7 @@ erm() {
 
 	rm ${verbose} --interactive=never --preserve-root --one-file-system "$@" || die
 }
+
 
 _RINDEAL_ECLASS=1
 fi
