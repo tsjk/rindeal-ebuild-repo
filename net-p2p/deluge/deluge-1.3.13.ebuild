@@ -53,9 +53,9 @@ REQUIRED_USE="
 
 inherit arrays
 
-L10N_LOCALES=( af ar ast be bg bn bs ca cs cy da de el en_AU en_CA en_GB eo es et eu fa fi fo fr fy ga gl
-	he hi hr hu id is it ja ka kk km kn ko ku ky la lb lt lv mk ml ms nb nds nl nn oc pl pt pt_BR ro
-	ru si sk sl sr sv ta te th tl tlh tr uk ur vi zh_CN zh_HK zh_TW )
+L10N_LOCALES=( af ar ast be bg bn bs ca cs cy da de el en_AU en_CA en_GB eo es et eu fa fi fo fr
+	fy ga gl he hi hr hu id is it ja ka kk km kn ko ku ky la lb lt lv mk ml ms nb nds nl nn oc pl
+	pt pt_BR ro ru si sk sl sr sv ta te th tl tlh tr uk ur vi zh_CN zh_HK zh_TW )
 L10N_LOCALES_MASK=( nap pms iu )
 inherit l10n-r1
 
