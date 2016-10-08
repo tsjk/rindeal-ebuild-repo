@@ -368,7 +368,7 @@ l10n_find_changes_in_dir() {
 	declare -A found known
 
 	## do the search
-	pushd "${dir}" >/dev/null || die "Cannot access '${dir}'"
+	epushd "${dir}"
 	for l in "${pre}"*"${post}" ; do
 		l="${l#"${pre}"}"
 		l="${l%"${post}"}"
@@ -376,7 +376,7 @@ l10n_find_changes_in_dir() {
 		[[ -v _L10N_LOCALES_MASK["${l}"] ]] && continue
 		found+=( ["${l}"]="${l}" )
 	done
-	popd >/dev/null || die
+	epopd
 
 	local locales
 	l10n_get_locales locales app all
