@@ -19,6 +19,7 @@ esac
 if [[ -z "$(type -t command_not_found_handle 2>/dev/null)" ]] ; then
 
 	command_not_found_handle() {
+		debug-print-function "${FUNCNAME}" "$@"
 		local -r cmd="${1}"
 
 		## do not die in a pipe
