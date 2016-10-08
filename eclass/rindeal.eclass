@@ -36,6 +36,18 @@ else
 	debug-print "${ECLASS}: command_not_found_handle() already registered"
 fi
 
+erm() {
+	debug-print-function "${FUNCNAME}" "$@"
+	local verbose="-v"
+	if [[ -n "${RM_V}" && \
+		( ! (( RM_V )) || "${RM_V}" == 'false' || "${RM_V}" == 'no' ) \
+		]]
+	then
+		verbose=
+	fi
+
+	rm ${verbose} --interactive=never --preserve-root --one-file-system "$@" || die
+}
 
 _RINDEAL_ECLASS=1
 fi
