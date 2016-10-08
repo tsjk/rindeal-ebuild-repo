@@ -396,10 +396,15 @@ l10n_find_changes_in_dir() {
 
 	if (( $(( ${#added[@]} + ${#removed[@]} )) > 0 )) ; then
 		elog "There are changes in locales!"
+
+		__my_sort() {
+			echo $(printf '%s\n' "${@}" | LC_ALL=C sort)
+		}
+
 		(( ${#added[@]} > 0 )) && \
-			elog "Locales added: '${added[*]}'"
+			elog "Locales added: '$(__my_sort "${added[@]}")'"
 		(( ${#removed[@]} > 0 )) && \
-			elog "Locales removed: '${removed[*]}'"
+			elog "Locales removed: '$(__my_sort "${removed[@]}")'"
 	fi
 }
 
