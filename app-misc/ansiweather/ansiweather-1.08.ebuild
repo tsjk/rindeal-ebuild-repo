@@ -5,28 +5,24 @@ EAPI=6
 
 GH_URI='github/fcambus'
 
-inherit git-hosting
+inherit rindeal git-hosting
 
 DESCRIPTION='Weather in your terminal, with ANSI colors and Unicode symbols'
 LICENSE='BSD'
 
 SLOT='0'
 
-KEYWORDS='~amd64 ~arm ~x86'
+KEYWORDS='~amd64 ~arm'
 
-RDEPEND='
+RDEPEND="
 	app-misc/jq:0
 	net-misc/curl:0
-	sys-devel/bc:0
-'
+	sys-devel/bc:0"
 
 src_install() {
 	dobin "${PN}"
-
 	doman "${PN}.1"
 
-	insinto "/usr/share/${PN}"
-	doins 'ansiweatherrc.example'
-
 	einstalldocs
+	dodoc 'ansiweatherrc.example'
 }
