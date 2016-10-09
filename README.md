@@ -10,20 +10,20 @@ Every package here has been carefully crafted to an unheard-of level of perfecti
 
 Features that the vast majority of my ebuilds have in common:
 
- - code in ebuilds is clean, elegant, uncluttered, commented and generally easy on the eyes, thus making packages maintainable and easilly updatable
+ - code in ebuilds is clean, elegant, uncluttered, commented and generally easy on the eyes, thus making packages maintainable and easily updatable
  - **USE flags** are provided for almost any configurable option
  - full **Systemd** integration (services, templates, timers, ...), no OpenRC/cron support
  - sane default configurations (default USE-flags, config files, ...)
- - locales support (`nls`/`l10n_*` USE-flags)
- - amd64/arm architectures only, which removes clutter introduced for exotic arches
- - only the native ABI is supported, again to reduce the clutter
+ - **locales** support (`nls`/`l10n_*` USE-flags)
+ - **amd64/arm** architectures only, which removes clutter introduced for exotic arches
+ - only the **native ABI** is supported, again to reduce the clutter
 
 In most package directories there is a _README_ file that says why is the package superior to any other out there including the "official" one.
 
 > _If you find a package superior to mine, please [report it here][New issue]_.
 
 User friendly list of packages is available [here][LISTING].
-I hihgly encourage you to browse through the list as the chances are high for you to discover some great new software.
+I highly encourage you to browse through the list as the chances are high for you to discover some great new software.
 
 
 Quality Assurance
