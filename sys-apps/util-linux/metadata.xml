@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "http://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+  <maintainer type="person">
+    <email>dev.rindeal+gentoo-overlay@gmail.com</email>
+    <name>Jan Chren (rindeal)</name>
+  </maintainer>
+  <use>
+    <!--     doc -->
+    <!--     test -->
+    <!--     nls -->
+    <!--     static-libs -->
+    <flag name="assert">Toggle assertions</flag>
+    <flag name="symvers">Library symbol versioning</flag>
+    <flag name="largefile">support for large files</flag>
+    <flag name="rpath">Hardcode runtime library paths</flag>
+
+<!--     <flag name="caps">build setpriv helper (run programs with diff capabilities)</flag> -->
+<!--     <flag name="cramfs">build mkfs/fsck helpers for cramfs filesystems</flag> -->
+<!--     <flag name="fdformat">build fdformat (floppy disk format)</flag> -->
+<!--     <flag name="kill">build the kill program</flag> -->
+<!--     <flag name="pam">build runuser helper</flag> -->
+<!--     <flag name="suid"> -->
+<!--       install mount/umount as setuid so non-root users may mount/umount devices, -->
+<!--       and wall/write as setgid so non-root users can notify other users -->
+<!--     </flag> -->
+<!--     <flag name="tty-helpers">install the mesg/wall/write tools for talking to local users</flag> -->
+
+
+    <!-- ### Libraries -->
+    <flag name="libblkid">libblkid and many related utilities</flag>
+    <flag name="libfdisk">libfdisk library</flag>
+    <flag name="libmount">libmount library</flag>
+    <flag name="libmount-support-mtab">Support /etc/mtab (default is use /proc/self/mountinfo)</flag>
+    <flag name="libsmartcols">libsmartcols library</flag>
+    <flag name="libuuid">libuuid and uuid utilities</flag>
+    <flag name="libuuid-force-uuidd">support uuidd even though the daemon is not built</flag>
+
+
+    <!-- ### Utilities -->
+    <flag name="agetty">agetty(8) utility</flag>
+    <flag name="bfs">mkfs.bfs(8) utility</flag>
+    <flag name="cal">cal(8) utility</flag>
+    <flag name="chfn-chsh">chfn(8) and chsh(8) utilities</flag>
+    <flag name="chfn-chsh-password">do not require the user to enter the password in chfn and chsh</flag>
+    <flag name="chsh-only-listed">chsh: allow only shells listed in /etc/shells</flag>
+    <flag name="cramfs">fsck.cramfs(8), mkfs.cramfs(8) utilities</flag>
+    <flag name="eject">eject(8) utility</flag>
+    <flag name="fallocate">fallocate(8) utility</flag>
+    <flag name="fdformat">fdformat(8) utility</flag>
+    <flag name="fsck">fsck(8) utility</flag>
+    <flag name="hwclock">hwclock(8) utility</flag>
+    <flag name="ipcrm">ipcrm(8) utility</flag>
+    <flag name="ipcs">ipcs(8) utility</flag>
+    <flag name="kill">kill(8) utility</flag>
+    <flag name="last">last(8) utility</flag>
+    <flag name="line">line(8) utility</flag>
+    <flag name="logger">logger(8) utility</flag>
+    <flag name="login">login(8) utility</flag>
+    <flag name="login-chown-vcs">let login(8) chown /dev/vcsN</flag>
+    <flag name="login-stat-mail">let login(8) stat() the mailbox</flag>
+    <flag name="losetup">losetup(8) utility</flag>
+    <flag name="lslogins">lslogins(8) utility</flag>
+    <flag name="mesg">mesg(8) utility; obsolete</flag>
+    <flag name="minix">fsck.minix(8), mkfs.minix(8) utilities</flag>
+    <flag name="more">more(8) utility</flag>
+    <flag name="mount">mount(8) and umount(8) utilities</flag>
+    <flag name="mountpoint">mountpoint(8) utility</flag>
+    <flag name="newgrp">newgrp(8) utility</flag>
+    <flag name="nologin">nologin(8) utility</flag>
+    <flag name="nsenter">nsenter(8) utility</flag>
+    <flag name="partx">addpart(8), delpart(8), partx(8) utilities</flag>
+    <flag name="pg">pg(8) utility; obsolete</flag>
+    <flag name="pg-bell">let pg(8) not ring the bell on invalid keys</flag>
+    <flag name="pivot_root">pivot_root(8) utility</flag>
+    <flag name="raw">raw(8) utility</flag>
+    <flag name="rename">rename(8) utility</flag>
+    <flag name="reset">reset(8) utility</flag>
+    <flag name="runuser">runuser(8) utility</flag>
+    <flag name="schedutils">chrt(8), ionice(8), taskset(8) utilities</flag>
+    <flag name="setpriv">setpriv(8) utility</flag>
+    <flag name="setterm">setterm(8) utility</flag>
+    <flag name="su">su(8) utility</flag>
+    <flag name="sulogin">sulogin(8) utility</flag>
+    <flag name="switch_root">switch_root(8) utility</flag>
+    <flag name="tunelp">tunelp(8) utility; obsolete</flag>
+    <flag name="ul">ul(8) utility; obsolete</flag>
+    <flag name="unshare">unshare(8) utility</flag>
+    <flag name="utmpdump">utmpdump utility</flag>
+    <flag name="vipw">vipw(8) utility</flag>
+    <flag name="wall">wall(8) utility; obsolete</flag>
+    <flag name="wdctl">wdctl(8) utility</flag>
+    <flag name="write">write(8) utility</flag>
+    <flag name="zramctl">zramctl(8) utility</flag>
+
+
+    <!-- ### Other -->
+    <flag name="uuidd">uuid daemon</flag>
+    <flag name="pylibmount">Python bindings for the libmount library</flag>
+
+
+    <!-- ### Options -->
+    <flag name="colors-default">colorize output from utils by default</flag>
+    <flag name="plymouth-support">Care about plymouth in sylogin(8) and agetty(8)</flag>
+    <flag name="sulogin-emergency-mount">Use emergency mount of /dev and /proc for sulogin</flag>
+    <flag name="use-tty-group">install wall and write setgid tty</flag>
+    <flag name="usrdir-path">use only /usr paths in PATH env. variable (recommended on systems with /bin -> /usr/bin symlinks)</flag>
+
+    <!-- ### Optional lib deps -->
+    <flag name="btrfs">build with support for btrfs</flag>
+    <flag name="cap-ng">compile with libcap-ng</flag>
+    <flag name="libpython">Compile with python support; required for pylibmount</flag>
+    <flag name="libz">compile with libz</flag>
+    <flag name="readline">compile with GNU Readline support</flag>
+    <flag name="slang">compile cfdisk with slang rather than ncurses</flag>
+    <flag name="smack">SMACK security subsystem support</flag>
+    <flag name="tinfo">compile with tinfo (low level lib from ncurses); obsolete</flag>
+    <flag name="user">compile with libuser (remote chsh); obsolete</flag>
+    <flag name="utempter">compile script(1) with libutempter</flag>
+    <flag name="util">Compile with libutil, part of libc</flag>
+  </use>
+</pkgmetadata>
