@@ -1,13 +1,13 @@
 # Copyright 2016 Jan Chren (rindeal)
 # Distributed under the terms of the GNU General Public License v2
 
-# @ECLASS: rpm-r1.eclass
+# @ECLASS: rpm.eclass
 # @MAINTAINER:
 # Jan Chren (rindeal) <dev.rindeal+gentoo-overlay@gmail.com>
-# @BLURB: E
+# @BLURB: RPM eclass
 # @DESCRIPTION:
 
-if [ -z "${_RPM_R1_ECLASS}" ] ; then
+if [ -z "${_RPM_ECLASS}" ] ; then
 
 case "${EAPI:-0}" in
     6) ;;
@@ -15,7 +15,7 @@ case "${EAPI:-0}" in
 esac
 
 
-DEPEND_A=(
+DEPEND_A_OLD=(
 	# rpmoffset
 	app-arch/rpm2targz
 	# cpio
@@ -23,11 +23,14 @@ DEPEND_A=(
 	# decompressors
 	# xz, bzip2, gz
 )
+DEPEND_A=(
+	'app-arch/libarchive[bzip2,lzma,zlib]'
+)
 DEPEND="${DEPEND_A[@]}"
 unset DEPEND_A
 
 
-rpm_unpack() {
+rpm_unpack_old() {
 	debug-print-function "${FUNCNAME}" "$@"
 	local f_in="${1}"
 	local d_out="${2:-"${PWD}"}"
@@ -52,17 +55,32 @@ rpm_unpack() {
 		--directory="${d_out}"
 		--preserve-modification-time --make-directories --unconditional
 		--no-absolute-filenames --quiet
-		--nonmatching "$@" )
+		--nonmatching )
 
 	"${dd[@]}" | "${decompress[@]}" | "${cpio[@]}"
 	assert "RPM extraction went wrong for '$(basename "$(dirname "${f_in}")")/$(basename "${f_in}")'"
+}
+
+rpm_unpack() {
+	debug-print-function "${FUNCNAME}" "$@"
+	local f_in="${1}"
+	local d_out="${2:-"${PWD}"}"
+	shift 2
+
+	local bsdtar=( bsdtar --extract
+		--no-same-owner -o
+		--file "${f_in}"
+		--directory "${d_out}"
+	)
+	echo "${bsdtar[@]}"
+	"${bsdtar[@]}" || die
 }
 
 
 EXPORT_FUNCTIONS src_unpack
 
 
-rpm-r1_src_unpack() {
+rpm_src_unpack() {
 	local a
 	for a in ${A} ; do
 		case ${a} in
@@ -76,5 +94,5 @@ rpm-r1_src_unpack() {
 }
 
 
-_RPM_R1_ECLASS=1
+_RPM_ECLASS=1
 fi
