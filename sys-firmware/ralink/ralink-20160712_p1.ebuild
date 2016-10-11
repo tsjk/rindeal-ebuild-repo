@@ -3,7 +3,7 @@
 
 EAPI=6
 
-inherit rpm-r1
+inherit rpm
 
 DESCRIPTION="Nonfree Ralink firmware files for the Linux kernel"
 HOMEPAGE="https://www.kernel.org/"
@@ -16,18 +16,6 @@ SRC_URI="mirror://mageia/distrib/${mageia_release}/x86_64/media/nonfree/release/
 KEYWORDS="amd64 arm"
 
 S="${WORKDIR}"
-
-src_unpack() {
-	local a
-	for a in ${A} ; do
-		case ${a} in
-		*.rpm)
-			rpm_unpack "${DISTDIR}/${a}" "${PWD}" "*/usr/share/*"
-			;;
-		*)		unpack "${a}" ;;
-		esac
-	done
-}
 
 src_install() {
 	insinto /lib/firmware
