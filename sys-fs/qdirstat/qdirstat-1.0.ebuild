@@ -7,7 +7,7 @@ GH_URI="github/shundhammer"
 
 inherit rindeal git-hosting qmake-utils xdg
 
-DESCRIPTION="Graphical application to show where your disk space has gone and to help you to clean it up"
+DESCRIPTION="GUI app to show where your disk space has gone and to help you to clean it up"
 LICENSE="GPL-2"
 
 SLOT="0"
