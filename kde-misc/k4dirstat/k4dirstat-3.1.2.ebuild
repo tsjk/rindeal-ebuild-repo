@@ -36,6 +36,6 @@ DEPEND="${CDEPEND}
 	sys-devel/gettext
 "
 RDEPEND="${CDEPEND}
-	!kde-misc/kdirstat:4
+	!kde-misc/kdirstat
 	!kde-misc/k4dirstat:4
 "
