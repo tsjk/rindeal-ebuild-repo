@@ -63,7 +63,7 @@ OPERA_HOME="/opt/${PN}/${PN_SLOTTED}"
 
 src_prepare() {
 	eapply_user
-    xdg_src_prepare
+	xdg_src_prepare
 
 	mkdir -p "${OPERA_HOME#/}" || die
 
