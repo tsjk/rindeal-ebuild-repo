@@ -1,0 +1,68 @@
+# This file was ported from:
+#  - etc/init.d/vcsFPServiceDaemon
+
+[Unit]
+Description=Validity Fingerprint Service
+# load before bringing up console so that FP authentication works
+Before=multi-user.target
+
+[Service]
+# delete single instance lock file
+ExecStartPre=/bin/rm -f /var/run/ValidityService.pid
+# these files cannot be created without root permissions
+ExecStartPre=/bin/touch /var/run/ValidityService.pid
+ExecStartPre=/bin/touch /var/tmp/ValidityPersistentData
+ExecStartPre=/bin/chown validity /var/run/ValidityService.pid
+ExecStartPre=/bin/chown validity /var/tmp/ValidityPersistentData
+
+User=validity
+Group=usb
+UMask=0033
+# permissions applied to ExecStart only
+PermissionsStartOnly=true
+
+# daemon creates:
+#  - `/tmp/vcsSemKey_*` files (pipes, IPC)
+#  - /var/run/ValidityService.pid
+#  - /etc/ValidityPersistentData
+# daemon tries to access:
+#  - /home/validity/Br_4_5_1xx/usdk/vcsFPService/../lib/linux/x64/Release/*
+#  - /etc/localtime
+#  - /usr/lib64/locale/locale-archive
+#  - /etc/udev/udev.conf
+#  - /run/udev/control
+#  - /run/udev/data/*
+#  - /sys/subsystem
+#  - /dev/bus/usb/*
+#  - / /sys /sys/bus/ /sys/bus/usb/ /sys/bus/usb/devices
+#  - /sys/bus/usb/*
+#  - /sys/class
+#  - /sys/devices/*
+# daemon tries to execute:
+#  - /bin/rm
+#  - /bin/sh
+InaccessiblePaths=/home
+ReadOnlyPaths=/etc/
+PrivateTmp=true
+# protect /boot and /usr
+ProtectSystem=true
+
+RestrictAddressFamilies=AF_UNIX
+# deny realtime scheduling
+RestrictRealtime=true
+NoNewPrivileges=true
+SystemCallFilter=~ @clock @cpu-emulation @debug @ipc @keyring @module @mount @obsolete @privileged @raw-io
+
+Type=forking
+ExecStart=/usr/sbin/vcsFPService
+
+# pidfile is empty, serves only as a single instance lock
+#PIDFile=/var/run/ValidityService.pid
+TimeoutSec=10s
+Restart=on-abort
+
+ExecReload=/bin/kill -HUP $MAINPID
+
+
+[Install]
+WantedBy=multi-user.target
