@@ -5,4 +5,20 @@
     <email>dev.rindeal+gentoo-overlay@gmail.com</email>
     <name>Jan Chren (rindeal)</name>
   </maintainer>
+  <longdescription>
+    This package contains:
+      - vcsFPService daemon
+      - driver for the sensor (libvfsFprintWrapper.so)
+      - validity-sensor binary
+
+    This driver supports these devices:
+      - VFS301    (ID 138A:0005)
+      - VFS451    (ID 138A:0007)
+      - VFS471    (ID 138A:003c)
+      - VFS491    (ID 138A:003d)
+      - VFS495    (ID 138A:003f)
+      - VFS5011   (ID 138A:0011)
+      - VFS5111   (ID 138A:0010)
+      - VFS5131   (ID 138A:0018)
+    </longdescription>
 </pkgmetadata>

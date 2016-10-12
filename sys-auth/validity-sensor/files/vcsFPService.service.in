@@ -1,5 +1,11 @@
-# This file was ported from:
-#  - etc/init.d/vcsFPServiceDaemon
+## Copyright 2016 Jan Chren (rindeal)
+## Distributed under the terms of the GNU General Public License v2
+
+## vcsFPService.service
+## The name vcsFPService was chosen based on vcsFPService.exe Windows service.
+
+## This file was ported from:
+##  - etc/init.d/vcsFPServiceDaemon
 
 [Unit]
 Description=Validity Fingerprint Service
@@ -9,20 +15,24 @@ Before=multi-user.target
 [Service]
 # delete single instance lock file
 ExecStartPre=/bin/rm -f /var/run/ValidityService.pid
+# clean `/tmp/vcsSemKey_* junk`
+ExecStartPre=/usr/bin/find /tmp -maxdepth 1 -type f -name "vcsSemKey_*" -delete
+# clean `/tmp/CH_* junk`
+ExecStartPre=/usr/bin/find /tmp -maxdepth 1 -type p -name "CH_*" -delete
 # these files cannot be created without root permissions
 ExecStartPre=/bin/touch /var/run/ValidityService.pid
-ExecStartPre=/bin/touch /var/tmp/ValidityPersistentData
-ExecStartPre=/bin/chown validity /var/run/ValidityService.pid
-ExecStartPre=/bin/chown validity /var/tmp/ValidityPersistentData
+ExecStartPre=/bin/chown @VFS_USER@:@VFS_GROUP@ /var/run/ValidityService.pid
 
-User=validity
-Group=usb
-UMask=0033
+User=@VFS_USER@
+Group=@VFS_GROUP@
+# libvfsFprintWrapper.so will still be creating files in /tmp with explicit 0666 perms
+UMask=@VFS_UMASK@
 # permissions applied to ExecStart only
 PermissionsStartOnly=true
 
 # daemon creates:
 #  - `/tmp/vcsSemKey_*` files (pipes, IPC)
+#  - /tmp/CH_* (pipes)
 #  - /var/run/ValidityService.pid
 #  - /etc/ValidityPersistentData
 # daemon tries to access:
@@ -41,20 +51,24 @@ PermissionsStartOnly=true
 # daemon tries to execute:
 #  - /bin/rm
 #  - /bin/sh
+#  - /usr/bin/pidof
 InaccessiblePaths=/home
 ReadOnlyPaths=/etc/
-PrivateTmp=true
+# `vcsFPService` communicates with `libvfsFprintWrapper.so` through tmp files
+#PrivateTmp=true
 # protect /boot and /usr
 ProtectSystem=true
 
-RestrictAddressFamilies=AF_UNIX
+# access("/run/udev/control", F_OK) = 0
+# socket(AF_NETLINK, SOCK_RAW|SOCK_CLOEXEC|SOCK_NONBLOCK, NETLINK_KOBJECT_UEVENT) = 5
+RestrictAddressFamilies=AF_UNIX AF_NETLINK
 # deny realtime scheduling
 RestrictRealtime=true
 NoNewPrivileges=true
-SystemCallFilter=~ @clock @cpu-emulation @debug @ipc @keyring @module @mount @obsolete @privileged @raw-io
+SystemCallFilter=~ @clock @cpu-emulation @debug @keyring @module @mount @obsolete @privileged @raw-io
 
 Type=forking
-ExecStart=/usr/sbin/vcsFPService
+ExecStart=@VCSFPSERVICE_INST_DIR@/vcsFPService
 
 # pidfile is empty, serves only as a single instance lock
 #PIDFile=/var/run/ValidityService.pid

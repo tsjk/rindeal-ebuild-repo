@@ -1,5 +1,7 @@
 #!/bin/sh
-#
+# Copyright 2016 Jan Chren (rindeal)
+# Distributed under the terms of the GNU General Public License v2
+
 # This script was ported from:
 #  - etc/pm/sleep.d/ValidityServiceSuspend.sh
 #  - usr/lib/pm-utils/sleep.d/65ValidityServiceResume.sh
