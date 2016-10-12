@@ -1,13 +1,13 @@
 # Copyright 2016 Jan Chren (rindeal)
 # Distributed under the terms of the GNU General Public License v2
 
-# @ECLASS: rindeal.eclass
+# @ECLASS: rindeal-utils.eclass
 # @MAINTAINER:
 # Jan Chren (rindeal) <dev.rindeal+gentoo-overlay@gmail.com>
 # @BLURB: Collection of handy functions for my overlay
 # @DESCRIPTION:
 
-if [ -z "${_RINDEAL_ECLASS}" ] ; then
+if [ -z "${_RINDEAL_UTILS_ECLASS}" ] ; then
 
 case "${EAPI:-0}" in
     6) ;;
@@ -36,6 +36,27 @@ rindeal::dsf::or() {
 	echo "${ret}"
 }
 
+rindeal::expand_vars() {
+	local f_in="${1}"
+	local f_out="${2}"
+	(( $# > 2 || $# < 1 )) && die
 
-_RINDEAL_ECLASS=1
+	local sed_args=()
+	local v vars=( $( grep -Eo '@[A-Z0-9_]+@' -- "${f_in}" | tr -d '@') )
+	for v in "${vars[@]}" ; do
+		if [[ -v "${v}" ]] ; then
+			sed_args+=( -e "s|@${v}@|${!v}|g" )
+		else
+			einfo "${FUNCNAME}: var '${v}' doesn't exist"
+		fi
+	done
+
+	local basedir="$(dirname "${WORKDIR}")"
+	echo "Converting '${f_in#"${basedir}/"}' -> '${f_out#"${basedir}/"}"
+
+	sed "${sed_args[@]}" -- "${f_in}" >"${f_out}" || die
+}
+
+
+_RINDEAL_UTILS_ECLASS=1
 fi
