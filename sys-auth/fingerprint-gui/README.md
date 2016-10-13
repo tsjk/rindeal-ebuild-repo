@@ -1,0 +1,4 @@
+- the dusty and bollocks-packed "official" package was completely revamped
+- updated to newest version
+- some bugs fixed
+- + all standard features of my ebuilds
