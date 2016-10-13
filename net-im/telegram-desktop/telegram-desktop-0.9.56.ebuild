@@ -41,8 +41,8 @@ RDEPEND="${RDEPEND[*]}"
 
 RESTRICT+=' test'
 
-PLOCALES=( de es it ko nl pt_BR )
-inherit l10n
+L10N_LOCALES=( de es it ko nl pt_BR )
+inherit l10n-r1
 
 CHECKREQS_DISK_BUILD='1G'
 inherit check-reqs
@@ -55,13 +55,15 @@ qt5_get_bindir() { echo "${QT5_PREFIX}/bin" ; }
 
 src_prepare-locales() {
 	local dir='Resources/langs' pre='lang_' post='.strings'
-	l10n_find_plocales_changes "${dir}" "${pre}" "${post}"
-	rm_loc() {
-		rm -v -f "${dir}/${pre}${1}${post}" || die
-		sed -e "\|${pre}${1}${post}|d" \
+
+	l10n_find_changes_in_dir "${dir}" "${pre}" "${post}"
+
+	l10n_get_locales locales app off
+	for l in ${locales} ; do
+		rm -v -f "${dir}/${pre}${l}${post}" || die
+		sed -e "\|${pre}${l}${post}|d" \
 			-i -- "${TG_PRO}" 'Resources/telegram.qrc' || die
-	}
-	l10n_for_each_disabled_locale_do rm_loc
+	done
 }
 
 src_prepare-delete_and_modify() {
