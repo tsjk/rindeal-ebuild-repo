@@ -1,26 +1,29 @@
-Rindeal's Gentoo Overlay
-==========================
+Rindeal's [_Gentoo™_](https://www.gentoo.org/) Overlay <img src="./assets/logo_96.png" title="Sir Benjamin the Bull" alt="logo" align="right">
+=================================================================================================
 
-### _The best overlay you have ever seen_
+_Packages done right™_
 
-[![Build Status](https://img.shields.io/travis/rindeal/gentoo-overlay/master.svg?style=flat-square&label=repoman full)](https://travis-ci.org/rindeal/gentoo-overlay)
-[![Dev Branch Build Status](https://img.shields.io/travis/rindeal/gentoo-overlay/dev.svg?style=flat-square&label=dev)](https://travis-ci.org/rindeal/gentoo-overlay)
+[![Build Status][ci-master-badge]](ci-master) [![Dev Branch Build Status][ci-dev-badge]](ci-dev)
 
-Every package here has been carefully crafted to an unheard-of level of perfection.
+Every package here has been carefully crafted to the highest level of perfection.
 
-Features that the vast majority of my ebuilds have in common:
+Features that the vast majority of my ebuilds has in common:
 
- - code in ebuilds is clean, elegant, uncluttered, commented and generally easy on the eyes, thus making packages maintainable and easily updatable
+ - code in ebuilds is **correct, clean, documented**, thus making packages maintainable and easily updatable
  - **USE flags** are provided for almost any configurable option
- - full **Systemd** integration (services, templates, timers, ...), no OpenRC/cron support
- - sane default configurations (default USE-flags, config files, ...)
+     - instead of packing multitude options under a single feature as _Gentoo™_ devs do
+ - full **_systemd_** integration (services, templates, timers, ...), no _OpenRC_/_cron_ support
+     - note that only recent versions of _systemd_ are supported (cca. only last the 3-4 releases)
+ - sane **default configurations** (default USE-flags, config files, ...)
  - **locales** support (`nls`/`l10n_*` USE-flags)
- - **amd64/arm** architectures only, which removes clutter introduced for exotic arches
+     - _Gentoo™_ packages mostly install all locales unconditionally
+ - **amd64**/**arm** architectures only
+     - this allows me to remove clutter introduced by Gentoo devs for exotic arches
  - only the **native ABI** is supported, again to reduce the clutter
 
-In most package directories there is a _README_ file that says why is the package superior to any other out there including the "official" one.
+In most package directories there is a _README_ file that says why is my package superior to any other out there including the "official" one.
 
-> _If you find a package superior to mine, please [report it here][New issue]_.
+> _If you find a package superior to mine, please [report it here][New issue], so that I can improve it even more._
 
 User friendly list of packages is available [here][LISTING].
 I highly encourage you to browse through the list as the chances are high for you to discover some great new software.
@@ -37,10 +40,10 @@ To achieve this goal I'm using several safety guards:
     - _[repoman](https://wiki.gentoo.org/wiki/Repoman)_ checks
     - _[shellcheck](https://www.shellcheck.net/)_ checks
     - custom checks
-- all points of _GitHub_'s feature called [protected branches], which means that all merges to _master_ have to pass CI tests
+- all points of _GitHub_'s feature called [protected branches], which means that all merges to _master_ must pass CI tests
 
 This all, of course, doesn't prevent build failures, missing dependencies, etc. So, should you find
-some issues, send me a PR (if you know how to fix it), or at least [file an issue][New issue].
+some issues, please send me a PR (if you know how to fix it), or at least [file an issue][New issue].
 
 
 How to install this overlay
@@ -54,7 +57,7 @@ How to install this overlay
 [rindeal]
 ## set this to any location you want
 location = /var/cache/portage/repos/rindeal
-## prefer gentoo-mirror which includes metadata cache, but introduces a delay for hotfixes
+## prefer gentoo-mirror which includes metadata cache, but introduces a delay for hotfixes (<1hour)
 sync-uri =  https://github.com/gentoo-mirror/rindeal.git
 #sync-uri = https://github.com/rindeal/gentoo-overlay.git
 sync-type = git
@@ -80,8 +83,16 @@ layman -o 'https://github.com/rindeal/gentoo-overlay/raw/master/repositories.xml
 layman -a rindeal
 ```
 
+---
+
+### Colophon
+
+- [Animal vector designed by Freepik](http://www.freepik.com/free-photos-vectors/animal)
 
 [protected branches]: https://help.github.com/articles/about-protected-branches/
 [LISTING]: ./LISTING.md
 [New issue]: https://github.com/rindeal/gentoo-overlay/issues/new
-[Telegram]: https://desktop.telegram.org/
+[ci-master-badge]: https://img.shields.io/travis/rindeal/gentoo-overlay/master.svg?style=flat-square&label=master%20build
+[ci-master]: https://travis-ci.org/rindeal/gentoo-overlay
+[ci-dev-badge]: https://img.shields.io/travis/rindeal/gentoo-overlay/dev.svg?style=flat-square&label=dev%20build
+[ci-dev]: https://travis-ci.org/rindeal/gentoo-overlay
