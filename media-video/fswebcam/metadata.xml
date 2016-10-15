@@ -5,4 +5,9 @@
     <email>dev.rindeal+gentoo-overlay@gmail.com</email>
     <name>Jan Chren (rindeal)</name>
   </maintainer>
+  <use>
+    <flag name="32bit-buffer">Allow capturing of 2^32 frames</flag>
+    <flag name="v4l1">V4L1 support</flag>
+    <flag name="v4l2">V4L2 support</flag>
+  </use>
 </pkgmetadata>
