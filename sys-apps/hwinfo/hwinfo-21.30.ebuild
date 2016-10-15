@@ -5,7 +5,7 @@ EAPI=6
 
 GH_URI='github/openSUSE'
 
-inherit git-hosting multilib toolchain-funcs
+inherit git-hosting toolchain-funcs
 
 DESCRIPTION='Hardware detection tool used in SuSE Linux'
 LICENSE='GPL-2'
@@ -16,10 +16,7 @@ KEYWORDS='amd64 arm'
 
 IUSE='doc examples'
 
-CDEPEND="
-	amd64? ( dev-libs/libx86emu )
-	x86? ( dev-libs/libx86emu )
-"
+CDEPEND=""
 DEPEND="${CDEPEND}
 	sys-devel/flex
 	>=sys-kernel/linux-headers-2.6.17
