@@ -30,8 +30,16 @@ RESTRICT="mirror"
 
 S="${WORKDIR}/${A%.tar.gz}"
 
-QA_EXECSTACK="usr/bin/${PN}"
 QA_PRESTRIPPED="/usr/bin/${PN}"
+
+pkg_pretend() {
+	ewarn ""
+	ewarn "You're trying to install '${PN}'."
+	ewarn "Please note that this app is not libre and is not even open-source."
+	ewarn "It uses an old statically-compiled version of OpenSSL (OpenSSL 1.0.0e 6 Sep 2011)."
+	ewarn "Use at your own discretion, you have been warned."
+	ewarn ""
+}
 
 src_install() {
 	dobin	"${PN}"
