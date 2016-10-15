@@ -5,7 +5,4 @@
     <email>dev.rindeal+gentoo-overlay@gmail.com</email>
     <name>Jan Chren (rindeal)</name>
   </maintainer>
-  <upstream>
-    <remote-id type="sourceforge">hdparm</remote-id>
-  </upstream>
 </pkgmetadata>

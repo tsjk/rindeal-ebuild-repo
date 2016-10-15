@@ -13,7 +13,7 @@ LICENSE="BSD GPL-2" # GPL-2 only
 SLOT="0"
 SRC_URI="mirror://sourceforge/hdparm/${P}.tar.gz"
 
-KEYWORDS="~amd64 ~arm"
+KEYWORDS="amd64 arm"
 IUSE="static"
 
 src_prepare() {
@@ -52,11 +52,11 @@ src_install() {
 	default
 
 	# contrib/{idectl,ultrabayd} are terribly outdated, even debian doesn't install them
-	insinto /usr/share/${PN}/contrib
+	insinto "/usr/share/${PN}/contrib"
 	doins contrib/fix_standby*
 
-	doman hdparm.8
+	doman "${PN}.8"
 
-	insinto /usr/share/${PN}/wiper
+	insinto "/usr/share/${PN}/wiper"
 	doins -r wiper/*
 }
