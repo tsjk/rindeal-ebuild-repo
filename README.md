@@ -3,7 +3,7 @@ Rindeal's [_Gentoo™_](https://www.gentoo.org/) Overlay <img src="./assets/logo
 
 _Packages done right™_
 
-[![Build Status][ci-master-badge]](ci-master) [![Dev Branch Build Status][ci-dev-badge]](ci-dev)
+[![Build Status][ci-master-badge]][ci-master] [![Dev Branch Build Status][ci-dev-badge]][ci-dev]
 
 Every package here has been carefully crafted to the highest level of perfection.
 
