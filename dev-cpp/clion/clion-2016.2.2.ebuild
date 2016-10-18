@@ -25,26 +25,6 @@ src_unpack() {
 	jetbrains-intellij_src_unpack
 }
 
-src_prepare() {
-	default
-
-	cd "${S}"/plugins/tfsIntegration/lib/native || die
-	{
-		eshopts_push -s extglob
-		# use eval() because of syntax errors
-		eval 'rm -rvf !(linux)' || die
-		eshopts_pop
-
-		cd linux || die
-		{
-			rm -rvf ppc || die
-			use amd64	|| { rm -rvf x86_64	|| die ;}
-			use arm		|| { rm -rvf arm	|| die ;}
-			use x86		|| { rm -rvf x86	|| die ;}
-		}
-	}
-}
-
 src_install() {
 	local JBIJ_DESKTOP_EXTRAS=(
 		"MimeType=text/plain;text/x-c;text/x-h;" # MUST end with semicolon
