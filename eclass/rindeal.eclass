@@ -33,7 +33,7 @@ if [[ -z "$(type -t command_not_found_handle 2>/dev/null)" ]] ; then
 	}
 
 else
-	debug-print "${ECLASS}: command_not_found_handle() already registered"
+	eqawarn "${ECLASS}: command_not_found_handle() already registered"
 fi
 
 
