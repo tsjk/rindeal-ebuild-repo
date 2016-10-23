@@ -3,17 +3,19 @@
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
+inherit rindeal
 
-inherit flag-o-matic-patched eutils
+inherit flag-o-matic-patched
+inherit eutils
 
 DESCRIPTION="Utility to change hard drive performance parameters"
-HOMEPAGE="https://sourceforge.net/projects/hdparm/"
+HOMEPAGE="https://sourceforge.net/projects/${PN}/"
 LICENSE="BSD GPL-2" # GPL-2 only
 
 SLOT="0"
-SRC_URI="mirror://sourceforge/hdparm/${P}.tar.gz"
+SRC_URI="mirror://sourceforge/${PN}/${P}.tar.gz"
 
-KEYWORDS="amd64 arm"
+KEYWORDS="~amd64 ~arm"
 IUSE="static"
 
 src_prepare() {
@@ -51,11 +53,11 @@ src_install() {
 	DOCS=( hdparm.lsm Changelog README.acoustic hdparm-sysconfig )
 	default
 
+	doman "${PN}.8"
+
 	# contrib/{idectl,ultrabayd} are terribly outdated, even debian doesn't install them
 	insinto "/usr/share/${PN}/contrib"
 	doins contrib/fix_standby*
-
-	doman "${PN}.8"
 
 	insinto "/usr/share/${PN}/wiper"
 	doins -r wiper/*
