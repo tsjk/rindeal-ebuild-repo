@@ -234,6 +234,8 @@ Please consider enabling IP_MULTICAST under Networking options.
 
 	check_extra_config
 	python-single-r1_pkg_setup
+
+	export V=1 # verbose build
 }
 
 my_eautoreconf() {
@@ -273,12 +275,17 @@ src_prepare() {
 	sed -e 's|make |${MAKE:-make} ${MAKEOPTS} |g' \
 		-i -- bootstrap || die
 
+	# disable version checking (home calling)
+	sed -e '\|<addon>service.xbmc.versioncheck</addon>|d' \
+		-i -- system/addon-manifest.xml || die
+
 	my_eautoreconf
 	elibtoolize
 
 	# bootstrap manually
 	# https://bugs.gentoo.org/show_bug.cgi?id=558798
-	tc-env_build emake -f codegenerator.mk || die
+	einfo "Bootstrapping..."
+	tc-env_build emake -f codegenerator.mk
 
 	# Tweak autotool timestamps to avoid regeneration
 	find . -type f -exec touch -r configure {} + || die
@@ -300,6 +307,8 @@ src_configure() {
 	export ac_cv_path_JAVA_EXE=$(which java)
 
 	local myeconfargs=(
+		# no static libs
+		--disable-static
 		# Portage sets it up itself
 		--disable-ccache
 		# use only optimizations specified by user
@@ -364,7 +373,8 @@ src_configure() {
 
 		# TODO: $(use_enable mdnsembedded)
 
-		# TODO: --with-lirc-device=file	# default LIRC device
+		# TODO
+		--with-lirc-device=/run/lirc/lircd	# default LIRC device
 		# TODO: --enable-codec= # additional codecs from a list of comma separated names,  choices are amcodec and imxvpu
 	)
 
@@ -389,7 +399,11 @@ src_install() {
 	# Remove fontconfig settings that are used only on MacOSX.
 	# Can't be patched upstream because they just find all files and install
 	# them into same structure like they have in git.
-# 	RM_V=0 erm "${ED}"/usr/share/kodi/system/players/dvdplayer/etc || die
+# 	RM_V=0 erm "${ED}"/usr/share/kodi/system/players/dvdplayer/etc
+
+	## no XBMC
+	erm "${ED}"/usr/share/xsessions/xbmc.desktop
+	erm "${ED}"/usr/bin/xbmc*
 
 	python_domodule tools/EventClients/lib/python/xbmcclient.py
 	python_newscript "tools/EventClients/Clients/Kodi Send/kodi-send.py" kodi-send
