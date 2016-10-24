@@ -3,11 +3,11 @@
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
+inherit rindeal
 
 GH_URI="github/the-${PN}-group"
 GH_REF="${PN}-${PV}"
 
-inherit rindeal
 inherit flag-o-matic toolchain-funcs user
 inherit git-hosting
 
