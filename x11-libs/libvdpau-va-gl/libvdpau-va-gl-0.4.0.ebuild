@@ -7,7 +7,7 @@ EAPI=6
 GH_URI="github/i-rinat"
 GH_REF="v${PV}"
 
-inherit cmake-utils-patched git-hosting
+inherit cmake-utils git-hosting
 
 DESCRIPTION="VDPAU driver with OpenGL/VAAPI backend"
 LICENSE="MIT"

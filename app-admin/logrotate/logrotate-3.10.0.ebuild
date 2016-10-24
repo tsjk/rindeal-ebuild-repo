@@ -6,7 +6,7 @@ EAPI=6
 
 GH_URI="github"
 
-inherit rindeal flag-o-matic-patched git-hosting autotools systemd
+inherit rindeal flag-o-matic git-hosting autotools systemd
 
 DESCRIPTION="Rotates, compresses, and mails system logs"
 LICENSE="GPL-2"

@@ -3,7 +3,7 @@
 
 EAPI=6
 
-inherit git-r3 cmake-utils-patched
+inherit git-r3 cmake-utils
 
 DESCRIPTION="Telegram binding for Qt"
 HOMEPAGE="https://github.com/Kaffeine/telegram-qt"

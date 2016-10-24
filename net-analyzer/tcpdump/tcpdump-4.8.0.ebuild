@@ -8,7 +8,7 @@ GH_URI="github/the-${PN}-group"
 GH_REF="${PN}-${PV}"
 
 inherit rindeal
-inherit flag-o-matic-patched toolchain-funcs user
+inherit flag-o-matic toolchain-funcs user
 inherit git-hosting
 
 DESCRIPTION="A Tool for network monitoring and data acquisition"

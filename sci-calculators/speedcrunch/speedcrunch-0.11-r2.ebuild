@@ -6,7 +6,7 @@ EAPI=6
 
 GH_URI="bitbucket/heldercorreia"
 
-inherit cmake-utils-patched git-hosting
+inherit cmake-utils git-hosting
 
 DESCRIPTION="Fast and usable calculator for power users"
 HOMEPAGE="http://speedcrunch.org/ ${HOMEPAGE}"

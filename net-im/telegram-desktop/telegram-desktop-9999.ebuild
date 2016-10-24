@@ -14,7 +14,7 @@ fi
 
 # xdg: src_prepare, pkg_preinst, pkg_post{inst,rm}
 # git-hosting: src_unpack
-inherit xdg git-hosting eutils flag-o-matic-patched qmake-utils systemd versionator
+inherit xdg git-hosting eutils flag-o-matic qmake-utils systemd versionator
 
 TG_PRETTY_NAME="Telegram Desktop"
 DESCRIPTION='Official desktop client for the Telegram messenger'

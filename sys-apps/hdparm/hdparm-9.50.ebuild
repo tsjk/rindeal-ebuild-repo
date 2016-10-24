@@ -5,7 +5,7 @@
 EAPI=6
 inherit rindeal
 
-inherit flag-o-matic-patched
+inherit flag-o-matic
 inherit eutils
 
 DESCRIPTION="Utility to change hard drive performance parameters"

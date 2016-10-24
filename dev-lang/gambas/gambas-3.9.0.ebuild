@@ -4,7 +4,7 @@
 
 EAPI="6"
 
-inherit flag-o-matic-patched
+inherit flag-o-matic
 inherit autotools eutils xdg
 
 DESCRIPTION="Gambas is a free development environment based on a Basic interpreter"

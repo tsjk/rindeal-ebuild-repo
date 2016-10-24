@@ -5,7 +5,7 @@ EAPI=6
 
 GH_URI='github/fcambus'
 
-inherit git-hosting cmake-utils-patched
+inherit git-hosting cmake-utils
 
 DESCRIPTION='Web log analyzer using probabilistic data structures'
 LICENSE='BSD'

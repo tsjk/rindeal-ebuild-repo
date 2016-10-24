@@ -4,7 +4,7 @@
 
 EAPI=6
 
-inherit flag-o-matic-patched eutils xdg
+inherit flag-o-matic eutils xdg
 
 DESCRIPTION="Tool for ripping and streaming Blu-ray, HD-DVD and DVD discs"
 HOMEPAGE="http://www.makemkv.com/"

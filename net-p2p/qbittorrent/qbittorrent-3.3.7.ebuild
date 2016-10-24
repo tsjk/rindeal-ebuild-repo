@@ -6,7 +6,7 @@ EAPI=6
 GH_URI="github/qbittorrent/qBittorrent"
 GH_REF="release-${PV}"
 
-inherit flag-o-matic-patched qmake-utils git-hosting xdg autotools
+inherit flag-o-matic qmake-utils git-hosting xdg autotools
 
 DESCRIPTION="BitTorrent client in C++/Qt based on libtorrent-rasterbar"
 HOMEPAGE="http://www.qbittorrent.org/ ${HOMEPAGE}"
