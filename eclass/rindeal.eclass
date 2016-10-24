@@ -37,6 +37,33 @@ else
 fi
 
 
+if [[ -z "$(declare -p _RINDEAL_ECLASS_SWAPS 2>/dev/null)" ]] ; then
+declare -gA _RINDEAL_ECLASS_SWAPS=(
+	['flag-o-matic']='flag-o-matic-patched'
+	['cmake-utils']='cmake-utils-patched'
+)
+fi
+
+## inherit hook
+if [[ -z "$(type -t __original_inherit 2>/dev/null)" ]] ; then
+
+eval "__original_$(declare -f inherit)"
+inherit() {
+	local a args=()
+	for a in "$@" ; do
+		if [[ ${_RINDEAL_ECLASS_SWAPS["${a}"]+exists} ]] ; then
+			args+=( "${_RINDEAL_ECLASS_SWAPS["${a}"]}" )
+			unset "_RINDEAL_ECLASS_SWAPS[${a}]"
+		else
+			args+=( "${a}" )
+		fi
+	done
+
+	__original_inherit "${args[@]}"
+}
+fi
+
+
 epushd() {
 	pushd "$@" >/dev/null || die
 }
