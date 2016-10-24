@@ -70,10 +70,9 @@ id_table[] = {
 	} \
 })
 
-#define VFS_LOAD_FUNC_SYM(handle, funcname) ({ \
-	funcname = dlsym(handle, #funcname); \
+#define VFS_LOAD_FUNC_SYM(handle, funcname) \
+	funcname ## _t funcname = dlsym(handle, #funcname); \
 	VFS_ASSERT(funcname, dlerror(), -ENODEV); \
-})
 
 static int
 vfs_extract_image (
@@ -84,11 +83,6 @@ vfs_extract_image (
 {
 	validity_dev * const vdev = dev->priv;
 	int result = 0;
-
-	vfs_get_img_width_t		vfs_get_img_width;
-	vfs_get_img_height_t	vfs_get_img_height;
-	vfs_get_img_data_t		vfs_get_img_data;
-	vfs_free_img_data_t		vfs_free_img_data;
 
 	VFS_LOAD_FUNC_SYM(handle, vfs_get_img_width);
 	VFS_LOAD_FUNC_SYM(handle, vfs_get_img_height);
@@ -133,14 +127,6 @@ dev_activate(struct fp_img_dev * dev, enum fp_imgdev_state state)
 	void * const handle = dlopen("libvfsFprintWrapper.so",
 					RTLD_LAZY | RTLD_GLOBAL | RTLD_NODELETE);
 	VFS_ASSERT(handle, dlerror(), -ENODEV);
-
-	vfs_wait_for_service_t	vfs_wait_for_service;
-	vfs_set_matcher_type_t	vfs_set_matcher_type;
-	vfs_dev_init_t			vfs_dev_init;
-	vfs_capture_t			vfs_capture;
-	vfs_get_img_datasize_t	vfs_get_img_datasize;
-	vfs_clean_handles_t		vfs_clean_handles;
-	vfs_dev_exit_t			vfs_dev_exit;
 
 	VFS_LOAD_FUNC_SYM(handle, vfs_wait_for_service);
 	VFS_LOAD_FUNC_SYM(handle, vfs_set_matcher_type);
@@ -191,12 +177,12 @@ cleanup:
 	}
 
 	if (result != -ENODEV) {
-		vfs_clean_handles = dlsym(handle, "vfs_clean_handles");
+		vfs_clean_handles_t vfs_clean_handles = dlsym(handle, "vfs_clean_handles");
 		if (vfs_clean_handles) {
 			(*vfs_clean_handles)(vdev);
 		}
 
-		vfs_dev_exit = dlsym(handle, "vfs_dev_exit");
+		vfs_dev_exit_t vfs_dev_exit = dlsym(handle, "vfs_dev_exit");
 		if (vfs_dev_exit) {
 			(*vfs_dev_exit)(vdev);
 		}
