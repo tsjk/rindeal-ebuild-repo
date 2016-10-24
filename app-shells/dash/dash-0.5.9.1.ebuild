@@ -23,7 +23,7 @@ DEPEND="${RDEPEND}
 
 src_prepare() {
 	PATCHES=(
-		"${FILESDIR}"/0.5.9-dumb_echo.patch
+		"${FILESDIR}"/0.5.9.1-dumb_echo.patch
 		"${FILESDIR}"/0.5.8-SHELL-print-n-upon-EOF-CTRL-D-when-run-interactively.patch
 		"${FILESDIR}"/0.5.8-PARSER-Remove-backslash-before-in-double-quotes-in-va.patch
 		"${FILESDIR}"/0.5.8-SHELL-Disable-sh-c-command-sh-c-exec-command-optimization.patch
