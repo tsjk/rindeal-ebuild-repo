@@ -13,7 +13,7 @@ LICENSE="MIT"
 
 RESTRICT="mirror test"
 SLOT="0"
-KEYWORDS="~amd64 ~arm"
+KEYWORDS="~amd64"
 
 ruby_add_rdepend '
 	=dev-ruby/github_api-0*
