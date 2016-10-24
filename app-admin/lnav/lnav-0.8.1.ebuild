@@ -3,24 +3,27 @@
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
+inherit rindeal
 
 GH_URI="github/tstack"
+GH_REF="v${PV}"
 PYTHON_COMPAT=( python2_7 )
 
-inherit git-hosting python-any-r1
+inherit git-hosting
+inherit python-any-r1
+inherit autotools
 
 DESCRIPTION="A curses-based tool for viewing and analyzing log files"
 HOMEPAGE="http://lnav.org ${HOMEPAGE}"
 LICENSE="BSD-2"
 
 SLOT="0"
-SRC_URI="https://github.com/tstack/lnav/releases/download/v${PV}/${P}.tar.gz"
 
-KEYWORDS="~amd64 ~arm ~x86"
+KEYWORDS="~amd64 ~arm"
 IUSE="pcre readline static test unicode"
 
 # system-wide yajl cannot be used, because lnav uses custom-patched version
-RDEPEND="
+CDEPEND="
 	app-arch/bzip2
 	net-misc/curl
 	sys-libs/ncurses:0=[unicode?]
@@ -30,17 +33,21 @@ RDEPEND="
 	sys-libs/zlib
 
 	pcre? ( dev-libs/libpcre[cxx] )"
-DEPEND="${RDEPEND}
+DEPEND="${CDEPEND}
 	sys-apps/gawk
 	dev-util/re2c
 
 	test? ( ${PYTHON_DEPS} )"
+RDEPEND="${CDEPEND}"
 
 src_prepare() {
 	default
 
 	# respect AR
-	sed -r -e '/^AR *= */d' -i -- src/Makefile.in || die
+	# https://github.com/tstack/lnav/pull/356
+	sed -e '/^AC_PROG_RANLIB/ a AM_PROG_AR' -i configure.ac || die
+
+	eautoreconf
 }
 
 src_configure() {
