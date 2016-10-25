@@ -13,47 +13,24 @@ Description=Validity Fingerprint Service
 Before=multi-user.target
 
 [Service]
-# delete single instance lock file
-ExecStartPre=/bin/rm -f /var/run/ValidityService.pid
-# clean `/tmp/vcsSemKey_* junk`
+# clean up `/tmp/vcsSemKey_* junk`
 ExecStartPre=/usr/bin/find /tmp -maxdepth 1 -type f -name "vcsSemKey_*" -delete
-# clean `/tmp/CH_* junk`
+# clean up `/tmp/CH_* junk`
 ExecStartPre=/usr/bin/find /tmp -maxdepth 1 -type p -name "CH_*" -delete
-# these files cannot be created without root permissions
-ExecStartPre=/bin/touch /var/run/ValidityService.pid
-ExecStartPre=/bin/chown @VFS_USER@:@VFS_GROUP@ /var/run/ValidityService.pid
 
-User=@VFS_USER@
-Group=@VFS_GROUP@
-# libvfsFprintWrapper.so will still be creating files in /tmp with explicit 0666 perms
-UMask=@VFS_UMASK@
 # permissions applied to ExecStart only
 PermissionsStartOnly=true
+User=@VFS_USER@
+Group=@VFS_GROUP@
+# libvfsFprintWrapper.so will still be creating files in with explicit 0777/0666 perms.
+# To overcome this we're using LD_PRELOAD wrapper.
+UMask=@VFS_UMASK@
 
-# daemon creates:
-#  - `/tmp/vcsSemKey_*` files (pipes, IPC)
-#  - /tmp/CH_* (pipes)
-#  - /var/run/ValidityService.pid
-#  - /etc/ValidityPersistentData
-# daemon tries to access:
-#  - /home/validity/Br_4_5_1xx/usdk/vcsFPService/../lib/linux/x64/Release/*
-#  - /etc/localtime
-#  - /usr/lib64/locale/locale-archive
-#  - /etc/udev/udev.conf
-#  - /run/udev/control
-#  - /run/udev/data/*
-#  - /sys/subsystem
-#  - /dev/bus/usb/*
-#  - / /sys /sys/bus/ /sys/bus/usb/ /sys/bus/usb/devices
-#  - /sys/bus/usb/*
-#  - /sys/class
-#  - /sys/devices/*
-# daemon tries to execute:
-#  - /bin/rm
-#  - /bin/sh
-#  - /usr/bin/pidof
-InaccessiblePaths=/home
-ReadOnlyPaths=/etc/
+# The daemon already requires public `/tmp` so let's put his CWD there as well.
+WorkingDirectory=/tmp
+# Because InaccessiblePaths restricts even resolved symlinks, it's not possible to put anything in here.
+#InaccessiblePaths=
+ReadOnlyPaths=/etc /run /var
 # `vcsFPService` communicates with `libvfsFprintWrapper.so` through tmp files
 #PrivateTmp=true
 # protect /boot and /usr
@@ -68,10 +45,8 @@ NoNewPrivileges=true
 SystemCallFilter=~ @clock @cpu-emulation @debug @keyring @module @mount @obsolete @privileged @raw-io
 
 Type=forking
-ExecStart=@VCSFPSERVICE_INST_DIR@/vcsFPService
-
-# pidfile is empty, serves only as a single instance lock
-#PIDFile=/var/run/ValidityService.pid
+ExecStart=/bin/sh -c \
+    'LD_PRELOAD=/usr/libexec/vcsFPService_preload.so @VCSFPSERVICE_INST_DIR@/vcsFPService'
 TimeoutSec=10s
 Restart=on-abort
 

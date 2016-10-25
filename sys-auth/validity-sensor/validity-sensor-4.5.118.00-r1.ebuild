@@ -44,6 +44,8 @@ src_unpack() {
 
 	mkdir -p "${S}" || die
 	rpm_unpack SP62413/Validity-Sensor-Setup-4.5-118.00.x86_64.rpm "${S}"
+
+	cp -r "${FILESDIR}/vcsFPService_preload" "${S}/" || die
 }
 
 my_generate_udev_rules() {
@@ -121,6 +123,9 @@ my_generate_udev_rules() {
 }
 
 src_compile() {
+	rindeal::expand_vars vcsFPService_preload/preload.c{.in,}
+	emake -C vcsFPService_preload
+
 	local f
 	for f in "${FILESDIR}"/*.in ; do
 		rindeal::expand_vars "${f}" "${T}/$(basename "${f%".in"}")"
@@ -136,6 +141,9 @@ src_install() {
 	dosbin usr/sbin/* usr/bin/vcsFPService
 
 	dodoc usr/share/doc/packages/validity/README
+
+	insinto /usr/libexec/
+	doins vcsFPService_preload/vcsFPService_preload.so
 
 	systemd_dounit "${T}/vcsFPService.service"
 	systemd_newtmpfilesd "${FILESDIR}/vcsFPService.tmpfilesd.conf" "vcsFPService.conf"
