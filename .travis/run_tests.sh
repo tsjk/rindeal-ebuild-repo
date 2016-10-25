@@ -3,7 +3,9 @@
 source "$(dirname "${BASH_SOURCE[0]}")/travis-functions.sh" || exit 1
 
 run_repoman() {
-    announce repoman full --xmlparse --verbose --without-mask
+    echo "\$ repoman full"
+    repoman full --xmlparse --verbose --without-mask --output-style=column | \
+        "$(dirname "${BASH_SOURCE[0]}")/repoman_format.awk"
 }
 
 run_shellcheck() {
