@@ -15,6 +15,7 @@ case "${EAPI:-0}" in
 esac
 
 
+inherit rindeal
 inherit eutils versionator xdg
 
 
