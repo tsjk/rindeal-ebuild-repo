@@ -41,6 +41,11 @@ CDEPEND_A=(
 	'x11-libs/libXi'
 	'x11-libs/libxkbcommon'
 	'x11-libs/libX11'
+
+	# Indirect dep. Older versions cause issues through
+	# 'qt-telegram-static' -> 'qtimageformats' -> 'libwebp' chain.
+	# https://github.com/rindeal/gentoo-overlay/issues/123
+	'>=media-libs/libwebp-0.4.2'
 )
 DEPEND_A=( "${CDEPEND_A[@]}"
 	'=dev-qt/qt-telegram-static-5.6.0*'	# 5.6.0 is required since 0.9.49
