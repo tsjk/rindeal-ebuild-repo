@@ -16,8 +16,7 @@ LICENSE="GPL-3"
 
 SLOT="0"
 
-# arm is missing qtprint
-KEYWORDS="~amd64"
+KEYWORDS="~amd64 ~arm"
 IUSE=""
 
 CDEPEND_A=(
@@ -27,7 +26,7 @@ CDEPEND_A=(
 	"dev-qt/qtgui:5"
 	"dev-qt/qtmultimedia:5"
 	"dev-qt/qtnetwork:5"
-	"dev-qt/qtprint:5"
+	"dev-qt/qtprintsupport:5"
 	"dev-qt/qtquickcontrols:5"
 	"dev-qt/qtsql:5"
 	"dev-qt/qtsvg:5"
