@@ -7,22 +7,31 @@ inherit rindeal
 GH_URI='github/telegramdesktop/tdesktop'
 if [[ "${PV}" != *9999* ]] ; then
 	GH_REF="v${PV}"
-	if [ -n "${TELEGRAM_DEBUG}" ]  ; then
+	if [[ -n "${TELEGRAM_DEBUG}" ]]  ; then
 		GH_FETCH_TYPE=live
 		EGIT_CLONE_TYPE=shallow
 	fi
 fi
 
-# xdg: src_prepare, pkg_preinst, pkg_post{inst,rm}
-# git-hosting: src_unpack
-inherit xdg git-hosting eutils flag-o-matic qmake-utils systemd versionator
+# EXPORT_FUNCTIONS: src_prepare, pkg_preinst, pkg_post{inst,rm}
+inherit xdg
+# EXPORT_FUNCTIONS: src_unpack
+inherit git-hosting
+# functions: make_desktop_entry
+inherit eutils
+inherit flag-o-matic qmake-utils systemd versionator
 
 TG_PRETTY_NAME="Telegram Desktop"
 DESCRIPTION='Official desktop client for the Telegram messenger'
-HOMEPAGE="https://desktop.telegram.org/ ${HOMEPAGE}"
-LICENSE='GPL-3' # with OpenSSL exception
+HOMEPAGE="https://desktop.telegram.org/ ${GH_HOMEPAGE}"
+LICENSE='telegram' # GPL-3 with OpenSSL exception
 
 SLOT='0'
+if [[ "${GH_FETCH_TYPE}" == 'snapshot' ]] ; then
+	GYP_REF='920ee58c3d3109dea3cd37d88054014891a93db7' # 2016-10-13T13:35:00Z
+	git-hosting_gen_snapshot_uri 'gitlab/rindeal-mirrors/gyp' "${GYP_REF}" GYP_SNAPSHOT_URI GYP_SNAPSHOT_EXT
+	SRC_URI+=" ${GYP_SNAPSHOT_URI} -> gyp-tdesktop-${GYP_REF}-gitlab${GYP_SNAPSHOT_EXT}"
+fi
 
 [[ "${PV}" == *9999* ]] || KEYWORDS="~amd64"
 IUSE='autostart_generic autostart_plasma_systemd +pch proxy'
@@ -95,6 +104,18 @@ pkg_setup() {
 		for u in ${TELEGRAM_AUTOSTART_USERS} ; do
 			id -u "${u}" >/dev/null || die "Invalid username '${u}' in TELEGRAM_AUTOSTART_USERS"
 		done
+	fi
+}
+
+src_unpack() {
+	git-hosting_src_unpack
+
+	if [[ "${GH_FETCH_TYPE}" == 'live' ]] ; then
+		## fetch gyp
+		local gyp_git_repo_uri='https://chromium.googlesource.com/external/gyp'
+		EGIT_CLONE_TYPE=shallow \
+			git-r3_fetch "${gyp_git_repo_uri}" HEAD
+		git-r3_checkout "${gyp_git_repo_uri}" "${S}/gyp"
 	fi
 }
 
@@ -182,6 +203,8 @@ src_prepare-appends() {
 }
 
 src_prepare() {
+	# cd gyp || die
+	# eapply "Telegram/Patches/gyp.diff"
 	eapply "${FILESDIR}"/0.10.1-revert_Round_radius_increased_for_message_bubbles.patch
 
 	xdg_src_prepare
