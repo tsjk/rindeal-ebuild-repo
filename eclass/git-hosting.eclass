@@ -4,7 +4,7 @@
 # @ECLASS: git-hosting.eclass
 # @MAINTAINER:
 # Jan Chren (rindeal) <dev.rindeal+gentoo@gmail.com>
-# @BLURB: Support eclass for packages hosted on online git hosting services like Github
+# @BLURB: Support eclass for packages hosted on online git hosting services like GitHub
 
 if [ -z "${_GH_ECLASS}" ] ; then
 
@@ -12,6 +12,162 @@ case "${EAPI:-0}" in
 	5|6) ;;
 	*) die "Unsupported EAPI='${EAPI}' for '${ECLASS}'" ;;
 esac
+
+### BEGIN Functions
+
+##
+# @FUNCTION:	_git-hosting_parse_uri
+# @PRIVATE
+# @USAGE:		$0 "${uri}" provider user repo
+# @DESCRIPTION: parses uri into its components
+##
+_git-hosting_parse_uri() {
+	(( $# != 4 )) && die "${FUNCNAME}: Not enough arguments provided"
+
+	local -r -- uri="$1" ; shift
+	local -n -- _provider="$1" ; shift
+	local -n -- _user="$1" ; shift
+	local -n -- _repo="$1" ; shift
+
+	# use an array to split the string to '/' delimited parts
+	local -a uri_a=( ${uri//\// } )
+
+	(( "${#uri_a[*]}" > 0 )) && \
+		_provider="${uri_a[0]}"
+	(( "${#uri_a[*]}" > 1 )) && \
+		_user="${uri_a[1]}"
+	(( "${#uri_a[*]}" > 2 )) && \
+		_repo="${uri_a[2]}"
+
+	return 0
+}
+
+##
+# @FUNCTION:	_git-hosting_gen_base_uri
+# @PRIVATE
+# @USAGE:		$0 "${provider}" "${user}" "${repo}" base_uri
+# @DESCRIPTION: Generate base URI of the repository. Can be used as a homepage.
+##
+_git-hosting_gen_base_uri() {
+	(( $# != 4 )) && die "${FUNCNAME}: Note enough arguments provided"
+
+	local -r -- provider="$1" ; shift
+	local -r -- user="$1" ; shift
+	local -r -- repo="$1" ; shift
+	local -n -- _base_uri="$1" ; shift
+
+	local domain=
+	_git-hosting_get_domain "${provider}" domain
+	readonly domain
+
+	_base_uri="https://${domain}/${user}/${repo}"
+
+	return 0
+}
+
+##
+# @FUNCTION:	_git-hosting_get_domain
+# @PRIVATE
+# @USAGE:		$0 "${provider}" domain
+# @DESCRIPTION: Outputs domain name of the hosting provider.
+##
+_git-hosting_get_domain() {
+	(( $# != 2 )) && die "${FUNCNAME}: Note enough arguments provided"
+
+	local -r -- provider="$1" ; shift
+	# this var shadowed by the one in _git-hosting_gen_base_uri
+	local -n -- _domain="$1" ; shift
+
+	case "${provider}" in
+	'bitbucket')
+		_domain='bitbucket.org' ;;
+	'github')
+		_domain='github.com' ;;
+	'gitlab')
+		_domain='gitlab.com' ;;
+	*) die "Unsupported provider '${provider}'" ;;
+	esac
+}
+
+##
+# @FUNCTION:	_git-hosting_parse_uri
+# @USAGE:		$0 "${uri}" "${ref}" "${distfile}" snapshot_uri
+# @DESCRIPTION: Generate snapshot URI
+##
+git-hosting_gen_snapshot_uri() {
+	case $# in
+	# interface mostly for extrenal use
+	4)
+		local -r -- uri="$1" ; shift
+
+		local -- provider user repo
+		_git-hosting_parse_uri "${uri}" provider user repo
+		readonly provider user repo
+
+		local -- base_uri
+		_git-hosting_gen_base_uri "${provider}" "${user}" "${repo}" base_uri
+		readonly base_uri
+		;;
+
+	# interface mostly for internal use
+	5)
+		local -r -- provider="$1" ; shift
+		local -r -- base_uri="$1" ; shift
+		;;
+
+	*) die "${FUNCNAME}: Note enough arguments provided" ;;
+	esac
+
+	local -r -- ref="$1" ; shift
+	local -n -- _snapshot_uri="$1" ; shift
+	local -n -- _ext="$1" ; shift
+
+	local -- uri_path
+
+	case "${provider}" in
+	'bitbucket' )
+		_ext=".tar.bz2"
+		uri_path="get/${ref}${_ext}"
+		;;
+	'github' )
+		_ext=".tar.gz"
+		uri_path="archive/${ref}${_ext}"
+		;;
+	'gitlab' )
+		_ext=".tar.bz2"
+		uri_path="repository/archive${_ext}?ref=${ref}"
+		;;
+	*) die "Unsupported provider '${provider}'" ;;
+	esac
+
+	_snapshot_uri="${base_uri}/${uri_path}"
+}
+
+##
+# @FUNCTION:	_git-hosting_parse_uri
+# @USAGE:		$0 "${uri}" live_uri
+# @DESCRIPTION: Generate URI for git
+##
+git-hosting_gen_live_uri() {
+	(( $# != 2 )) && die "${FUNCNAME}: Note enough arguments provided"
+
+	local -r -- uri="$1" ; shift
+	local -n -- live_uri="$1" ; shift
+
+	local -- provider user repo
+	_git-hosting_parse_uri "${uri}" provider user repo
+	readonly provider user repo
+
+	local -- base_uri
+	_git-hosting_gen_base_uri "${provider}" "${user}" "${repo}" base_uri
+	readonly base_uri
+
+	live_uri="${base_uri}.git"
+}
+
+### END Functions
+
+### BEGIN Variables
 
 ##
 # @ECLASS-VARIABLE: GH_URI
@@ -25,9 +181,6 @@ esac
 ##
 [[ -z "${GH_URI}" ]] && die "GH_URI must be set to a non-empty value"
 
-# use an array to split the string to '/' delimited parts
-_GH_URI_A=( ${GH_URI//\// } )
-
 ##
 # @ECLASS-VARIABLE: GH_PROVIDER
 # @READONLY
@@ -36,7 +189,7 @@ _GH_URI_A=( ${GH_URI//\// } )
 # Contains the first part of GH_URI - the git hosting provider.
 # Currently one of 'github', 'gitlab', 'bitbucket'.
 ##
-GH_PROVIDER="${_GH_URI_A[0]}"
+GH_PROVIDER=
 
 ##
 # @ECLASS-VARIABLE: GH_USER
@@ -45,7 +198,7 @@ GH_PROVIDER="${_GH_URI_A[0]}"
 # @DESCRIPTION:
 # Contains the second part of GH_URI - the username/orgname/groupname.
 ##
-GH_USER="${_GH_URI_A[1]:-"${PN}"}"
+GH_USER="${PN}"
 
 ##
 # @ECLASS-VARIABLE: GH_REPO
@@ -54,10 +207,10 @@ GH_USER="${_GH_URI_A[1]:-"${PN}"}"
 # @DESCRIPTION:
 # Contains the third part of GH_URI - the repository name.
 ##
-GH_REPO="${_GH_URI_A[2]:-"${PN}"}"
+GH_REPO="${PN}"
 
-readonly GH_PROVIDER GH_USER GH_REPO
-unset _GH_URI_A
+_git-hosting_parse_uri "${GH_URI}" GH_PROVIDER GH_USER GH_REPO
+declare -g -r -- GH_PROVIDER GH_USER GH_REPO
 
 ##
 # @ECLASS-VARIABLE: GH_FETCH_TYPE
@@ -73,7 +226,7 @@ if [[ -z "${GH_FETCH_TYPE}" ]] ; then
 		GH_FETCH_TYPE='snapshot'
 	fi
 fi
-readonly GH_FETCH_TYPE
+declare -g -r -- GH_FETCH_TYPE
 
 ##
 # @ECLASS-VARIABLE: GH_REF
@@ -93,28 +246,17 @@ if [[ -z "${GH_REF}" ]] ; then
 		*) die "Unsupported fetch type: '${GH_FETCH_TYPE}'" ;;
 	esac
 fi
-readonly GH_REF
+declare -g -r -- GH_REF
 
 ##
-# @ECLASS-VARIABLE: GH_DISTFILE
-# @DEFAULT: ${P}-${GH_PROVIDER}
+# @ECLASS-VARIABLE: _GH_DOMAIN
+# @PRIVATE
+# @READONLY
 # @DESCRIPTION:
-# Name of the distfile (without any extensions).
+# Domain name of the hosting provider.
 ##
-: "${GH_DISTFILE:="${P}-${GH_PROVIDER}"}"
-readonly GH_DISTFILE
-
-
-case "${GH_PROVIDER}" in
-	'bitbucket')
-		_GH_DOMAIN='bitbucket.org' ;;
-	'github')
-		_GH_DOMAIN='github.com' ;;
-	'gitlab')
-		_GH_DOMAIN='gitlab.com' ;;
-	*) die "Unsupported provider '${GH_PROVIDER}'" ;;
-esac
-
+_git-hosting_get_domain "${GH_PROVIDER}" _GH_DOMAIN
+declare -g -r -- _GH_DOMAIN
 
 ##
 # @ECLASS-VARIABLE: GH_BASE_URI
@@ -123,43 +265,44 @@ esac
 # @DESCRIPTION:
 # Base uri of the repo
 ##
-declare -g -r GH_BASE_URI="https://${_GH_DOMAIN}/${GH_USER}/${GH_REPO}"
+_git-hosting_gen_base_uri "${GH_PROVIDER}" "${GH_USER}" "${GH_REPO}" GH_BASE_URI
+declare -g -r -- GH_BASE_URI
 
+##
+# @ECLASS-VARIABLE: GH_HOMEPAGE
+# @READONLY
+# @DEFAULT: "${GH_BASE_URI}"
+# @DESCRIPTION:
+# Homepage of the repository hosted by the git hosting provider/
+##
+declare -g -r -- GH_HOMEPAGE="${GH_BASE_URI}"
 
-# set SRC_URI only for 'snapshot' GH_FETCH_TYPE
-declare -g -- _GH_SNAPSHOT_SRC_URI=''
-if [[ "${GH_FETCH_TYPE}" == 'snapshot' ]] ; then
-	case "${GH_PROVIDER}" in
-		'bitbucket')
-			_GH_SNAPSHOT_EXT=".tar.bz2"
-			_GH_SNAPSHOT_URI_PATH="get/${GH_REF}${_GH_SNAPSHOT_EXT}"
-			;;
-		'github')
-			_GH_SNAPSHOT_EXT=".tar.gz"
-			_GH_SNAPSHOT_URI_PATH="archive/${GH_REF}${_GH_SNAPSHOT_EXT}"
-			;;
-		'gitlab')
-			_GH_SNAPSHOT_EXT=".tar.bz2"
-			_GH_SNAPSHOT_URI_PATH="repository/archive${_GH_SNAPSHOT_EXT}?ref=${GH_REF}"
-			;;
-		*) die "Unsupported provider '${GH_PROVIDER}'" ;;
-	esac
-
-	_GH_SNAPSHOT_FILENAME="${GH_DISTFILE}${_GH_SNAPSHOT_EXT}"
-	_GH_SNAPSHOT_SRC_URI="${GH_BASE_URI}/${_GH_SNAPSHOT_URI_PATH} -> ${_GH_SNAPSHOT_FILENAME}"
-	SRC_URI="${_GH_SNAPSHOT_SRC_URI}"
-	readonly _GH_SNAPSHOT_FILENAME _GH_SNAPSHOT_SRC_URI
-fi
-
-if [[ -z "${EGIT_REPO_URI}" ]] ; then
-	EGIT_REPO_URI="
-		${GH_BASE_URI}.git
-		git@${_GH_DOMAIN}:${GH_USER}/${GH_REPO}.git"
-fi
-
+##
+# @ECLASS-VARIABLE: GH_DISTFILE
+# @DEFAULT: ${P}-${GH_PROVIDER}
+# @DESCRIPTION:
+# Name of the distfile (without any extensions).
+##
+: "${GH_DISTFILE:="${P}-${GH_PROVIDER}"}"
+declare -g -r -- GH_DISTFILE
 
 case "${GH_FETCH_TYPE}" in
-	'live')
+'snapshot' )
+	git-hosting_gen_snapshot_uri "${GH_PROVIDER}" "${GH_BASE_URI}" "${GH_REF}" _GH_SNAPSHOT_SRC_URI _GH_DISTFILE_EXT
+	declare -g -r -- _GH_SNAPSHOT_SRC_URI _GH_DISTFILE_EXT
+	;;
+'live' | 'manual' ) : ;;
+*) die "Unsupported fetch type: '${GH_FETCH_TYPE}'" ;;
+esac
+
+### END Variables
+
+### BEGIN Inherits
+
+case "${GH_FETCH_TYPE}" in
+	'live' )
+		[[ -z "${EGIT_REPO_URI}" ]] && \
+			EGIT_REPO_URI="${GH_BASE_URI}.git"
 		[[ -n "${GH_REF}" && -z "${EGIT_COMMIT}" ]] && \
 			EGIT_COMMIT="${GH_REF}"
 		[[ -z "${EGIT_CLONE_TYPE}" ]] && \
@@ -167,17 +310,27 @@ case "${GH_FETCH_TYPE}" in
 
 		inherit git-r3
 		;;
-	'snapshot') : ;;
-	'manual') : ;;
+	'snapshot' | 'manual' ) : ;;
 	*) die "Unsupported fetch type: '${GH_FETCH_TYPE}'" ;;
 esac
 
+### END Inherits
 
-: "${HOMEPAGE:="${GH_BASE_URI}"}"
+### BEGIN Portage variables
+
+# set SRC_URI only for 'snapshot' GH_FETCH_TYPE
+case "${GH_FETCH_TYPE}" in
+'snapshot' ) SRC_URI="${_GH_SNAPSHOT_SRC_URI} -> ${GH_DISTFILE}${_GH_DISTFILE_EXT}" ;;
+'live' | 'manual' ) : ;;
+*) die "Unsupported fetch type: '${GH_FETCH_TYPE}'" ;;
+esac
+
+: "${HOMEPAGE:="${GH_HOMEPAGE}"}"
 
 # prefer their CDN over Gentoo mirrors
 RESTRICT="${RESTRICT} primaryuri"
 
+### END Portage variables
 
 # debug-print summary
 if [[ -n "${EBUILD_PHASE_FUNC}" && "${EBUILD_PHASE_FUNC}" == 'pkg_setup' ]] ; then
@@ -191,9 +344,9 @@ if [[ -n "${EBUILD_PHASE_FUNC}" && "${EBUILD_PHASE_FUNC}" == 'pkg_setup' ]] ; th
 	unset _v
 fi
 
+### BEGIN Exported functions
 
 EXPORT_FUNCTIONS src_unpack
-
 
 ##
 # @FUNCTION: git-hosting_src_unpack
@@ -210,16 +363,17 @@ git-hosting_src_unpack() {
 	case "${GH_FETCH_TYPE}" in
 		'live') git-r3_src_unpack ;;
 		'snapshot')
+			local -r -- unpack_from="${DISTDIR}/${GH_DISTFILE}${_GH_DISTFILE_EXT}"
 			# do not use '${S}' for 'unpack_to' as user might overwrite 'S' leading to a wrong behaviour
-			local unpack_from="${DISTDIR}/${_GH_SNAPSHOT_FILENAME}" unpack_to="${WORKDIR}/${P}"
+			local -r -- unpack_to="${WORKDIR}/${P}"
 
 			## extract snapshot to 'S'
 			printf ">>> Unpacking '%s' to '%s'\n" "${unpack_from##*/}" "${unpack_to}"
 			mkdir -p "${unpack_to}" || die "Failed to create S='${unpack_to}' directory"
-			tar --extract \
-				--strip-components=1 \
-				--file="${unpack_from}" --directory="${unpack_to}" \
-				|| die "Failed to extract '${unpack_from}' archive"
+			local tar=( tar --extract
+				--strip-components=1
+				--file="${unpack_from}" --directory="${unpack_to}" )
+			"${tar[@]}" || die "Failed to extract '${unpack_from}' archive"
 
 			## filter 'unpack_from' from 'A'
 			local f new_a_a=()
@@ -235,6 +389,7 @@ git-hosting_src_unpack() {
 	esac
 }
 
+### END Exported functions
 
 _GH_ECLASS=1
 fi
