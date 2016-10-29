@@ -1,6 +1,8 @@
 # Initial idea of repoman checks: https://github.com/mrueg/repoman-travis
 
-sudo: false
+# use "Trusty" as "Precise" has bash 4.2 only, which doesn't support nameref vars
+sudo: required
+dist: trusty
 language: python
 python:
     - "3.4" # repoman seems to be fastest with python-3.4
