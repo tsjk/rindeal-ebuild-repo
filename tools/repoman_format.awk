@@ -69,5 +69,6 @@ END {
         pkg = sorted[i]
         printf("%s:\n%s", yellow(bg_black(pkg)), pkgs[pkg])
     }
-    printf("\n" yellow(bg_black("Other errors")) ":\n%s\n", other)
+    if (other)
+        printf("\n" yellow(bg_black("Other errors")) ":\n%s\n", other)
 }
