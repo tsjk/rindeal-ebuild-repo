@@ -26,8 +26,8 @@ if [[ -z "$(type -t command_not_found_handle 2>/dev/null)" ]] ; then
 		[[ -t 1 ]] || return 127
 
 		## do not die in a subshell
-		read pid cmd state ppid pgrp session tty_nr tpgid rest < /proc/self/stat
-		(( $$ == tpgid )) && return 127
+		read _pid _cmd _state _ppid _pgrp _session _tty_nr _tpgid _rest < /proc/self/stat
+		(( $$ == _tpgid )) && return 127
 
 		die "'${cmd}': command not found"
 	}
