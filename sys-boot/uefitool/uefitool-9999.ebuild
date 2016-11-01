@@ -35,12 +35,38 @@ RDEPEND_A=( "${CDEPEND_A[@]}" )
 
 inherit arrays
 
+my_eqmake() {
+	eqmake$(usex qt5 5 4) "$@"
+}
+
+for_each_extra_tool() {
+	local MY_EXTRA_TOOLS=( UEFIExtract UEFIFind UEFIPatch )
+	for x in "${MY_EXTRA_TOOLS[@]}" ; do
+		epushd "${x}"
+		"$@" "${x}"
+		epopd
+	done
+}
+
 src_configure() {
-	eqmake$(usex qt5 5 4) "${PN}.pro"
+	my_eqmake "${PN}.pro"
+
+	my_config_extra_tool() { my_eqmake "${1,,}.pro"; }
+	for_each_extra_tool my_config_extra_tool
+}
+
+src_compile() {
+	emake
+
+	my_compile_extra_tool() { emake; }
+	for_each_extra_tool my_compile_extra_tool
 }
 
 src_install() {
 	dobin UEFITool
+
+	my_install_extra_tool() { dobin "$1"; }
+	for_each_extra_tool my_install_extra_tool
 
 	einstalldocs
 
