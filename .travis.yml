@@ -60,4 +60,8 @@ script:
 # -----------------------------------------------------------------------------
 
 notifications:
-    email: false
+  email: false
+  hipchat:
+    rooms:
+      secure: IStd9nRQehPWV9UbY326zsA87n51FsuckeUGa8vxNuKYMmc7MElQK5ApnHy5b9PbHzPVs6M2FIGQB/zcipa9H/jFrw4q9yk3IWKLvbxt1CYsxWdt6v4H4NwLwv1UMZ1umodH0BCQ1jXApB252CiqitXrhVrx7WRyWQs40vNJ6NJJBpFquo+t4hugR1xE6JVkeobmUhXukazAN5cKxO2jie2kOqvXNszjznIMmeyA4Ud+Wi6J0EwzQnSyepHxuugQUEbWDuroe0DlyNG84jWP2G3oLC5t7DjPmhjeSKPkQ5FVM08k65tPaaA9v0ZpxYD3HunjdtAAQDrHdcNYTrNF8fbDcGL/I+B0nxELBO1IDTXAerZ6xiCE00CKoMZh5XLKkQZhvsu64Ize6z5766LWyopKRCSi6Pzx/H44nNwaP9OHexGBgEIFs6MTTlquGytYP0CtFd7SgJ0w0mo0vMttqOFBR+b6S3ilCbXfJex9NPRVCqfGqmN3fy0Q+H1aXYWr+8PSPA1jsKarPyBdtRevnd63oAKWyu3y7Ga3oUUWcsWn8x/JsOJHrojnEIEQ9uVr2G92wmsh9MnLHZGDWwyHW/UoVvJsA54EHMRbC6Rfe+ub+/c878uJovAFD/6HWNGwNj1cMJIKKfMIj0UYQ0yrmAyruugsNOjb864uURmMcTg=
+    notify: true
