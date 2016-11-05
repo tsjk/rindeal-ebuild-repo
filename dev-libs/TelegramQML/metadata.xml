@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "http://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+  <maintainer type="person">
+    <email>dev.rindeal+gentoo-overlay@gmail.com</email>
+    <name>Jan Chren (rindeal)</name>
+  </maintainer>
+  <longdescription>
+    TelegramQML or TgQML s a QML plugins, provides many components and tools for developers to create their own applications for Telegram using these tools and components.
+    Also there are some examples and demos to help developers learn how TgQML works. Developers can build/use it as a library, qml-plugin or embedded in their source code.
+    It's a highly flexible tool.
+    It's free and open-source and released under the GPLv3 license. Also It's multiplatform and tested to be working on Linux, Windows, OSX, BSD, Android and UbuntuTouch without problems.
+    It was created in a cooperation between Aseman Team and Ubuntu Core App Developers.
+  </longdescription>
+</pkgmetadata>
