@@ -3,27 +3,27 @@
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
+inherit rindeal
 
 # git-hosting.eclass
 GH_URI="github"
 GH_REF="v${PV}"
 # python-.eclass
-PYTHON_COMPAT=( python{2_7,3_3,3_4,3_5} )
+PYTHON_COMPAT=( python2_7 python3_{3,4,5} )
 
-inherit rindeal
-# eautoreconf()
+# functions: eautoreconf()
 inherit autotools
-# getpam_mod_dir()
+# functions: getpam_mod_dir()
 inherit pam
-# tc-*()
+# functions: tc-*()
 inherit toolchain-funcs
-# enewuser()/enewgroup()
+# functions: enewuser()/enewgroup()
 inherit user
-# get_bashcompdir()
+# functions: get_bashcompdir()
 inherit bash-completion-r1
-# systemd_update_catalog()
+# functions: systemd_update_catalog()
 inherit systemd
-# udev_reload()
+# functions: udev_reload()
 inherit udev
 # EXPORT_FUNCTIONS: pkg_setup
 inherit linux-info
@@ -33,28 +33,28 @@ inherit python-any-r1
 inherit git-hosting
 
 DESCRIPTION="System and service manager for Linux"
-HOMEPAGE="https://www.freedesktop.org/wiki/Software/systemd"
-# licences are described in 'README' file
+HOMEPAGE="https://www.freedesktop.org/wiki/Software/systemd ${GH_HOMEPAGE}"
+# licences are described in the 'README' file
 LICENSE_A=(
 	'LGPL-2.1+' # most of the code
 	'GPL-2' # udev
 	'public-domain' # MurmurHash2, siphash24, lookup3
 )
 
-# - the subslot versioning follows Gentoo
-# - incremented for ABI breaks in libudev or libsystemd
+# The subslot versioning follows the Gentoo repo.
+# Explanation: "incremented for ABI breaks in libudev or libsystemd".
 SLOT="0/2"
 
 KEYWORDS=""
 IUSE_A=(
 	## generic
-	+man nls test vanilla python
+	+man nls python sysv-utils test vanilla
 
 	## daemons
-	+hostnamed importd +localed +logind machined networkd resolved +timedated timesyncd
+	+hostnamed importd +localed +logind machined networkd +resolved +timedated +timesyncd
 
 	## utils
-	backlight coredump +firstboot quotacheck randomseed rfkill +sysusers +tmpfiles
+	backlight +coredump +firstboot quotacheck randomseed rfkill +sysusers +tmpfiles
 
 	## security modules
 	apparmor audit ima seccomp selinux smack
@@ -62,7 +62,7 @@ IUSE_A=(
 	acl +pam policykit tpm
 
 	## compression
-	bzip2 lz4 lzma zlib
+	bzip2 +lz4 +lzma +zlib
 
 	## EFI
 	efi gnuefi
@@ -72,9 +72,7 @@ IUSE_A=(
 
 	## misc
 	binfmt +blkid cryptsetup curl +elfutils gcrypt hibernate +hwdb idn +kmod libiptc myhostname
-	+utmp +vconsole xkb
-
-	nat sysv-utils
+	nat +utmp +vconsole xkb
 )
 
 # deps are specified in 'README' file
@@ -111,7 +109,7 @@ CDEPEND_A=(
 	"nat? ( net-firewall/iptables:0= )"
 	"pam? ( virtual/pam:= )"
 	"qrcode? ( media-gfx/qrencode:0= )"
-	"seccomp? ( >=sys-libs/libseccomp-1.0.0:0= )"
+	"seccomp? ( >=sys-libs/libseccomp-2.3.1:0= )"
 	"selinux? ( sys-libs/libselinux:0= )"
 	"sysv-utils? ("
 		"!sys-apps/systemd-sysv-utils"
@@ -168,6 +166,8 @@ REQUIRED_USE_A=(
 	"efi? ( blkid )"
 	"gnuefi? ( efi )"
 	"importd? ( curl lzma zlib bzip2 gcrypt )"
+	# systemd-journal-remote requires systemd-sysusers
+	"http? ( sysusers )"
 )
 
 inherit arrays
@@ -208,7 +208,7 @@ pkg_pretend() {
 
 		# Required for PrivateNetwork and PrivateDevices
 		'~NET_NS'
-		$(kernel_is -lt 4 7 &>/dev/null && echo '~DEVPTS_MULTIPLE_INSTANCES')
+		"$(kernel_is -lt 4 7 &>/dev/null && echo '~DEVPTS_MULTIPLE_INSTANCES')"
 
 		# Required for CPUShares= in resource control unit settings
 		'~CGROUP_SCHED'
@@ -224,15 +224,15 @@ pkg_pretend() {
 		'~AUTOFS4_FS'
 		# acl
 		'~TMPFS_XATTR'
-		$(use acl && echo '~TMPFS_POSIX_ACL')
+		"$(use acl && echo '~TMPFS_POSIX_ACL')"
 		# seccomp
-		$(use seccomp && echo '~SECCOMP')
+		"$(use seccomp && echo '~SECCOMP')"
 		# for the kcmp() syscall
 		'~CHECKPOINT_RESTORE'
 		# Required for CPUQuota= in resource control unit settings
 		'~CFS_BANDWIDTH'
 		# efi
-		$(use efi && echo '~EFIVAR_FS ~EFI_PARTITION')
+		"$(use efi && echo '~EFIVAR_FS ~EFI_PARTITION')"
 		# real-time group scheduling - see 'README'
 		'~!RT_GROUP_SCHED'
 		# systemd doesn't like it - see 'README'
@@ -247,7 +247,7 @@ pkg_pretend() {
 	CONFIG_CHECK="${CONFIG_CHECK_A[@]}"
 
 	if linux_config_exists ; then
-		local uevent_helper_path=$(linux_chkconfig_string UEVENT_HELPER_PATH)
+		local uevent_helper_path="$(linux_chkconfig_string UEVENT_HELPER_PATH)"
 		if [[ -n "${uevent_helper_path}" ]] && [[ "${uevent_helper_path}" != '""' ]]; then
 			ewarn "Legacy hotplug slows down the system and confuses udev."
 			ewarn "It's recommended to set an empty value to the following kernel config option:"
@@ -268,24 +268,7 @@ pkg_setup() {
 src_prepare() {
 	eapply "${FILESDIR}/218-Dont-enable-audit-by-default.patch"
 	eapply "${FILESDIR}/228-noclean-tmp.patch"
-	eapply "${FILESDIR}/231-bootctl_fix_error_message_check.patch"
-	eapply "${FILESDIR}/231-bootctl_minor_coding_style_improvements.patch"
-	eapply "${FILESDIR}/231-bootctl_rework_to_use_common_verbs_parsing_and_add_search.patch"
-	eapply "${FILESDIR}/231-build_sys_get_rid_of_move_to_rootlibdir.patch"
-	eapply "${FILESDIR}/231-core_do_not_fail_at_step_SECCOMP_if_there_is_no_kernel_su.patch"
-	eapply "${FILESDIR}/231-fix_test-path-util_lt_prefix.patch"
 	eapply "${FILESDIR}/231-manager-ignore_0_length_notification_messages.patch"
-	eapply "${FILESDIR}/231-networkd_limit_the_number_of_routes_to_the_kernel_limit_4.patch"
-	eapply "${FILESDIR}/231-networkd_test_add_a_helper_function_to_always_clean_up_test.patch"
-	eapply "${FILESDIR}/231-nss_install_nss_modules_to_rootlibdir.patch"
-	eapply "${FILESDIR}/231-pid1_dont_return_any_error_in_manager_dispatch_notify_fd.patch"
-	eapply "${FILESDIR}/231-pid1_process_zero_length_notification_messages_again.patch"
-	eapply "${FILESDIR}/231-resolved_dont_query_domain_limited_DNS_servers_for_other.patch"
-	eapply "${FILESDIR}/231-Revert_logind_really_handle_KeyIgnoreInhibited_options_in_logind_conf.patch"
-	eapply "${FILESDIR}/231-Revert_pid1_reconnect_to_the_console_before_being_re_exec.patch"
-	eapply "${FILESDIR}/231-seccomp_also_detect_if_seccomp_filtering_is_enabled.patch"
-	eapply "${FILESDIR}/231-shared_recognize_DNS_names_with_more_than_one_trailing_do.patch"
-	eapply "${FILESDIR}/231-systemctl_consider_service_running_only_when_it_is_in_act.patch"
 	eapply_user
 
 	# 'uucp' group is prefered for this purpose in Gentoo (gentoo#463376)
@@ -295,7 +278,7 @@ src_prepare() {
 	sed -e 's,http://,https://,g' \
 		-i -- configure.ac || die
 	# use an eclass when we have it, the result is the same, but hey, it's an eclass
-	sed -e "s,\(udevlibexecdir=\),\1$(get_udevdir)," \
+	sed -e "s,\(udevlibexecdir=\),\1"$(get_udevdir)"," \
 		-i -- Makefile.am || die
 	# Avoid the log bloat to the user
 	sed -e 's,#SystemMaxUse=,SystemMaxUse=500M,' \
@@ -317,9 +300,10 @@ src_configure() {
 	# work around bug in gobject-introspection (gentoo#463846)
 	tc-export CC
 
+	# safe defaults
+	export EFI_CFLAGS="${EFI_CFLAGS-"-O1 -g"}"
+
 	local econf_args=(
-		# TODO: replace with '--disable-lto' in v232
-		cc_cv_CFLAGS__flto=no
 		# Disable -fuse-ld=gold since Gentoo supports explicit linker
 		# choice and forcing gold is undesired. (gentoo#539998)
 		# ld.gold may collide with user's LDFLAGS. (gentoo#545168)
@@ -328,6 +312,7 @@ src_configure() {
 		# TODO: we may need to restrict this to gcc
 		EFI_CC="$(tc-getCC)"
 
+		--disable-lto
 		--disable-static
 		# workaround for bug 516346
 # 		--enable-dependency-tracking
@@ -375,86 +360,86 @@ src_configure() {
 		--without-kill-user-processes
 
 		## generic options
-		$(use_enable nls)
-		$(use_enable test tests)	# disable tests, or enable extra tests with =unsafe
-		$(use_enable test dbus)		# disable usage of dbus-1 in tests
-		$(use_enable man manpages)
+		"$(use_enable nls)"
+		"$(use_enable test tests)"	# disable tests, or enable extra tests with =unsafe
+		"$(use_enable test dbus)"		# disable usage of dbus-1 in tests
+		"$(use_enable man manpages)"
 		#--enable-debug[=LIST]   enable extra debugging (hashmap,mmap-cache)
-		$(use_with python)
+		"$(use_with python)"
 
 		## systemd daemons
-		$(use_enable hostnamed)	# systemd-hostnamed(8)
-		$(use_enable importd)	# systemd-importd(8)
-		$(use_enable localed)	# systemd-localed(8)
-		$(use_enable logind)	# systemd-logind(8)
-		$(use_enable machined)	# systemd-machined(8)
-		$(use_enable networkd)	# systemd-networkd(8)
-		$(use_enable resolved)	# systemd-resolved(8)
-		$(use_enable timedated)	# systemd-timedated(8)
-		$(use_enable timesyncd)	# systemd-timesyncd(8)
+		"$(use_enable hostnamed)"	# systemd-hostnamed(8)
+		"$(use_enable importd)"		# systemd-importd(8)
+		"$(use_enable localed)"		# systemd-localed(8)
+		"$(use_enable logind)"		# systemd-logind(8)
+		"$(use_enable machined)"	# systemd-machined(8)
+		"$(use_enable networkd)"	# systemd-networkd(8)
+		"$(use_enable resolved)"	# systemd-resolved(8)
+		"$(use_enable timedated)"	# systemd-timedated(8)
+		"$(use_enable timesyncd)"	# systemd-timesyncd(8)
 
 		## systemd utils
-		$(use_enable backlight)	# systemd-backlight(8)
-		$(use_enable coredump)	# systemd-coredump(8)
-		$(use_enable firstboot)	# systemd-firstboot(1)
-		$(use_enable quotacheck)	# systemd-quotacheck(8)
-		$(use_enable randomseed)	# systemd-randomseed(8)
-		$(use_enable rfkill)	# systemd-rfkill(8)
-		$(use_enable sysusers)	# sysusers.d(5)
-		$(use_enable tmpfiles)	# tmpfiles.d(5)
+		"$(use_enable backlight)"	# systemd-backlight(8)
+		"$(use_enable coredump)"	# systemd-coredump(8)
+		"$(use_enable firstboot)"	# systemd-firstboot(1)
+		"$(use_enable quotacheck)"	# systemd-quotacheck(8)
+		"$(use_enable randomseed)"	# systemd-randomseed(8)
+		"$(use_enable rfkill)"		# systemd-rfkill(8)
+		"$(use_enable sysusers)"	# sysusers.d(5)
+		"$(use_enable tmpfiles)"	# tmpfiles.d(5)
 
-		## optional security modules
-		$(use_enable apparmor)
-		$(use_enable audit)
-		$(use_enable ima)
-		$(use_enable seccomp)
-		$(use_enable selinux)
-		$(use_enable smack)
+		## kernel-space security modules
+		"$(use_enable apparmor)"
+		"$(use_enable audit)"
+		"$(use_enable ima)"
+		"$(use_enable seccomp)"
+		"$(use_enable selinux)"
+		"$(use_enable smack)"
 
-		## security modules 2
-		$(use_enable acl)
-		$(use_enable pam)
-		$(use_enable policykit polkit)
-		$(use_enable tpm)
+		## user-space security modules
+		"$(use_enable acl)"
+		"$(use_enable pam)"
+		"$(use_enable policykit polkit)"
+		"$(use_enable tpm)"
 
 		## compression algorithms
-		$(use_enable bzip2)
-		$(use_enable lz4)
-		$(use_enable lzma xz)
-		$(use_enable zlib)
+		"$(use_enable bzip2)"
+		"$(use_enable lz4)"
+		"$(use_enable lzma xz)"
+		"$(use_enable zlib)"
 
 		## EFI
-		$(use_enable efi)
-		$(use_enable gnuefi)
+		"$(use_enable efi)"
+		"$(use_enable gnuefi)"
 
 		## gimmick
-		$(use_enable http microhttpd)
+		"$(use_enable http microhttpd)"
 		# if use_http && use_ssl then --enable-gnutls else --disable-gnutls
-		$(use_enable $(usex http ssl http) gnutls)
-		$(use_enable qrcode qrencode)
+		"$(use_enable "$(usex http ssl http)" gnutls)"
+		"$(use_enable qrcode qrencode)"
 
 		## misc
-		$(use_enable binfmt)	# emulators (Wine, qemu, ...)
-		$(use_enable blkid)
-		$(use_enable cryptsetup libcryptsetup)
-		$(use_enable curl libcurl)
-		$(use_enable elfutils)
-		$(use_enable gcrypt)
-		$(use_enable hibernate)
-		$(use_enable hwdb)
-		$(use_enable idn libidn)
-		$(use_enable kmod)
-		$(use_enable libiptc)
-		$(use_enable myhostname)
-		$(use_enable utmp)
-		$(use_enable vconsole)
+		"$(use_enable binfmt)"	# emulators (Wine, qemu, ...)
+		"$(use_enable blkid)"
+		"$(use_enable cryptsetup libcryptsetup)"
+		"$(use_enable curl libcurl)"
+		"$(use_enable elfutils)"
+		"$(use_enable gcrypt)"
+		"$(use_enable hibernate)"
+		"$(use_enable hwdb)"
+		"$(use_enable idn libidn)"
+		"$(use_enable kmod)"
+		"$(use_enable libiptc)"
+		"$(use_enable myhostname)"
+		"$(use_enable utmp)"
+		"$(use_enable vconsole)"
 		# - NEWS: "systemd-localed will verify x11 keymap settings by compiling the given keymap"
 		# - enable for desktops
-		$(use_enable xkb xkbcommon)
+		"$(use_enable xkb xkbcommon)"
 	)
 
 	: "${SYSTEMD_WITH_NTP_SERVERS:="$( echo {0..3}'.gentoo.pool.ntp.org' )"}"
-	# Google DNS servers, another alternative is https://www.opennicproject.org/ or leave empty
+	# Google DNS servers by default, alternatives: https://www.opennicproject.org/ or leave empty
 	: "${SYSTEMD_WITH_DNS_SERVERS:="$( echo 8.8.{8.8,4.4} 2001:4860:4860::88{88,44} )"}"
 
 	# used for options which can be modified based on env vars
@@ -493,9 +478,8 @@ src_configure() {
 
 		"$(my_with tty-gid)"
 
-		## TODO: coming in v232
-# 		"$(my_with nobody-user)"	# Specify the name of the nobody user (the one with UID 65534)
-# 		"$(my_with nobody-group)"	# Specify the name of the nobody group (the one with GID 65534)
+#  		"$(my_with nobody-user)"	# Specify the name of the nobody user (the one with UID 65534)
+#  		"$(my_with nobody-group)"	# Specify the name of the nobody group (the one with GID 65534)
 	)
 
 	econf "${econf_args[@]}"
@@ -525,9 +509,9 @@ src_install() {
 	if use sysv-utils ; then
 		local app
 		for app in halt poweroff reboot runlevel shutdown telinit ; do
-			dosym "..$(my_get_rootprefix)/bin/systemctl" "/sbin/${app}"
+			dosym ".."$(my_get_rootprefix)"/bin/systemctl" "/sbin/${app}"
 		done
-		dosym "..$(my_get_rootprefix)/lib/systemd/systemd" '/sbin/init'
+		dosym ".."$(my_get_rootprefix)"/lib/systemd/systemd" '/sbin/init'
 	elif use man ; then
 		## we just keep sysvinit tools, so no need for the mans
 		erm "${ED}"/usr/share/man/man8/{halt,poweroff,reboot,runlevel,shutdown,telinit}.8
@@ -652,9 +636,9 @@ pkg_postinst() {
 		eerror
 	fi
 
-	#if use resolved && [[ $(readlink "${ROOT}"etc/resolv.conf) == */run/systemd/* ]]; then
+	#if use resolved && [[ "$(readlink "${ROOT}"etc/resolv.conf)" == */run/systemd/* ]]; then
 	#	ewarn "You should replace the resolv.conf symlink:"
-	#	ewarn "ln -snf $(my_get_rootprefix)/lib/systemd/resolv.conf ${ROOT}etc/resolv.conf"
+	#	ewarn "ln -snf "$(my_get_rootprefix)"/lib/systemd/resolv.conf ${ROOT}etc/resolv.conf"
 	#fi
 
 	if ! [[ "$(readlink "${ROOT}/etc/mtab")" == *"/proc/self/mounts" ]] ; then

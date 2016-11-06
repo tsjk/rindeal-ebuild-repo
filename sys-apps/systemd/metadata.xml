@@ -6,12 +6,13 @@
     <name>Jan Chren (rindeal)</name>
   </maintainer>
   <use>
-    <!-- ## generic -->
+    <!-- ### Generic -->
     <flag name="man">Build manpages</flag>
     <flag name="python">Use python in build; This doesn't build python bindings</flag>
+    <flag name="sysv-utils">Install sysvinit compatibility symlinks and manpages for init, telinit, halt, poweroff, reboot, runlevel, and shutdown</flag>
     <flag name="vanilla">Disable Gentoo-specific behavior and compatibility quirks</flag>
 
-    <!-- ## daemons -->
+    <!-- ### Daemons -->
     <flag name="hostnamed">systemd-hostnamed - Host name bus mechanism</flag>
     <flag name="importd">systemd-importd - VM and container image import and export service</flag>
     <flag name="localed">systemd-localed - Locale bus mechanism</flag>
@@ -22,7 +23,7 @@
     <flag name="timedated">systemd-timedated - Time and date bus mechanism</flag>
     <flag name="timesyncd">systemd-timesyncd - Network Time Synchronization</flag>
 
-    <!-- ## utils -->
+    <!-- ### Utils -->
     <flag name="backlight">systemd-backlight - Load and save the display backlight brightness at boot and shutdown</flag>
     <flag name="coredump">systemd-coredump - Acquire, save and process core dumps</flag>
     <flag name="firstboot">systemd-firstboot - Initialize basic system settings on or before the first boot-up of a system</flag>
@@ -32,40 +33,39 @@
     <flag name="sysusers">systemd-sysusers - Allocate system users and groups</flag>
     <flag name="tmpfiles">systemd-tmpfiles - Creates, deletes and cleans up volatile and temporary files and directories</flag>
 
-    <!-- ## security modules -->
+    <!-- ### Security modules (kernel-space) -->
     <flag name="apparmor">AppArmor Linux kernel security module support</flag>
     <flag name="audit">Linux Audit Linux kernel subsystem support</flag>
     <flag name="ima">Integrity Measurement Architecture (IMA) Linux kernel subsystem support</flag>
-    <!-- <flag name="seccomp"></flag> -->
-    <!-- <flag name="selinux"></flag> -->
+    <!-- <flag name="seccomp">Default description</flag> -->
+    <!-- <flag name="selinux">Default description</flag> -->
     <flag name="smack">Simplified Mandatory Access Control Kernel (SMACK) Linux kernel security module support</flag>
 
-    <!-- ## security modules 2 -->
+    <!-- ### Security modules (user-space) -->
     <!-- <flag name="acl"></flag> -->
     <flag name="pam">Linux Pluggable Authentication Modules (PAM) support;
       systemd-user-sessions - Permit user logins after boot, prohibit user logins at shutdown</flag>
-    <!-- <flag name="polkit"></flag> -->
+    <!-- <flag name="polkit">Default description</flag> -->
     <flag name="tpm">Trusted Platform Module (TPM) support</flag>
 
-    <!-- ## compression -->
+    <!-- ### Compression -->
     <flag name="bzip2">Enable bzip2 compression for systemd-journald; Required for systemd-importd</flag>
     <flag name="lz4">Enable lz4 compression for systemd-journald</flag>
     <flag name="lzma">Enable lzma compression for systemd-journald; Required for systemd-importd</flag>
     <flag name="zlib">Enable zlib compression for systemd-journald; Required for systemd-importd</flag>
 
-    <!-- ## EFI -->
+    <!-- ### EFI -->
     <flag name="efi">bootctl - Control the firmware and boot manager settings</flag>
     <flag name="gnuefi">systemd-boot (gummiboot) UEFI boot manager and stub loader (built using <pkg>sys-boot/gnu-efi</pkg>)</flag>
 
-    <!-- ## gimmick -->
+    <!-- ### Gimmick -->
     <flag name="qrcode">Enable qrcode output support in journal;
       "The QR code stuff is for showing a scannable QR code for the FSS sealing key. It's a gimmick." -- Lennart Poettering</flag>
-    <!-- systemd-journal-remote requires systemd-sysusers -->
     <flag name="http">systemd-journal-gatewayd - HTTP server for journal events;
       systemd-journal-remote - Receive journal messages over the network</flag>
     <flag name="ssl">SSL for the systemd's microhttpd</flag>
 
-    <!-- ## misc -->
+    <!-- ### Misc -->
     <flag name="binfmt">systemd-binfmt - Configure additional binary formats for executables at boot</flag>
     <flag name="blkid">Add support for libblkid from <pkg>sys-apps/util-linux</pkg>; enables eg. systemd-gpt-auto-generator</flag>
     <flag name="cryptsetup">systemd-cryptsetup - Full disk decryption logic;
@@ -81,11 +81,9 @@
     <flag name="kmod">systemd-modules-load - Enable kernel module loading via <pkg>sys-apps/kmod</pkg></flag>
     <flag name="libiptc">netfilter Linux kernel framework support enabling eg. systemd's firewall feature in networkd/nspawn</flag>
     <flag name="myhostname">nss-myhostname - Provide hostname resolution for the locally configured system hostname (it's a plugin for GNU NSS)</flag>
+    <flag name="nat">Enable support for network address translation in networkd</flag>
     <flag name="utmp">systemd-update-utmp - Write audit and utmp updates at bootup, runlevel changes and shutdown</flag>
     <flag name="vconsole">systemd-vconsole-setup - Configure the virtual console at boot</flag>
     <flag name="xkb">Validate XKB keymap in systemd-localed</flag>
-
-    <flag name="nat">Enable support for network address translation in networkd</flag>
-    <flag name="sysv-utils">Install sysvinit compatibility symlinks and manpages for init, telinit, halt, poweroff, reboot, runlevel, and shutdown</flag>
   </use>
 </pkgmetadata>
