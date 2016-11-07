@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "http://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+  <maintainer type="person">
+    <email>dev.rindeal+gentoo-overlay@gmail.com</email>
+    <name>Jan Chren (rindeal)</name>
+  </maintainer>
+  <use>
+    <!-- ### Compilation options -->
+    <flag name="curldebug">curl debug memory tracking</flag>
+    <flag name="largefile">Omit support for large files</flag>
+    <flag name="libgcc">Use libgcc when linking</flag>
+    <flag name="rt">Add dependency on -lrt</flag>
+    <!-- static-libs -->
+    <flag name="symbol-hiding">Hide library internal symbols ("-fvisibility=hidden"; https://gcc.gnu.org/wiki/Visibility)</flag>
+    <flag name="versioned-symbols">Version symbols in shared library</flag>
+
+    <!-- ### Docs -->
+    <flag name="libcurl-option">libcurl C code generation support</flag>
+    <flag name="manual">Built-in manual</flag>
+    <flag name="verbose">Verbose strings (disable to reduce size)</flag>
+
+    <!-- ### Features (SUPPORT_FEATURES) -->
+    <flag name="ipv6">IPv6 (with IPv4) support</flag>
+    <flag name="unix-sockets">Unix domain sockets</flag>
+    <!-- zlib -->
+    <flag name="ares">Use c-ares for DNS lookups</flag>
+    <flag name="threaded-resolver">threaded DNS resolver</flag>
+    <!-- idn -->
+    <flag name="gssapi">Generic Security Service Application Program Interface</flag>
+    <flag name="psl">Publix Suffix List - avoids privacy-leaking "supercookies"</flag>
+    <flag name="spnego">Simple and Protected GSSAPI Negotiation Mechanisms</flag>
+    <!-- kerberos -->
+    <flag name="ntlm">NTLM</flag>
+    <flag name="ntlm-wb">NTLM delegation to winbind's ntlm_auth helper</flag>
+    <flag name="tls-srp">TLS-SRP authentication</flag>
+    <flag name="http2">HTTP/2.0 protocol support</flag>
+
+    <!-- ### Other Features -->
+    <flag name="cookies">Cookies support</flag>
+    <flag name="crypto-auth">Cryptographic authentication</flag>
+    <flag name="metalink">metalink support</flag>
+    <flag name="proxy">Proxy support</flag>
+    <flag name="ssh2">libssh2 support for (SCP, SFTP)</flag>
+
+    <!-- ### Protocols (SUPPORT_PROTOCOLS) -->
+    <flag name="protocol_all">Force all protocols on, don't touch if off</flag>
+    <flag name="protocol_http">HTTP protocol support</flag>
+    <flag name="protocol_https">HTTPS protocol support</flag>
+    <flag name="protocol_ftp">FTP protocol support</flag>
+    <flag name="protocol_ftps">FTPS protocol support</flag>
+    <flag name="protocol_file">file protocol support</flag>
+    <flag name="protocol_telnet">telnet protocol support</flag>
+    <flag name="protocol_ldap">LDAP protocol support</flag>
+    <flag name="protocol_ldaps">LDAPS protocol support</flag>
+    <flag name="protocol_dict">DICT protocol support</flag>
+    <flag name="protocol_tftp">TFTP protocol support</flag>
+    <flag name="protocol_gopher">Gopher protocol support</flag>
+    <flag name="protocol_pop3">POP3 protocol support</flag>
+    <flag name="protocol_pop3s">POP3S protocol support</flag>
+    <flag name="protocol_imap">IMAP protocol support</flag>
+    <flag name="protocol_imaps">IMAPS protocol support</flag>
+    <flag name="protocol_smb">SMB/CIFS protocol support</flag>
+    <flag name="protocol_smbs">SMBS/CIFS protocol support</flag>
+    <flag name="protocol_smtp">SMTP protocol support</flag>
+    <flag name="protocol_smtps">SMTPS protocol support</flag>
+    <flag name="protocol_rtsp">RTSP protocol support</flag>
+    <flag name="protocol_rtmp">RTMP Streaming Media support</flag>
+    <flag name="protocol_scp">SCP protocol support</flag>
+    <flag name="protocol_sftp">SFTP protocol support</flag>
+
+    <!-- ### SSL -->
+    <flag name="ssl">crypto engine support</flag>
+    <flag name="ssl_axtls">ssl_axtls</flag>
+    <flag name="ssl_gnutls">ssl_gnutls</flag>
+    <flag name="ssl_libressl">ssl_libressl</flag>
+    <flag name="ssl_mbedtls">ssl_mbedtls</flag>
+    <flag name="ssl_nss">ssl_nss</flag>
+    <flag name="ssl_openssl">ssl_openssl</flag>
+    <flag name="ssl_polarssl">ssl_polarssl</flag>
+  </use>
+</pkgmetadata>
