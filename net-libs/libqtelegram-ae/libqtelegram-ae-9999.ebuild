@@ -39,7 +39,7 @@ src_prepare() {
 	sed -e "/LIBS *+=.*-lssl/ s|-lssl -lcrypto -lz|$(pkg-config --libs-only-l openssl zlib)|" \
 		-i -- "${PN,,}.pri" || die
 
-    mkdir -p "${BUILD_DIR}" >/dev/null || die
+	mkdir -p "${BUILD_DIR}" >/dev/null || die
 }
 
 src_configure() {
