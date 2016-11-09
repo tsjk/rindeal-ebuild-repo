@@ -2,15 +2,19 @@
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
+inherit rindeal
 
-inherit qmake-utils xdg eutils qt-pro-formatter
+inherit qmake-utils
+inherit xdg
+inherit eutils
+inherit qt-pro-formatter
 
 DESCRIPTION="SQLiteStudio3 is a powerful cross-platform SQLite database manager"
 HOMEPAGE="http://sqlitestudio.pl"
 LICENSE="GPL-3"
 
 SLOT="0"
-SRC_URI="${HOMEPAGE}/files/sqlitestudio3/complete/tar/${P}.tar.gz"
+SRC_URI="http://sqlitestudio.pl/files/sqlitestudio3/complete/tar/${P}.tar.gz"
 
 KEYWORDS="~amd64"
 IUSE="cli cups nls tcl test"
@@ -48,11 +52,11 @@ pkg_setup() {
 
 	# Additional directory to look up for plugins.
 	# NOTE: this dir is the same as for core plugins
-	SQLITESTUDIO_PLUGINS_DIR="${EPREFIX}/usr/$(get_libdir)/${PN}"
+	SQLITESTUDIO_PLUGINS_DIR="/usr/$(get_libdir)/${PN}"
 	# Additional directory to look up for icons.
-	SQLITESTUDIO_ICONS_DIR="${EPREFIX}/usr/share/${PN}/icons"
+	SQLITESTUDIO_ICONS_DIR="/usr/share/${PN}/icons"
 	# Additional directory to look up for *.ui files (forms used by plugins).
-	SQLITESTUDIO_FORMS_DIR="${EPREFIX}/usr/share/${PN}/forms"
+	SQLITESTUDIO_FORMS_DIR="/usr/share/${PN}/forms"
 }
 
 src_prepare() {
@@ -131,9 +135,9 @@ src_configure() {
 		"BINDIR=${EPREFIX}/usr/bin"
 		"LIBDIR=${EPREFIX}/usr/$(get_libdir)"
 
-		"DEFINES+=PLUGINS_DIR=\"${SQLITESTUDIO_PLUGINS_DIR}\""
-		"DEFINES+=ICONS_DIR=\"${SQLITESTUDIO_ICONS_DIR}\""
-		"DEFINES+=FORMS_DIR=\"${SQLITESTUDIO_FORMS_DIR}\""
+		"DEFINES+=PLUGINS_DIR=\"${EPREFIX}${SQLITESTUDIO_PLUGINS_DIR}\""
+		"DEFINES+=ICONS_DIR=\"${EPREFIX}${SQLITESTUDIO_ICONS_DIR}\""
+		"DEFINES+=FORMS_DIR=\"${EPREFIX}${SQLITESTUDIO_FORMS_DIR}\""
 
 		$(usex test 'DEFINES+=tests' '')
 	)
@@ -167,7 +171,7 @@ src_install() {
 		"${EPREFIX}/usr/bin/${PN} -- %F"	# exec
 		'SQLiteStudio3'	# name
 		"${PN}"	# icon
-		'Development;Utility'	# categories
+		'Development;Database;Utility'	# categories
 	)
 	make_desktop_entry_extras=( 'MimeType=application/x-sqlite3;' )
 	make_desktop_entry "${make_desktop_entry_args[@]}" \
