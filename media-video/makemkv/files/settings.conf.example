@@ -1,0 +1,12 @@
+#
+# MakeMKV settings file, written by MakeMKV v1.10.2 linux(x64-release)
+#
+
+app_ExpertMode = "1"
+app_Java = ""
+app_Key = "T-Rj9dmR37zXFQlCz2ljQzy8tKHPasVYXIyREZwfDSi8uwRQjo1xw7Kzdr2iDGL@4QoW"
+app_ShowAVSyncMessages = "1"
+app_UpdateEnable = "0"
+io_RBufSizeMB = "1024"
+stream_EnableUPNP = "0"
+
