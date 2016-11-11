@@ -5,7 +5,12 @@
 EAPI=6
 inherit rindeal
 
-inherit flag-o-matic eutils xdg
+# functions: make_desktop_entry
+inherit eutils
+# functions: tc-getCC
+inherit toolchain-funcs
+# EXPORT_FUNCTIONS: src_prepare
+inherit xdg
 
 DESCRIPTION="Tool for ripping and streaming Blu-ray, HD-DVD and DVD discs"
 HOMEPAGE="http://www.makemkv.com/"
@@ -73,10 +78,6 @@ inherit l10n-r1
 S="${WORKDIR}/${MY_P_OSS}"
 
 src_prepare() {
-	# make these vars global as they're used in src_install()
-	declare -g loc_dir="${WORKDIR}/${MY_P_BIN}"/src/share loc_pre='makemkv_' loc_post='.mo.gz'
-	l10n_find_changes_in_dir "${loc_dir}" "${loc_pre}" "${loc_post}"
-
 	eapply "${FILESDIR}"/${PN}-{makefile,path,sysmacros}.patch
 
 	# Qt5 always trumps Qt4 if it is available. There are no configure
@@ -90,6 +91,10 @@ src_prepare() {
 	fi
 
 	xdg_src_prepare
+
+	# make these vars global as they're used in src_install()
+	declare -g LOC_DIR="${WORKDIR}/${MY_P_BIN}"/src/share LOC_PRE='makemkv_' LOC_POST='.mo.gz'
+	l10n_find_changes_in_dir "${LOC_DIR}" "${LOC_PRE}" "${LOC_POST}"
 }
 
 src_configure() {
@@ -147,6 +152,7 @@ src_install() {
 			_EOF_
 		) 20-${PN}-libmmbd
 
+	## beta key updater
 	exeinto "/usr/libexec/${PN}"
 	newexe <(cat <<-_EOF_
 		#!/bin/sh
@@ -194,7 +200,7 @@ src_install() {
 	local l locales
 	l10n_get_locales locales app on
 	for l in ${locales} ; do
-		doins "${loc_dir}/${loc_pre}${l}${loc_post}"
+		doins "${LOC_DIR}/${LOC_PRE}${l}${LOC_POST}"
 	done
 
 	## END
