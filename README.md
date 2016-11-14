@@ -11,15 +11,16 @@ Features that the vast majority of my ebuilds has in common:
 
  - code in ebuilds is **correct, clean, documented**, thus making packages maintainable and easily updatable
  - **USE flags** are provided for almost any configurable option
-     - instead of packing multitude options under a single feature as _Gentoo™_ devs do
+     - instead of packing multitude of options under a single feature as _Gentoo™_ devs do
  - full **_systemd_** integration (services, templates, timers, ...), no _OpenRC_/_cron_ support
-     - note that only recent versions of _systemd_ are supported (cca. only last the 3-4 releases)
+     - note that only recent versions of _systemd_ are supported (cca. only the last 3-4 releases)
  - sane **default configurations** (default USE-flags, config files, ...)
  - **locales** support (`nls`/`l10n_*` USE-flags)
      - _Gentoo™_ packages mostly install all locales unconditionally
  - **amd64**/**arm** architectures only
      - this allows me to remove clutter introduced by Gentoo devs for exotic arches
  - only the **native ABI** is supported, again to reduce the clutter
+ - no _libav_, _libressl_, ... support
 
 In most package directories there is a _README_ file that says why is my package superior to any other out there including the "official" one.
 
