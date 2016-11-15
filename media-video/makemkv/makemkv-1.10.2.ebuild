@@ -192,6 +192,7 @@ src_install() {
 	insinto "/usr/share/MakeMKV"
 	doins "${FILESDIR}/settings.conf.example"
 
+	# ---
 
 	### Install binary/pre-compiled/pre-generated components
 	cd "${WORKDIR}/${MY_P_BIN}" || die
