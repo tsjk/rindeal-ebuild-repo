@@ -1,0 +1,26 @@
+[Unit]
+Description=qBittorrent nox daemon - instance '%I'
+Documentation=https://github.com/qbittorrent/qBittorrent/wiki
+
+Requires=local-fs.target
+Wants=network.target
+After=local-fs.target network.target
+
+
+[Service]
+# USER var is not set if config doesn't contain `User=` directive
+ExecStartPre=/usr/bin/test -n ${USER}
+# daemon must not run as root
+ExecStartPre=/usr/bin/test ${USER} != 'root'
+
+ExecStart=/usr/bin/qbittorrent-nox \
+    $OPTS
+TimeoutStartSec=30s
+
+# stopping daemon may take time, but waiting now is still better
+# than waiting for forced checks to finish
+TimeoutStopSec=3m
+
+
+[Install]
+WantedBy=multi-user.target

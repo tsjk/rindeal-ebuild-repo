@@ -7,17 +7,25 @@ inherit rindeal
 GH_URI="github/qbittorrent/qBittorrent"
 GH_REF="release-${PV}"
 
-inherit flag-o-matic qmake-utils git-hosting xdg autotools
+# functions: append-cppflags
+inherit flag-o-matic
+# functions: eqmake*
+inherit qmake-utils
+# functions: eautoreconf
+inherit autotools
+inherit systemd
+# EXPORT_FUNCTIONS: src_unpack
+inherit git-hosting
+inherit xdg
 
 DESCRIPTION="BitTorrent client in C++/Qt based on libtorrent-rasterbar"
-HOMEPAGE="http://www.qbittorrent.org/ ${HOMEPAGE}"
+HOMEPAGE="http://www.qbittorrent.org/ ${GH_HOMEPAGE}"
 LICENSE="GPL-2"
 
 SLOT="0"
 
 KEYWORDS="~amd64 ~arm"
-# TODO: rename 'X' to 'gui'
-IUSE="+dbus debug nls +qt5 webui +X"
+IUSE_A=(dbus debug nls qt5 webui +X)
 
 CDEPEND_A=(
 	"dev-libs/boost:="
@@ -39,9 +47,9 @@ CDEPEND_A=(
 		"dev-qt/qtcore:5"
 		"dev-qt/qtnetwork:5[ssl]"
 		"dev-qt/qtsingleapplication[qt5,X?]"
-		"dev-qt/qtxml:5"
 		"X? ("
 			"dev-qt/qtgui:5"
+			"dev-qt/qtxml:5"
 			"dev-qt/qtwidgets:5"
 			"dbus? ( dev-qt/qtdbus:5 )"
 		")"
@@ -66,6 +74,7 @@ MAKEOPTS+=" -j1"
 src_prepare() {
 	eapply_user
 
+	## locales
 	local l locales loc_dir='src/lang' loc_pre='qbittorrent_' loc_post='.ts'
 	l10n_find_changes_in_dir "${loc_dir}" "${loc_pre}" "${loc_post}"
 	l10n_get_locales locales app $(usex nls off all)
@@ -75,14 +84,14 @@ src_prepare() {
 	done
 
 	# make build verbose
-	sed -r -e 's|(CONFIG .*)silent||' \
+	sed -e '/CONFIG.*=/ s|silent||' \
 		-i -- src/src.pro || die
 
 	# disable AUTOMAKE as no Makefile.am is present
-	sed '/^AM_INIT_AUTOMAKE/d' -i -- configure.ac || die
+	sed -e '/^AM_INIT_AUTOMAKE/d' -i -- configure.ac || die
 
-	# disable qmake call inside ./configure script
-	sed '/^$QT_QMAKE/ s|^|echo |' -i -- configure.ac || die
+	# disable qmake call inside ./configure script, we'll call it manually later
+	sed -e '/^$QT_QMAKE/ s|^|echo |' -i -- configure.ac || die
 
 	eautoreconf
 }
@@ -90,26 +99,31 @@ src_prepare() {
 src_configure() {
 	# workaround build issue with older boost
 	# https://github.com/qbittorrent/qBittorrent/issues/4112
-	if has_version '<dev-libs/boost-1.58'; then
+	if has_version '<dev-libs/boost-1.58' ; then
 		append-cppflags -DBOOST_NO_CXX11_REF_QUALIFIERS
 	fi
 
 	local econf_args=(
 		--with-qjson=system
 		--with-qtsingleapplication=system
+		# we're using a custom systemd service files
+		--disable-systemd
 		$(use_enable dbus qt-dbus)
 		$(use_enable debug)
 		$(use_enable webui)
 		$(use_enable X gui)
-		$(use_enable !X systemd) # Install the systemd service file (headless only).
 		$(use_with !qt5 qt4)
 	)
 	econf "${econf_args[@]}"
 
-	eqmake$(usex qt5 5 4) -r ./qbittorrent.pro
+	eqmake$(usex qt5 5 4) ./qbittorrent.pro
 }
 
 src_install() {
 	emake INSTALL_ROOT="${D}" install
+
+	systemd_newservice "${FILESDIR}/qbittorrent-nox@.service"
+	systemd_newuserservice "${FILESDIR}/qbittorrent-nox@.service"
+
 	einstalldocs
 }
