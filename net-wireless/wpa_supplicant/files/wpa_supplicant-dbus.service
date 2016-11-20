@@ -1,0 +1,15 @@
+[Unit]
+Description=WPA supplicant (D-Bus version)
+Documentation=man:wpa_supplicant(8)
+
+Before=network.target
+Wants=network.target
+
+[Service]
+Type=dbus
+BusName=fi.w1.wpa_supplicant1
+ExecStart=/usr/sbin/wpa_supplicant -u $OPTIONS
+
+[Install]
+WantedBy=multi-user.target
+Alias=dbus-fi.w1.wpa_supplicant1.service

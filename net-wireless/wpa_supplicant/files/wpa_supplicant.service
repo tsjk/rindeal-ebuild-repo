@@ -1,0 +1,15 @@
+# NOTE: NetworkManager users will probably want the dbus version instead.
+
+[Unit]
+Description=WPA supplicant daemon
+Documentation=man:wpa_supplicant(8)
+
+Before=network.target
+Wants=network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/sbin/wpa_supplicant -c/etc/wpa_supplicant/wpa_supplicant.conf $OPTIONS
+
+[Install]
+WantedBy=multi-user.target

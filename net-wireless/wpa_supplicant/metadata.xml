@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "http://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+  <maintainer type="person">
+    <email>dev.rindeal+gentoo-overlay@gmail.com</email>
+    <name>Jan Chren (rindeal)</name>
+  </maintainer>
+  <use>
+    <flag name="gui">Build Qt-based GUI</flag>
+
+    <flag name="ap">access point mode</flag>
+    <flag name="wifi-direct">Wi-Fi Direct mode</flag>
+    <flag name="hotspot_2-0">802.11u and Passpoint for HotSpot 2.0
+      (please read 'wpa_supplicant/README-HS20')</flag>
+    <flag name="mesh">Wireless mesh network (WMN)</flag>
+
+    <flag name="bgscan_simple">Background scanning module: Periodic background scans based on signal strength</flag>
+    <flag name="bgscan_learn">Background scanning module: Learn channels used by the network and try to avoid bgscans on other channels (experimental)</flag>
+
+    <flag name="openssl">Use OpenSSL instead of GnuTLS</flag>
+    <flag name="tls1_1">Allow to use TLSv1.1 encryption</flag>
+    <flag name="tls1_2">Allow to use TLSv1.2 encryption</flag>
+    <flag name="smartcard">smartcards</flag>
+
+    <!-- ## WPS -->
+    <flag name="wps">Wi-Fi Protected Setup</flag>
+    <flag name="wps_er">External Registrar</flag>
+    <flag name="wps_nfc">Near Field Communication</flag>
+    <flag name="wps_ufd">USB Flash Drive</flag>
+    <flag name="wps_upnp">Universal Plug'n'Play</flag>
+    <flag name="wps_strict">Strict WPS protocol validation routines</flag>
+
+    <!-- ## Authentication -->
+    <flag name="eap-aka">Authentication and Key Agreement (EAP-AKA) - method for UMTS Authentication and Key Agreement</flag>
+    <flag name="eap-aka-prime">Variant of EAP-AKA for non-3GPP access to a 3GPP core network</flag>
+    <flag name="eap-eke">Encrypted Key Exchange (EAP-EKE) - secure mutual authentication using short passwords</flag>
+    <flag name="eap-fast">Flexible Authentication via Secure Tunneling (EAP-FAST)</flag>
+    <flag name="eap-gpsk">Generalized Pre-Shared Key (EAP-GPSK) -- ciphersuite #1 = CMAC</flag>
+    <flag name="eap-gpsk-sha256">Generalized Pre-Shared Key (EAP-GPSK) -- ciphersuite #2 = HMAC + SHA256</flag>
+    <flag name="eap-gtc">Generic Token Card (EAP-GTC)</flag>
+    <flag name="eap-ikev2">Internet Key Exchange v2 (EAP-IKEv2)</flag>
+    <flag name="eap-leap">Lightweight Extensible Authentication Protocol (EAP-LEAP)</flag>
+    <flag name="eap-md5">EAP-MD5</flag>
+    <flag name="eap-mschapv2">Microsoft's Challenge Handshake Authentication Protocol v2 (EAP-MSCHAPv2)</flag>
+    <flag name="eap-otp">One-Time Password</flag>
+    <flag name="eap-pax">Password Authenticated Exchange (EAP-PAX)</flag>
+    <flag name="eap-peap">Protected Extensible Authentication Protocol (EAP-PEAP)</flag>
+    <flag name="eap-psk">EAP Pre-Shared Key (EAP-PSK) - (NOTE: not required for WPA PSK)</flag>
+    <flag name="eap-sake">Shared-secret Authentication and Key Establishment (EAP-SAKE)</flag>
+    <flag name="eap-sim">Subscriber Identity Module (EAP-SIM)</flag>
+    <flag name="eap-tls">Transport Layer Security (EAP-TLS)</flag>
+    <flag name="eap-ttls">Tunneled Transport Layer Security (EAP-TTLS)</flag>
+    <flag name="ieee8021x_eapol">EAP over LAN (EAPOL)</flag>
+    <flag name="pcsc">Personal Computer/Smart Card (PC/SC)</flag>
+    <flag name="peerkey">PeerKey for Direct Link Setup (DLS)</flag>
+    <flag name="pkcs12">Public-Key Cryptography Standards #12 (PKCS 12)</flag>
+
+    <!-- ## IEEE 802.11 standards -->
+    <flag name="ieee80211ac">IEEE 802.11ac - 5GHz</flag>
+    <flag name="ieee80211n">IEEE 802.11n-2009 - multiple-input and multiple-output (MIMO)</flag>
+    <flag name="ieee80211r">IEEE 802.11r-2008 - fast roaming</flag>
+    <flag name="ieee80211u">IEEE 802.11u - interworking with external networks</flag>
+    <flag name="ieee80211w">IEEE802.11w - security of management frames</flag>
+    <flag name="ieee80211z">IEEE802.11z - Tunneled Direct Link Setup (TDLS)</flag>
+
+    <!-- ## Drivers -->
+    <flag name="driver_atheros">hostapd / Driver interaction with Atheros driver</flag>
+    <flag name="driver_hostap">Driver interaction with Linux Host AP driver</flag>
+    <flag name="driver_macsec_qsa">Wired Ethernet driver interface for QCA MACsec driver</flag>
+    <flag name="driver_nl80211">Driver interface for Linux drivers using the new nl80211 kernel interface</flag>
+    <flag name="driver_nl80211_qca">Qualcomm Atheros vendor extensions to nl80211</flag>
+    <flag name="driver_none">Driver interface for no driver (e.g., WPS ER only)</flag>
+    <flag name="driver_roboswitch">Driver interface for the Broadcom RoboSwitch family</flag>
+    <flag name="driver_wext">"cfg80211 wireless extensions compatibility" for old drivers</flag>
+    <flag name="driver_wired">Driver interface for wired Ethernet drivers</flag>
+  </use>
+</pkgmetadata>
