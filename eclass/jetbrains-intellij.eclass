@@ -16,7 +16,12 @@ esac
 
 
 inherit rindeal
-inherit eutils versionator xdg
+# functions: make_desktop_entry, newicon, eshopts_push
+inherit eutils
+# functions: get_version_component_range
+inherit versionator
+# EXPORT_FUNCTIONS: src_prepare, pkg_preinst, pkg_postinst, pkg_postrm
+inherit xdg
 
 
 declare -g -r _JBIJ_PN_BASE="${PN%"-community"}"
@@ -111,12 +116,6 @@ jetbrains-intellij_src_prepare() {
 jetbrains-intellij_src_compile() { : ; }
 
 
-jetbrains-intellij_pkg_preinst() {
-	debug-print-function ${FUNCNAME}
-	xdg_pkg_preinst
-}
-
-
 # @ECLASS-VARIABLE: JBIJ_DESKTOP_CATEGORIES=()
 # @DEFAULT_UNSET
 # @DESCRIPTION:
@@ -139,6 +138,7 @@ declare -g -r JBIJ_INSTALL_DIR="/opt/jetbrains/${_JBIJ_PN_SLOTTED}"
 # 	Filename of the startup script.
 # 	This file must be located in the 'bin/' dir and ends with '.sh'.
 : "${JBIJ_STARTUP_SCRIPT_NAME:="${_JBIJ_PN_BASE}.sh"}"
+
 
 jetbrains-intellij_src_install() {
 	debug-print-function ${FUNCNAME}
@@ -205,6 +205,12 @@ jetbrains-intellij_src_install() {
 	mkdir -p "${D}"/etc/sysctl.d || die
 	echo "fs.inotify.max_user_watches = 524288" \
 		>"${D}"/etc/sysctl.d/30-idea-inotify-watches.conf || die
+}
+
+
+jetbrains-intellij_pkg_preinst() {
+	debug-print-function "${FUNCNAME}"
+	xdg_pkg_preinst
 }
 
 
