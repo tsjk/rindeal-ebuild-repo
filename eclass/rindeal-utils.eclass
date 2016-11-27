@@ -57,6 +57,18 @@ rindeal::expand_vars() {
 	sed "${sed_args[@]}" -- "${f_in}" >"${f_out}" || die
 }
 
+rindeal::dsf::prefix_flags() {
+	(( $# < 2 )) && die
+
+	local prefix="$1" ; shift
+	local f flags=( "$@" )
+	local regex="^([+-])?(.*)"
+
+	for f in "${flags[@]}" ; do
+		[[ "${f}" =~ ${regex} ]] || die
+		printf "%s%s%s\n" "${BASH_REMATCH[1]}" "${prefix}" "${BASH_REMATCH[2]}"
+	done
+}
 
 _RINDEAL_UTILS_ECLASS=1
 fi
