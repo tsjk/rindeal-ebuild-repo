@@ -123,12 +123,12 @@ my_generate_udev_rules() {
 }
 
 src_compile() {
-	rindeal::expand_vars vcsFPService_preload/preload.c{.in,}
+	rindeal:expand_vars vcsFPService_preload/preload.c{.in,}
 	emake -C vcsFPService_preload
 
 	local f
 	for f in "${FILESDIR}"/*.in ; do
-		rindeal::expand_vars "${f}" "${T}/$(basename "${f%".in"}")"
+		rindeal:expand_vars "${f}" "${T}/$(basename "${f%".in"}")"
 	done
 
 	my_generate_udev_rules
