@@ -91,7 +91,7 @@ _git-hosting_get_domain() {
 
 ##
 # @FUNCTION:	_git-hosting_parse_uri
-# @USAGE:		$0 "${uri}" "${ref}" "${distfile}" snapshot_uri
+# @USAGE:		$0 "${uri}" "${ref}" snapshot_uri snapshot_ext
 # @DESCRIPTION: Generate snapshot URI
 ##
 git-hosting_gen_snapshot_uri() {
@@ -165,6 +165,34 @@ git-hosting_gen_live_uri() {
 	live_uri="${base_uri}.git"
 }
 
+##
+# @FUNCTION:	git-hosting_unpack
+##
+git-hosting_unpack() {
+	(( $# != 2 )) && die
+	local -r -- unpack_from="${1}"
+	# do not use '${S}' for 'unpack_to' as user might overwrite 'S' leading to a wrong behaviour
+	local -r -- unpack_to="${2}"
+
+	## extract snapshot to 'S'
+	printf ">>> Unpacking '%s' to '%s'\n" "${unpack_from##*/}" "${unpack_to}"
+	mkdir -p "${unpack_to}" || die "Failed to create S='${unpack_to}' directory"
+	local tar=( tar --extract
+		--strip-components=1
+		--file="${unpack_from}" --directory="${unpack_to}" )
+	"${tar[@]}" || die "Failed to extract '${unpack_from}' archive"
+
+	## filter 'unpack_from' from 'A'
+	local f new_a_a=()
+	for f in ${A} ; do
+		if [[ "${f}" != "${unpack_from##*/}" ]] ; then
+			new_a_a+=( "${f}" )
+		fi
+	done
+	A="${new_a_a[@]}"
+
+	return 0
+}
 ### END Functions
 
 ### BEGIN Variables
@@ -363,26 +391,7 @@ git-hosting_src_unpack() {
 	case "${GH_FETCH_TYPE}" in
 		'live') git-r3_src_unpack ;;
 		'snapshot')
-			local -r -- unpack_from="${DISTDIR}/${GH_DISTFILE}${_GH_DISTFILE_EXT}"
-			# do not use '${S}' for 'unpack_to' as user might overwrite 'S' leading to a wrong behaviour
-			local -r -- unpack_to="${WORKDIR}/${P}"
-
-			## extract snapshot to 'S'
-			printf ">>> Unpacking '%s' to '%s'\n" "${unpack_from##*/}" "${unpack_to}"
-			mkdir -p "${unpack_to}" || die "Failed to create S='${unpack_to}' directory"
-			local tar=( tar --extract
-				--strip-components=1
-				--file="${unpack_from}" --directory="${unpack_to}" )
-			"${tar[@]}" || die "Failed to extract '${unpack_from}' archive"
-
-			## filter 'unpack_from' from 'A'
-			local f new_a_a=()
-			for f in ${A} ; do
-				if [[ "${f}" != "${unpack_from##*/}" ]] ; then
-					new_a_a+=( "${f}" )
-				fi
-			done
-			A="${new_a_a[@]}"
+			git-hosting_unpack "${DISTDIR}/${GH_DISTFILE}${_GH_DISTFILE_EXT}" "${WORKDIR}/${P}"
 			;;
 		'manual') default ;;
 		*) die ;;
