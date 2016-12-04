@@ -88,7 +88,7 @@ src_prepare() {
 	# fix icon paths
 	local s
 	for s in 16 32 48 128 256 ; do
-		mv "icons/hicolor/${s}x${s}/apps"/{${PN},${PN_SLOTTED}}.png || die
+		mv -v "icons/hicolor/${s}x${s}/apps"/{${PN},${PN_SLOTTED}}.png || die
 	done
 	mv -v "pixmaps"/{${PN},${PN_SLOTTED}}.xpm || die
 
@@ -102,6 +102,7 @@ src_prepare() {
 		-e "/Exec=${PN}/ s@${PN}( |$)@${EPREFIX}${OPERA_HOME}/${PN}\1@"
 		# add slot to Name
 		-e "s|^Name=${PN}.*|& ${SLOT}|I"
+		-e "/^Icon=/ s|.*|Icon=${PN_SLOTTED}|"
 	)
 	sed -r "${sedargs[@]}" \
 		-i -- "applications/${PN}.desktop" || die
