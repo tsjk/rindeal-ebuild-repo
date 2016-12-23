@@ -21,9 +21,6 @@ DESCRIPTION="A web browser that adheres to the unix philosophy"
 LICENSE="GPL-2"
 
 SLOT="0"
-# TODO: remove in >0.9.0
-SRC_URI+=" https://patch-diff.githubusercontent.com/raw/uzbl/uzbl/pull/321.patch ->
-				${PN}-0.9.0-desktop_menu_entries.patch"
 
 KEYWORDS="~amd64 ~arm"
 
@@ -70,7 +67,6 @@ RDEPEND_A=( "${CDEPEND_A[@]}"
 inherit arrays
 
 src_prepare() {
-	eapply "${DISTDIR}/${PN}-0.9.0-desktop_menu_entries.patch"
 	xdg_src_prepare
 
 	# respect user CFLAGS
