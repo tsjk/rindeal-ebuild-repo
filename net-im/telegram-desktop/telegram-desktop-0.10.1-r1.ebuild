@@ -29,7 +29,7 @@ CDEPEND_A=(
 	# Telegram requires shiny new versions since v0.10.1 and commit
 	# https://github.com/telegramdesktop/tdesktop/commit/27cf45e1a97ff77cc56a9152b09423b50037cc50
 	# list of required USE flags is taken from `.travis/build.sh`
-	'=media-video/ffmpeg-3.1*:0=[mp3,opus,vorbis,wavpack]'	# 'libav*', 'libsw*'
+	'>=media-video/ffmpeg-3.1:0=[mp3,opus,vorbis,wavpack]'	# 'libav*', 'libsw*'
 	'>=media-libs/openal-1.17.2'	# 'openal', '<AL/*.h>'
 	'dev-libs/openssl:0'
 	'sys-libs/zlib[minizip]'		# replaces the bundled copy in 'Telegram/ThirdParty/minizip/'
