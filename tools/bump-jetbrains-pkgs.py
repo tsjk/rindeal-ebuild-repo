@@ -95,6 +95,10 @@ for pn, code in sorted(codes.items()):
     old_ver = portage.pkgsplit(pkg)[1]
     new_ver = versions[code]['latest']
     if portage.vercmp(old_ver, new_ver) < 0:
+        # check if duplicate
+        c,p,s,o,n = table[-1]
+        if c == cat and p == pn and n == new_ver:
+            continue
         table.append([cat, pn, 'latest', old_ver, new_ver])
 
 # now print the table
@@ -106,48 +110,43 @@ if y != "y":
     exit(0)
 
 
-def update_pkg(cat, pn, slot, from_v, to_v):
-    global locks
-    try:
-        lock = locks["{}/{}".format(cat, pn)]
-        lock.acquire()
-    except:
-        traceback.print_exc()
+def run_cmd(cmd):
+    print("> Executing `{}`".format(cmd))
+    err = os.system(cmd)
+    if err:
+        print("{}/{}: command '{}' failed with code {}".format(cat, pn, cmd, err))
         return 1
+    return err
+
+
+def update_pkg(cat, pn, slot, from_v, to_v):
+    global LOCK
 
     os.chdir("{}/{}/{}".format(PORTDIR_OVERLAY, cat, pn))
 
-    cmds=[ ]
+    LOCK.acquire()
     if slot == "latest":
-        cmds.append('cp -v {0}-{1}*.ebuild {0}-{2}.ebuild'.format(pn, from_v, to_v))
+        run_cmd('cp -v {0}-{1}*.ebuild {0}-{2}.ebuild'.format(pn, from_v, to_v))
     else: # bump inside a slot
-        cmds.append('mv -v {0}-{1}*.ebuild {0}-{2}.ebuild'.format(pn, from_v, to_v))
+        run_cmd('git mv -v {0}-{1}*.ebuild {0}-{2}.ebuild'.format(pn, from_v, to_v))
+    LOCK.release()
 
-    cmds.append('repoman manifest')
-    cmds.append('git add .')
+    run_cmd('repoman manifest')
 
+    LOCK.acquire()
+    run_cmd('git add .')
     if slot == "latest":
-        cmds.append("git commit -m '{}/{}: new version v{}' .".format(cat, pn, to_v))
+        run_cmd("git commit -m '{}/{}: new version v{}' .".format(cat, pn, to_v))
     else: # bump inside a slot
-        cmds.append("git commit -m '{}/{}: bump to v{}' .".format(cat, pn, to_v))
-
-    for cmd in cmds:
-        err = os.system(cmd)
-        if err:
-            print("{}/{}: command '{}' failed with code {}".format(cat, pn, cmd, err))
-            return 1
-
-    lock.release()
+        run_cmd("git commit -m '{}/{}: bump to v{}' .".format(cat, pn, to_v))
+    LOCK.release()
 
 processes = []
-# format: `["cat/pn"] = Lock()`
-# only one process can run for a package
-locks={}
+# only one git command may run concurrently
+LOCK = Lock()
 
 for x in table[1:]:
     cat_pn = "{}/{}".format(x[0], x[1])
-    if not cat_pn in locks:
-        locks[cat_pn] = Lock()
     processes.append(Process(target=update_pkg, args=(x[0], x[1], x[2], x[3], x[4])))
 
 for p in processes:
