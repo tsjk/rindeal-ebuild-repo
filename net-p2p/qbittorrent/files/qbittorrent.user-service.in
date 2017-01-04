@@ -1,0 +1,37 @@
+[Unit]
+Description=qBittorrent Daemon Service
+Documentation=man:qbittorrent-nox
+Documentation=https://github.com/qbittorrent/qBittorrent/wiki
+
+After=network.target
+
+
+[Service]
+Type=simple
+
+WorkingDirectory=~
+
+# daemon must not run as root
+ExecStartPre=/usr/bin/test ${USER} != 'root'
+
+ExecStart=@EXPAND_BINDIR@/qbittorrent-nox $QB_ARGS
+TimeoutStartSec=30s
+
+TimeoutStopSec=3m
+
+Restart=on-abnormal
+
+PrivateTmp=true
+# fails with `qbittorrent.service: Failed at step CAPABILITIES spawning /usr/bin/test: Operation not permitted`
+#PrivateDevices=true
+ProtectSystem=full
+ProtectKernelTunables=true
+ProtectControlGroups=true
+NoNewPrivileges=true
+ProtectKernelModules=true
+MemoryDenyWriteExecute=true
+RestrictRealtime=true
+
+
+[Install]
+WantedBy=multi-user.target
