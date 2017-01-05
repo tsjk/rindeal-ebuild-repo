@@ -66,8 +66,8 @@ RDEPEND_A=( "${CDEPEND_A[@]}" )
 
 inherit arrays
 
-L10N_LOCALES=( hy ar ru pt_BR uk nl nb gl de hr eu es hu da zh_TW pt_PT ka eo en el ro en_AU he ko fr bg
-	sk be sl zh_HK zh hi_IN cs vi en_GB tr id lt ca sr fi pl sv ja it )
+L10N_LOCALES=( ar be bg ca cs da de el en en_AU en_GB eo es eu fi fr gl he hi_IN hr hu hy id is it
+	ja ka ko lt lv_LV ms_MY nb nl oc pl pt_BR pt_PT ro ru sk sl sr sv tr uk uz@Latn vi zh zh_HK zh_TW )
 inherit l10n-r1
 
 src_prepare() {
