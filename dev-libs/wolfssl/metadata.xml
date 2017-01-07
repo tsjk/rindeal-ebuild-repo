@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "http://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+  <maintainer type="person">
+    <email>dev.rindeal+gentoo-overlay@gmail.com</email>
+    <name>Jan Chren (rindeal)</name>
+  </maintainer>
+  <use>
+    <flag name="proto_dtls">DTLS (Datagram Transport Layer Security)</flag>
+    <flag name="proto_dtls-sctp">DTLS-SCTP (Datagram Transport Layer Security over Stream Control Transmission Protocol)</flag>
+
+    <flag name="rng">RNG (Random Number Generator): Enable compiling and using RNG</flag>
+
+    <flag name="openssh">OpenSSH compatibility</flag>
+    <flag name="opensslextra">OpenSSL compatibility, providing wolfSSL functions with OpenSSL names</flag>
+
+    <flag name="maxstrength">Max Strengh build, allows TLSv1.2-AEAD-PFS ciphers only</flag>
+    <flag name="harden">Hardened build, Enables Timing Resistance and Blinding</flag>
+
+    <flag name="ipv6-test">testing of IPV6</flag>
+
+    <flag name="fortress">SSL fortress</flag>
+    <flag name="bump">SSL Bump</flag>
+    <flag name="leanpsk">Lean PSK</flag>
+    <flag name="leantls">Lean TLS</flag>
+
+    <flag name="bigcache">big session cache</flag>
+    <flag name="hugecache">huge session cache</flag>
+    <flag name="smallcache">small session cache</flag>
+    <flag name="savesession">persistent session cache</flag>
+    <flag name="savecert">persistent cert cache</flag>
+    <flag name="sessioncerts">session cert storing</flag>
+    <flag name="atomicuser">Atomic User Record Layer</flag>
+    <flag name="pkcallbacks">Public Key Callbacks</flag>
+    <flag name="sniffer">sniffer</flag>
+
+    <flag name="aesgcm">AES-GCM (Galois/Counter Mode)</flag>
+    <flag name="aesccm">AES-CCM (Counter with CBC-MAC)</flag>
+
+    <flag name="armasm">ARMv8 ASM</flag>
+    <flag name="aesni">AES-NI</flag>
+    <flag name="intelasm">All Intel ASM speedups</flag>
+
+    <flag name="camellia">Camellia</flag>
+    <flag name="md2">MD2</flag>
+    <flag name="nullcipher">NULL cipher</flag>
+    <flag name="ripemd">RIPEMD-160</flag>
+    <flag name="blake2">BLAKE2</flag>
+    <flag name="sha512">SHA-512</flag>
+
+    <flag name="keygen">key generation</flag>
+    <flag name="certgen">cert generation</flag>
+    <flag name="certreq">cert request generation</flag>
+    <flag name="certext">cert request extensions</flag>
+    <flag name="sep">SEP certificate extensions</flag>
+    <flag name="hkdf">HKDF (HMAC-KDF)</flag>
+    <flag name="x963kdf">X9.63 KDF</flag>
+    <flag name="dsa">DSA</flag>
+
+    <flag name="eccshamir">ECC Shamir</flag>
+    <flag name="ecc">ECC (Elliptic curve cryptography)</flag>
+    <flag name="ecccustcurves">ecc_custcurves ECC custom curves</flag>
+    <flag name="compkey">ecc_compkeys ECC compressed keys</flag>
+    <flag name="curve25519">ecc_curve25519 Curve25519</flag>
+    <flag name="ed25519">ecc_ed25519 ED25519</flag>
+    <flag name="fpecc">ecc_fp Fixed Point cache ECC</flag>
+    <flag name="eccencrypt">ecc_encrypt ECC encrypt</flag>
+
+    <flag name="psk">PSK</flag>
+
+    <flag name="errorstrings">error strings table</flag>
+    <flag name="oldtls">TLS versions < 1.2</flag>
+    <flag name="sslv3">SSL version 3.0</flag>
+    <flag name="stacksize">stack size info on examples</flag>
+    <flag name="memory">memory callbacks</flag>
+    <flag name="rsa">RSA</flag>
+
+    <flag name="dh">DH</flag>
+    <flag name="anon">Anonymous</flag>
+    <flag name="asn">ASN</flag>
+    <flag name="aes">AES</flag>
+    <flag name="coding">Coding base 16/64</flag>
+    <flag name="base64encode">Base64 encoding</flag>
+    <flag name="des3">DES3</flag>
+    <flag name="idea">IDEA Cipher</flag>
+    <flag name="arc4">ARC4</flag>
+    <flag name="md5">MD5</flag>
+    <flag name="sha">SHA</flag>
+    <flag name="cmac">CMAC</flag>
+
+    <flag name="webserver">Web Server</flag>
+
+    <flag name="hc128">HC-128</flag>
+    <flag name="rabbit">RABBIT</flag>
+    <flag name="fips">FIPS 140-2 Will NOT work w/o FIPS</flag>
+    <flag name="sha224">SHA-224</flag>
+    <flag name="poly1305">POLY1305</flag>
+    <flag name="chacha">CHACHA</flag>
+    <flag name="hashdrbg">Hash DRBG</flag>
+
+    <flag name="filesystem">Filesystem</flag>
+    <flag name="inline">inline functions</flag>
+    <flag name="ocsp">OCSP</flag>
+    <flag name="ocspstapling">OCSP Stapling</flag>
+    <flag name="ocspstapling2">OCSP Stapling v2</flag>
+    <flag name="crl">CRL</flag>
+    <flag name="crl-monitor">CRL Monitor</flag>
+    <flag name="sni">SNI</flag>
+    <flag name="maxfragment">Maximum Fragment Length</flag>
+    <flag name="alpn">ALPN</flag>
+    <flag name="truncatedhmac">Truncated HMAC</flag>
+    <flag name="renegotiation-indication">Renegotiation Indication</flag>
+    <flag name="secure-renegotiation">Secure Renegotiation</flag>
+    <flag name="supportedcurves">Supported Elliptic Curves</flag>
+    <flag name="session-ticket">Session Ticket</flag>
+    <flag name="extended-master">Extended Master Secret</flag>
+    <flag name="tlsx">all TLS Extensions</flag>
+    <flag name="pkcs7">PKCS7</flag>
+    <flag name="scep">wolfSCEP</flag>
+    <flag name="srp">Secure Remote Password</flag>
+    <flag name="smallstack">Small Stack Usage</flag>
+
+    <flag name="valgrind">valgrind for unit tests</flag>
+    <flag name="testcert">Test Cert</flag>
+    <flag name="iopool">I/O Pool example</flag>
+
+    <flag name="certservice">cert service</flag>
+    <flag name="jni">wolfSSL JNI</flag>
+    <flag name="lighty">lighttpd/lighty</flag>
+    <flag name="stunnel">stunnel</flag>
+    <flag name="md4">MD4</flag>
+    <flag name="pwdbased">password based encryption. This is often paired with opensslextra</flag>
+    <flag name="scrypt">SCRYPT</flag>
+
+    <flag name="cryptonly">wolfCrypt Only</flag>
+    <flag name="fastmath">fast math ops</flag>
+    <flag name="fasthugemath">fast math + huge code</flag>
+
+    <flag name="examples">Examples</flag>
+    <flag name="crypttests">Crypt Bench/Test</flag>
+
+    <flag name="fast-rsa">RSA using Intel IPP</flag>
+    <flag name="staticmemory">static memory use</flag>
+    <flag name="mcapi">Microchip API</flag>
+    <flag name="asynccrypt">Asynchronous Crypto</flag>
+    <flag name="sessionexport">export and import of sessions</flag>
+    <flag name="aeskeywrap">AES key wrap</flag>
+
+  </use>
+</pkgmetadata>
