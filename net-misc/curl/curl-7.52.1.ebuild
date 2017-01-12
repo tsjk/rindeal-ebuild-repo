@@ -30,13 +30,17 @@ IUSE_A=(
 
 	libcurl-option manual +verbose
 
-	ipv6 +unix-sockets +zlib ares threaded-resolver idn gssapi psl spnego kerberos ntlm ntlm-wb tls-srp http2
+	ipv6 +unix-sockets +zlib dns_c-ares dns_threaded idn psl
 
-	+cookies +crypto-auth metalink proxy ssh2
+	+cookies metalink proxy ssh2
+
+	$(rindeal:dsf:prefix_flags \
+		"auth_" \
+		+digest gssapi kerberos ntlm ntlm-wb spnego tls-srp)
 
 	$(rindeal:dsf:prefix_flags \
 		"protocol_" \
-		all +http +https +ftp +ftps +file telnet ldap ldaps dict tftp gopher pop3 pop3s imap imaps \
+		+http +https http2 +ftp +ftps +file telnet ldap ldaps dict tftp gopher pop3 pop3s imap imaps \
 		smb smbs smtp smtps rtsp rtmp scp sftp)
 
 	+ssl
@@ -66,10 +70,10 @@ CDEPEND_A=(
 		"ssl_nss?		( dev-libs/nss:0 )"
 		"ssl_polarssl?	( net-libs/polarssl:0= )"
 	")"
-	"http2?	( net-libs/nghttp2 )"
+	"protocol_http2?	( net-libs/nghttp2 )"
 	"idn?	( net-dns/libidn2:0[static-libs?] )"
-	"ares?	( net-dns/c-ares:0 )"
-	"kerberos?	( >=virtual/krb5-0-r1 )"
+	"dns_c-ares?	( net-dns/c-ares:0 )"
+	"auth_kerberos?	( >=virtual/krb5-0-r1 )"
 	"metalink?	( >=media-libs/libmetalink-0.1.1 )"
 	"protocol_rtmp?	( media-video/rtmpdump )"
 	"ssh2?	( net-libs/libssh2[static-libs?] )"
@@ -88,8 +92,7 @@ DEPEND_A=( "${CDEPEND_A[@]}"
 RDEPEND_A=( "${CDEPEND_A[@]}" )
 
 REQUIRED_USE_A=(
-	# c-ares must be disabled for threads
-	"threaded-resolver? ( !ares )"
+	"?? ( dns_threaded dns_c-ares )"
 	"ssl? ("
 		"^^ ("
 			$(rindeal:dsf:prefix_flags \
@@ -98,17 +101,17 @@ REQUIRED_USE_A=(
 		")"
 	")"
 
-	"spnego? ( || ( crypto-auth gssapi ) )"
-	"kerberos? ( crypto-auth gssapi )"
-	"ntlm? ( crypto-auth ssl )"
-	"ntlm-wb? ( ntlm protocol_http )"
+	"auth_kerberos?	( auth_digest auth_gssapi )"
+	"auth_ntlm-wb?	( auth_ntlm protocol_http )"
+	"auth_ntlm?		( auth_digest ssl )"
+	"auth_spnego?	( || ( auth_digest auth_gssapi ) )"
 
 	"protocol_https?	( protocol_http ssl )"
 	"protocol_ftps?		( protocol_ftp ssl )"
 	"protocol_ldaps?	( protocol_ldap )"
 	"protocol_pop3s?	( protocol_pop3 ssl )"
 	"protocol_imaps?	( protocol_imap ssl )"
-	"protocol_smb?		( crypto-auth ^^ ( $(rindeal:dsf:prefix_flags "ssl_" openssl libressl gnutls nss) ) )"
+	"protocol_smb?		( auth_digest ^^ ( $(rindeal:dsf:prefix_flags "ssl_" openssl libressl gnutls nss) ) )"
 	"protocol_smbs?		( protocol_smb ssl )"
 	"protocol_smtps?	( protocol_smtp ssl )"
 	"protocol_scp?		( ssh2 )"
@@ -121,6 +124,7 @@ src_prepare() {
 	eapply "${FILESDIR}/${PN}-7.30.0-prefix.patch"
 	eapply "${FILESDIR}/${PN}-respect-cflags-3.patch"
 	eapply "${FILESDIR}/${PN}-fix-gnutls-nettle.patch"
+	eapply "${FILESDIR}/7.52.1-vtls__s_SSLEAY_OPENSSL.patch"
 	eapply_user
 
 	# gentoo#382241
@@ -132,8 +136,6 @@ src_prepare() {
 }
 
 src_configure() {
-	# We make use of the fact that later flags override earlier ones
-	# So start with all ssl providers off until proven otherwise
 	local my_econf_args=(
 		--disable-debug # just sets -g* flags
 		--disable-optimize # just sets -O* flags
@@ -142,58 +144,61 @@ src_configure() {
 		--disable-soname-bump
 		--with-zsh-functions-dir="${EPREFIX}"/usr/share/zsh/site-functions
 
-		$(use_enable curldebug)
-		$(use_enable largefile)
-		$(use_enable libgcc)
-		$(use_enable rt)
-		$(use_enable symbol-hiding)
-		$(use_enable versioned-symbols)
-		$(use_enable static-libs static)
+		$(use_enable	curldebug)
+		$(use_enable	largefile)
+		$(use_enable	libgcc)
+		$(use_enable	rt)
+		$(use_enable	symbol-hiding)
+		$(use_enable	versioned-symbols)
+		$(use_enable	static-libs static)
 		# --with-pic=yes|no|default
 
-		$(use_enable libcurl-option)
-		$(use_enable manual)
-		$(use_enable verbose)
+		$(use_enable	libcurl-option)
+		$(use_enable	manual)
+		$(use_enable	verbose)
 
-		$(use_enable ipv6)
-		$(use_enable unix-sockets)
-		$(use_with zlib)
-		$(use_enable ares) # =PATH
-		$(use_enable threaded-resolver)
-		$(use_with idn libidn2)
-		"$(use_with gssapi gssapi "${EPREFIX}"/usr)"
-		$(use_with psl libpsl)
-		$(use_enable ntlm-wb)
-		$(use_enable tls-srp)
-		$(use_with http2 nghttp2)
+		$(use_enable	ipv6)
+		$(use_enable	unix-sockets)
+		$(use_with		zlib)
+		$(use_enable	dns_c-ares ares) # =PATH
+		$(use_enable	dns_threaded threaded-resolver)
+		$(use_with		idn libidn2)
+		$(use_with		psl libpsl)
 
-		$(use_enable cookies)
-		$(use_enable crypto-auth)
-		$(use_with metalink libmetalink)
-		$(use_enable proxy)
-		$(use_with ssh2 libssh2)
+		$(use_enable	cookies)
+		$(use_with		metalink libmetalink)
+		$(use_enable	proxy)
+		$(use_with		ssh2 libssh2)
+	)
+
+	my_econf_args+=(
+		"$(use_with		auth_gssapi		gssapi "${EPREFIX}"/usr)"
+		$(use_enable	auth_ntlm-wb	ntlm-wb)
+		$(use_enable	auth_tls-srp	tls-srp)
+		$(use_enable	auth_digest		crypto-auth)
 	)
 
 	### Protocols
-	my_use_protocol() {
-		usex protocol_all protocol_all protocol_$1
+	myprotouse() {
+		use_$1 protocol_$2 ${3:-${2}}
 	}
 	my_econf_args+=(
-		"$(use_enable $(my_use_protocol http)	http)"
-		"$(use_enable $(my_use_protocol ftp)	ftp)"
-		"$(use_enable $(my_use_protocol file)	file)"
-		"$(use_enable $(my_use_protocol telnet)	telnet)"
-		"$(use_enable $(my_use_protocol ldap)	ldap)"
-		"$(use_enable $(my_use_protocol ldaps)	ldaps)"
-		"$(use_enable $(my_use_protocol dict)	dict)"
-		"$(use_enable $(my_use_protocol tftp)	tftp)"
-		"$(use_enable $(my_use_protocol gopher)	gopher)"
-		"$(use_enable $(my_use_protocol pop3)	pop3)"
-		"$(use_enable $(my_use_protocol imap)	imap)"
-		"$(use_enable $(my_use_protocol smb)	smb)"
-		"$(use_enable $(my_use_protocol smtp)	smtp)"
-		"$(use_enable $(my_use_protocol rtsp)	rtsp)"
-		"$(use_with   $(my_use_protocol rtmp)	librtmp)"
+		$(myprotouse enable	http)
+		$(myprotouse with	http2 nghttp2)
+		$(myprotouse enable	ftp)
+		$(myprotouse enable	file)
+		$(myprotouse enable	telnet)
+		$(myprotouse enable	ldap)
+		$(myprotouse enable	ldaps)
+		$(myprotouse enable	dict)
+		$(myprotouse enable	tftp)
+		$(myprotouse enable	gopher)
+		$(myprotouse enable	pop3)
+		$(myprotouse enable	imap)
+		$(myprotouse enable	smb)
+		$(myprotouse enable	smtp)
+		$(myprotouse enable	rtsp)
+		$(myprotouse with	rtmp librtmp)
 	)
 
 	### SSL
@@ -208,12 +213,12 @@ src_configure() {
 		--without-darwinssl	# disable Apple OS native SSL/TLS
 		--without-winidn	# disable Windows native IDN
 
-		$(use_with $(my_use_ssl axtls)	axtls)
-		$(use_with $(my_use_ssl gnutls)	gnutls)
-		$(use_with $(my_use_ssl gnutls)	nettle)
+		$(use_with $(my_use_ssl axtls)		axtls)
+		$(use_with $(my_use_ssl gnutls)		gnutls)
+		$(use_with $(my_use_ssl gnutls)		nettle)
 		$(use_with $(my_use_ssl libressl)	ssl)
 		$(use_with $(my_use_ssl mbedtls)	mbedtls)
-		$(use_with $(my_use_ssl nss)	nss)
+		$(use_with $(my_use_ssl nss)		nss)
 		$(use_with $(my_use_ssl polarssl)	polarssl)
 		$(use_with $(my_use_ssl openssl)	ssl)
 	)
@@ -222,12 +227,6 @@ src_configure() {
 	else
 		my_econf_args+=( --without-ca-path )
 	fi
-
-	my_econf_args+=(
-		$(use_enable crypto-auth)
-		$(use_enable ntlm-wb) # =FILE
-		$(use_enable tls-srp)
-	)
 
 	econf "${my_econf_args[@]}"
 
@@ -238,7 +237,7 @@ src_configure() {
 		libs+=( "-lz" )
 		priv+=( "zlib" )
 	fi
-	if use http2 ; then
+	if use protocol_http2 ; then
 		libs+=( "-lnghttp2" )
 		priv+=( "libnghttp2" )
 	fi
