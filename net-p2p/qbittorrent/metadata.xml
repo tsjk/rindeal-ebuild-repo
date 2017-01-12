@@ -6,6 +6,7 @@
     <name>Jan Chren (rindeal)</name>
   </maintainer>
   <use>
+    <flag name="gui">Qt based GUI</flag>
     <flag name="webui">Enable the Web UI</flag>
   </use>
 </pkgmetadata>
