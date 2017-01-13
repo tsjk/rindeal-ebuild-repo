@@ -6,14 +6,15 @@ inherit rindeal
 
 GH_URI='github/fcambus'
 
-inherit git-hosting cmake-utils
+inherit git-hosting
+inherit cmake-utils
 
 DESCRIPTION='Web log analyzer using probabilistic data structures'
-LICENSE='BSD'
+LICENSE='BSD-2'
 
 SLOT='0'
 
-KEYWORDS='~amd64 ~arm ~x86'
+KEYWORDS='~amd64 ~arm ~arm64'
 
 CDEPEND="
 	dev-libs/geoip:0
@@ -23,6 +24,12 @@ DEPEND="${CDEPEND}
 	virtual/pkgconfig
 "
 RDEPEND="${CDEPEND}"
+
+src_prepare() {
+	default
+
+	sed -r -e '/^add_definitions/ s,(-Werror|-pedantic),,g' -i -- CMakeLists.txt || die
+}
 
 src_configure() {
 	local mycmakeargs=(
