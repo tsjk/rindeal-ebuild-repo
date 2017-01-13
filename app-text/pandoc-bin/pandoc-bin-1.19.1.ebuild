@@ -12,11 +12,11 @@ HOMEPAGE="http://pandoc.org"
 LICENSE="GPL-2"
 
 SLOT="0"
-SRC_URI="amd64? ( https://github.com/jgm/pandoc/releases/download/${PV}/${MY_PN}-${PV}-2-amd64.deb )"
+SRC_URI="amd64? ( https://github.com/jgm/pandoc/releases/download/${PV}/${MY_PN}-${PV}-1-amd64.deb )"
 
 KEYWORDS="-* ~amd64"
 IUSE="citeproc"
-RESTRICT="mirror"
+RESTRICT+=" mirror"
 
 DEPEND="
 	dev-libs/gmp:*
@@ -44,3 +44,6 @@ src_install() {
 	doman "${MY_PN}.1"
 	use citeproc && doman 'pandoc-citeproc.1'
 }
+
+QA_EXECSTACK="usr/bin/pandoc"
+QA_PRESTRIPPED="usr/bin/pandoc"
