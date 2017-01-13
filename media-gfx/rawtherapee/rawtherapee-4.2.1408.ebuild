@@ -7,7 +7,7 @@ inherit rindeal
 
 GH_URI="github/Beep6581/RawTherapee"
 # check http://rawtherapee.com/downloads for a new commit number
-GH_REF="d16d244fc572615248a8c0f741f434213f4cd548"
+GH_REF="8094ce7c99d5c45fb34ec349c8cb16de5077048d"
 
 inherit git-hosting cmake-utils toolchain-funcs xdg
 
