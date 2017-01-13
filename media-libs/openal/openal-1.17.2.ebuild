@@ -8,15 +8,18 @@ inherit rindeal
 GH_URI="github/kcat/openal-soft"
 GH_REF="openal-soft-${PV}"
 
-inherit cmake-utils git-hosting xdg eutils
+inherit cmake-utils
+inherit git-hosting
+inherit xdg
+inherit eutils
 
 DESCRIPTION="A software implementation of the OpenAL 3D audio API"
-HOMEPAGE="http://kcat.strangesoft.net/openal.html ${HOMEPAGE}"
+HOMEPAGE="http://kcat.strangesoft.net/openal.html ${GH_HOMEPAGE}"
 LICENSE="LGPL-2+"
 
 SLOT="0"
 
-KEYWORDS="amd64 ~arm"
+KEYWORDS="amd64 ~arm ~arm64"
 backends=( alsa coreaudio jack oss portaudio pulseaudio )
 IUSE_A=(
 	${backends[@]}
