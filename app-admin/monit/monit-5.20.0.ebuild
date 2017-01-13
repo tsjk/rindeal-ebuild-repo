@@ -13,7 +13,7 @@ LICENSE="AGPL-3"
 SLOT="0"
 SRC_URI="https://mmonit.com/monit/dist/${P}.tar.gz"
 
-KEYWORDS="~amd64 ~arm"
+KEYWORDS="~amd64 ~arm ~arm64"
 IUSE="libressl pam ssl"
 
 CDEPEND="
