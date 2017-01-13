@@ -36,8 +36,7 @@ src_prepare() {
 	PATCHES=(
 		"${FILESDIR}"/3.9.2-configure_ac_lfs.patch
 		"${FILESDIR}"/3.9.2-ignore_hidden_files_in_conf_dir.patch
-		"${FILESDIR}"/3.9.2-atomic-createOutputFile.patch
-		"${FILESDIR}"/3.9.2-manpage_config_clarification.patch
+		"${FILESDIR}"/3.11.0-manpage_config_clarification.patch
 	)
 	default
 
@@ -45,7 +44,7 @@ src_prepare() {
 
 	# https://bugs.gentoo.org/show_bug.cgi?id=357275
 	sed -e "s|/var/lib/logrotate.status|${STATEFILE}|" \
-		-i -- ${PN}.8 config.h || die
+		-i -- ${PN}.8.in config.h || die
 
 	# prevent these from installing
 	rm -v -f README.{HPUX,Solaris} || die
