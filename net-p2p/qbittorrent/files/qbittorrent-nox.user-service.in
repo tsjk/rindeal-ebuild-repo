@@ -1,9 +1,10 @@
 [Unit]
-Description=qBittorrent Service
+Description=qBittorrent Daemon Service
+Documentation=man:qbittorrent-nox
 Documentation=https://github.com/qbittorrent/qBittorrent/wiki
 
 After=network.target
-Conflicts=qbittorrent-nox.service
+Conflicts=qbittorrent.service
 
 
 [Service]
@@ -11,12 +12,10 @@ Type=simple
 
 WorkingDirectory=~
 
-# qbittorrent must not run as root
+# daemon must not run as root
 ExecStartPre=/usr/bin/test ${USER} != 'root'
-# wait some time for a DE to start
-ExecStartPre=/usr/bin/sleep 30
 
-ExecStart=@EXPAND_BINDIR@/qbittorrent $QB_ARGS
+ExecStart=@EXPAND_BINDIR@/qbittorrent-nox $QB_ARGS
 TimeoutStartSec=30s
 
 TimeoutStopSec=3m
@@ -36,4 +35,4 @@ RestrictRealtime=true
 
 
 [Install]
-WantedBy=graphical.target
+WantedBy=multi-user.target

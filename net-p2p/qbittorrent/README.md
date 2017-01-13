@@ -2,3 +2,4 @@
 - verbose build
 - source built from git snapshots rather than from pre-generated tarballs
 - customized and hardened systemd service template + user service
+- ability to install gui and webui versions simultaneously

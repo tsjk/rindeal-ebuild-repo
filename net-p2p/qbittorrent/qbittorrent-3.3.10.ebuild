@@ -20,6 +20,8 @@ inherit autotools
 inherit rindeal-utils
 # functions: systemd_dounit
 inherit systemd
+# functions: multibuild_copy_sources
+inherit multibuild
 
 DESCRIPTION="BitTorrent client in C++/Qt based on libtorrent-rasterbar"
 HOMEPAGE="http://www.qbittorrent.org/ ${GH_HOMEPAGE}"
@@ -28,7 +30,7 @@ LICENSE="GPL-2"
 SLOT="0"
 
 KEYWORDS="~amd64 ~arm"
-IUSE="+dbus debug nls +qt5 webui +gui"
+IUSE="+dbus debug nls +qt5 +gui webui"
 
 CDEPEND_A=(
 	"dev-libs/boost:="
@@ -64,6 +66,10 @@ DEPEND_A=( "${CDEPEND_A[@]}"
 )
 RDEPEND_A=( "${CDEPEND_A[@]}" )
 
+REQUIRED_USE_A=(
+	"|| ( gui webui )"
+)
+
 inherit arrays
 
 L10N_LOCALES=( ar be bg ca cs da de el en en_AU en_GB eo es eu fi fr gl he hi_IN hr hu hy id is it
@@ -72,6 +78,8 @@ inherit l10n-r1
 
 src_prepare() {
 	xdg_src_prepare
+
+	declare -g -r -a MULTIBUILD_VARIANTS=( $(usev gui) $(usev webui) )
 
 	local l locales loc_dir='src/lang' loc_pre='qbittorrent_' loc_post='.ts'
 	l10n_find_changes_in_dir "${loc_dir}" "${loc_pre}" "${loc_post}"
@@ -91,9 +99,11 @@ src_prepare() {
 	sed '/^$QT_QMAKE/ s|^|echo |' -i -- configure.ac || die
 
 	eautoreconf
+
+	multibuild_copy_sources
 }
 
-src_configure() {
+multibuild_src_configure() {
 	# workaround build issue with older boost
 	# https://github.com/qbittorrent/qBittorrent/issues/4112
 	if has_version '<dev-libs/boost-1.58' ; then
@@ -104,27 +114,53 @@ src_configure() {
 		--with-qjson=system
 		--with-qtsingleapplication=system
 		--disable-systemd # we have a service of our own
+
 		$(use_enable dbus qt-dbus)
 		$(use_enable debug)
-		$(use_enable webui)
-		$(use_enable gui)
 		$(use_with !qt5 qt4)
 	)
+
+	if [[ "${MULTIBUILD_VARIANT}" == gui ]] ; then
+		econf_args+=( --enable-gui --disable-webui )
+	elif [[ "${MULTIBUILD_VARIANT}" == webui ]] ; then
+		econf_args+=( --disable-gui --enable-webui )
+	else
+		die
+	fi
+
 	econf "${econf_args[@]}"
 
 	eqmake$(usex qt5 5 4) -r ./qbittorrent.pro
 }
 
-src_install() {
+src_configure() {
+	multibuild_foreach_variant run_in_build_dir \
+		multibuild_src_configure
+}
+
+src_compile() {
+	multibuild_foreach_variant run_in_build_dir \
+		default_src_compile
+}
+
+multibuild_src_install() {
 	emake INSTALL_ROOT="${D}" install
+}
 
-	if ! use gui ; then
-		EXPAND_BINDIR="${EPREFIX}/usr/bin"
+src_install() {
+	multibuild_foreach_variant run_in_build_dir \
+		multibuild_src_install
 
-		rindeal:expand_vars "${FILESDIR}/qbittorrent@.service.in" "${T}/qbittorrent@.service"
+	EXPAND_BINDIR="${EPREFIX}/usr/bin"
+	if use webui ; then
+		rindeal:expand_vars "${FILESDIR}/qbittorrent-nox@.service.in" "${T}/qbittorrent-nox@.service"
+		rindeal:expand_vars "${FILESDIR}/qbittorrent-nox.user-service.in" "${T}/qbittorrent-nox.service"
+
+		systemd_dounit "${T}/qbittorrent-nox@.service"
+		systemd_douserunit "${T}/qbittorrent-nox.service"
+	fi
+	if use gui ; then
 		rindeal:expand_vars "${FILESDIR}/qbittorrent.user-service.in" "${T}/qbittorrent.service"
-
-		systemd_dounit "${T}/qbittorrent@.service"
 		systemd_douserunit "${T}/qbittorrent.service"
 	fi
 
