@@ -1,3 +1,2 @@
-- contains a patch to fix LTO builds (GCC 4.9.x,5.x)
 - EAPI6
 - additional USE flags (eg. to nuke docs)

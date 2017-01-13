@@ -25,11 +25,10 @@ DEPEND="${RDEPEND}
 
 src_prepare() {
 	local PATCHES=(
-		"${FILESDIR}"/1.3.0-LTLIBICONV.patch
 		"${FILESDIR}"/1.3.0-dont_build_tests.patch
-		"${FILESDIR}"/1.3.0-dont_build_examples.patch
-		"${FILESDIR}"/1.3.1-configure_ac_flags.patch
-		"${FILESDIR}"/1.3.1-gcc-lto-avx2.patch
+		"${FILESDIR}"/1.3.2-configure_ac_flags.patch
+		"${FILESDIR}"/1.3.2-LTLIBICONV.patch
+		"${FILESDIR}"/1.3.2-honor_html_dir.patch
 	)
 	default
 
@@ -40,6 +39,8 @@ src_prepare() {
 	assert
 	# delete doxygen tagfile
 	sed -e 's|FLAC.tag||g' -e '/doc_DATA =/d' -i -- doc/Makefile.am || die
+
+	use examples || sed -e '/^SUBDIRS/ s| examples | |' -i -- Makefile.am || die
 
 	AT_M4DIR="m4" eautoreconf
 }
@@ -55,7 +56,6 @@ src_configure() {
 		$(use_enable cpu_flags_x86_sse sse)
 		$(use_enable cxx cpplibs)
 		$(use_enable debug)
-		$(use_enable examples)
 		$(use_enable ogg)
 	)
 	econf "${econf_args[@]}"
