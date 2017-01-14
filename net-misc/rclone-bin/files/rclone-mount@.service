@@ -1,0 +1,17 @@
+[Unit]
+Description=rclone mount service - '%i' instance
+
+
+[Service]
+WorkingDirectory=~
+
+ExecStartPre=/usr/bin/test -d ${MNT_POINT}
+ExecStartPre=/bin/sh -c '/usr/bin/fusermount -z -u "${MNT_POINT}" ; true'
+
+ExecStart=/usr/bin/rclone --checkers 8 --contimeout 5m --drive-use-trash --drive-upload-cutoff 20M --retries 10 --timeout 10m --transfers 8 $ARGS mount ${REMOTE_NAME}: ${MNT_POINT}
+
+ExecStopPost=/usr/bin/fusermount -z -u ${MNT_POINT}
+
+
+[Install]
+WantedBy=default.target

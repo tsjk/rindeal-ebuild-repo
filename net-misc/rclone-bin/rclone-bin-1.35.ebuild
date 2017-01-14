@@ -4,6 +4,9 @@
 EAPI=6
 inherit rindeal
 
+# functions: systemd_douserunit
+inherit systemd
+
 DESCRIPTION='Sync files to and from Google Drive, S3, Swift, Cloudfiles, Dropbox, ...'
 HOMEPAGE='http://rclone.org/ https://github.com/ncw/rclone'
 LICENSE='MIT'
@@ -39,4 +42,6 @@ src_install() {
 
 	doman "${PN_NB}.1"
 	dodoc README.*
+
+	systemd_douserunit "${FILESDIR}/rclone-mount@.service"
 }
