@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "http://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+  <maintainer type="person">
+    <email>dev.rindeal+gentoo-overlay@gmail.com</email>
+    <name>Jan Chren (rindeal)</name>
+  </maintainer>
+  <use>
+    <flag name="cache-stats">Disk cache statistics collection, use `cacheinfo` command to retrieve the stats</flag>
+    <flag name="boot-time">Boot time statistics collection, use `boottime` command to retrieve stats</flag>
+    <flag name="device-mapper">Enable support for device-mapper from <pkg>sys-fs/lvm2</pkg></flag>
+    <flag name="efiemu">Build and install the efiemu runtimes</flag>
+    <flag name="fonts">Build and install fonts for the gfxterm module</flag>
+    <flag name="mount">Build and install the grub-mount utility</flag>
+    <flag name="libzfs">Enable support for <pkg>sys-fs/zfs</pkg></flag>
+    <flag name="multislot">
+		Allow concurrent installation of <pkg>sys-boot/grub</pkg> SLOT 0 and
+		<pkg>sys-boot/grub</pkg> SLOT 2 by renaming all programs.
+	</flag>
+    <flag name="themes">Build and install GRUB themes (starfield)</flag>
+    <flag name="truetype">Build and install grub-mkfont conversion utility</flag>
+  </use>
+  <upstream>
+    <remote-id type="sourceforge">dejavu</remote-id>
+  </upstream>
+</pkgmetadata>
