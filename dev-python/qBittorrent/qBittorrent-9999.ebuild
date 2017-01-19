@@ -1,4 +1,4 @@
-# Copyright 2016 Jan Chren (rindeal)
+# Copyright 2016-2017 Jan Chren (rindeal)
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
@@ -11,8 +11,7 @@ PYTHON_COMPAT=( python2_7 )
 inherit git-hosting
 inherit distutils-r1
 
-DESCRIPTION="Python wrapper for qBittorrent Web API (for versions above v3.1.x) "
-HOMEPAGE="${GH_HOMEPAGE}"
+DESCRIPTION="Python wrapper for qBittorrent Web API (for versions above v3.1.x)"
 LICENSE="MIT"
 
 SLOT="0"
@@ -25,8 +24,5 @@ DEPEND_A=( "${CDEPEND_A[@]}" )
 RDEPEND_A=( "${CDEPEND_A[@]}"
 	"dev-python/requests[${PYTHON_USEDEP}]"
 )
-
-REQUIRED_USE_A=(  )
-RESTRICT+=""
 
 inherit arrays
