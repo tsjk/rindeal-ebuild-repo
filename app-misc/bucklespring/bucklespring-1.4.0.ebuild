@@ -1,11 +1,16 @@
-# Copyright 2016 Jan Chren (rindeal)
+# Copyright 2016-2017 Jan Chren (rindeal)
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
+inherit rindeal
 
 GH_URI="github/zevv"
 
-inherit git-hosting toolchain-funcs systemd
+inherit git-hosting
+# functions: tc-getCC
+inherit toolchain-funcs
+# functions: systemd_douserunit, systemd_get_userunitdir
+inherit systemd
 
 DESCRIPTION="Nostalgia bucklespring keyboard (IBM Model-M) sound emulator"
 LICENSE="GPL-2"
@@ -62,6 +67,7 @@ src_compile() {
 
 src_install() {
 	dobin "${BIN_NAME}"
+
 	doman "${BIN_NAME}.1"
 	einstalldocs
 
