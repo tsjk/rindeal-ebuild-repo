@@ -5,4 +5,7 @@
     <email>dev.rindeal+gentoo-overlay@gmail.com</email>
     <name>Jan Chren (rindeal)</name>
   </maintainer>
+  <use>
+    <flag name="docs">Build and install docs+man pages</flag>
+  </use>
 </pkgmetadata>
