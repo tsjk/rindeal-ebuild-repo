@@ -1,4 +1,4 @@
-# Copyright 2016 Jan Chren (rindeal)
+# Copyright 2016-2017 Jan Chren (rindeal)
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
@@ -13,13 +13,11 @@ inherit git-hosting
 inherit distutils-r1
 
 DESCRIPTION="Simple ctypes python bindings for FUSE"
-HOMEPAGE="${GH_HOMEPAGE}"
 LICENSE="MIT"
 
 SLOT="0"
 
-KEYWORDS="~amd64 ~arm"
-IUSE_A=( )
+KEYWORDS="~amd64 ~arm ~arm64"
 
 CDEPEND_A=(
 	">=sys-fs/fuse-2.6"
