@@ -1,4 +1,4 @@
-# Copyright 2016 Jan Chren (rindeal)
+# Copyright 2016-2017 Jan Chren (rindeal)
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
@@ -24,7 +24,7 @@ HOMEPAGE="https://rockdaboot.github.io/libpsl ${GH_HOMEPAGE}"
 LICENSE="MIT"
 
 SLOT="0"
-list_commit=41a519ad34cf86ff4470b967d9e4755d72b63a6c
+list_commit="41a519ad34cf86ff4470b967d9e4755d72b63a6c"
 list_uri=""
 list_ext=""
 list_distfile="${PN}-list-${list_commit}"
