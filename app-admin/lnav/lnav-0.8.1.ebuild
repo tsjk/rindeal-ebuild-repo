@@ -1,5 +1,5 @@
 # Copyright 1999-2016 Gentoo Foundation
-# Copyright 2016 Jan Chren (rindeal)
+# Copyright 2016-2017 Jan Chren (rindeal)
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
@@ -14,12 +14,12 @@ inherit python-any-r1
 inherit autotools
 
 DESCRIPTION="A curses-based tool for viewing and analyzing log files"
-HOMEPAGE="http://lnav.org ${HOMEPAGE}"
+HOMEPAGE="http://lnav.org ${GH_HOMEPAGE}"
 LICENSE="BSD-2"
 
 SLOT="0"
 
-KEYWORDS="~amd64 ~arm"
+KEYWORDS="~amd64 ~arm ~arm64"
 IUSE="pcre readline static test unicode"
 
 # system-wide yajl cannot be used, because lnav uses custom-patched version
