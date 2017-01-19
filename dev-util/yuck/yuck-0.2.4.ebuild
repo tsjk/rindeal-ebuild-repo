@@ -1,19 +1,21 @@
-# Copyright 2016 Jan Chren (rindeal)
+# Copyright 2016-2017 Jan Chren (rindeal)
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
+inherit rindeal
 
 GH_URI="github/hroptatyr"
 GH_REF="v${PV}"
 
-inherit git-hosting autotools
+inherit git-hosting
+inherit autotools
 
 DESCRIPTION="Your Umbrella Command Kit, a command line option parser for C"
 LICENSE="BSD"
 
 SLOT="0"
 
-KEYWORDS="~amd64 ~arm ~x86"
+KEYWORDS="~amd64 ~arm ~arm64"
 
 src_prepare() {
 	default
