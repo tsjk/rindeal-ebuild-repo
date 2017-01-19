@@ -31,7 +31,7 @@ src_prepare() {
 	eapply "${FILESDIR}"/0.5.8-PARSER-Remove-backslash-before-in-double-quotes-in-va.patch
 	eapply "${FILESDIR}"/0.5.8-SHELL-Disable-sh-c-command-sh-c-exec-command-optimization.patch
 	eapply "${FILESDIR}"/0.5.8-JOBS-address-format-security-build-error.patch
-	eapply "${FILESDIR}"/0.5.8-EVAL-Report-I-O-error-on-stdout.patch )
+	eapply "${FILESDIR}"/0.5.8-EVAL-Report-I-O-error-on-stdout.patch
 	eapply_user
 
 	# Fix the invalid sort
