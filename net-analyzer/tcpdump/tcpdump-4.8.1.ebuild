@@ -1,5 +1,5 @@
 # Copyright 1999-2016 Gentoo Foundation
-# Copyright 2016 Jan Chren (rindeal)
+# Copyright 2016-2017 Jan Chren (rindeal)
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
@@ -8,16 +8,18 @@ inherit rindeal
 GH_URI="github/the-${PN}-group"
 GH_REF="${PN}-${PV}"
 
-inherit flag-o-matic toolchain-funcs user
+inherit flag-o-matic
+inherit toolchain-funcs
+inherit user
 inherit git-hosting
 
 DESCRIPTION="A Tool for network monitoring and data acquisition"
-HOMEPAGE="http://www.tcpdump.org/"
+HOMEPAGE="http://www.tcpdump.org/ ${GH_HOMEPAGE}"
 LICENSE="BSD"
 
 SLOT="0"
 
-KEYWORDS="~amd64 ~arm"
+KEYWORDS="~amd64 ~arm ~arm64"
 IUSE="+drop-root libressl smi ssl samba suid test"
 
 CDEPEND="
