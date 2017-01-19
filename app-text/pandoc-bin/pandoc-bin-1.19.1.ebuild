@@ -1,14 +1,15 @@
-# Copyright 2016 Jan Chren (rindeal)
+# Copyright 2016-2017 Jan Chren (rindeal)
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
+inherit rindeal
 
 inherit unpacker
 
 MY_PN="${PN//-bin/}"
 
 DESCRIPTION="Universal markup converter"
-HOMEPAGE="http://pandoc.org"
+HOMEPAGE="http://pandoc.org https://github.com/jgm/pandoc"
 LICENSE="GPL-2"
 
 SLOT="0"
