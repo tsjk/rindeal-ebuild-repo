@@ -1,5 +1,5 @@
 # Copyright 1999-2016 Gentoo Foundation
-# Copyright 2016 Jan Chren (rindeal)
+# Copyright 2016-2017 Jan Chren (rindeal)
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
@@ -12,16 +12,18 @@ MY_P="lmon${PV}"
 DESCRIPTION="Nigel's performance MONitor for CPU, memory, network, disks, etc..."
 HOMEPAGE="http://nmon.sourceforge.net/"
 LICENSE="GPL-3"
-SRC_URI="mirror://sourceforge/${PN}/${MY_P}.c"
 
 SLOT="0"
-KEYWORDS="amd64 arm"
+SRC_URI="mirror://sourceforge/${PN}/${MY_P}.c"
 
-RDEPEND="sys-libs/ncurses:0="
-DEPEND="${RDEPEND}
+KEYWORDS="amd64 arm ~arm64"
+
+CDEPEND="sys-libs/ncurses:0="
+DEPEND="${CDEPEND}
 	sys-apps/help2man
 	virtual/pkgconfig
 "
+RDEPEND="${CDEPEND}"
 
 S="${WORKDIR}"
 
@@ -59,11 +61,13 @@ src_compile() {
 
 		./${PN}
 	)
+	echo "${help2man[@]}"
 	"${help2man[@]}" > ${PN}.1 || die
 }
 
 src_install() {
 	dobin ${PN}
+
 	doman ${PN}.1
 
 	newenvd "${FILESDIR}"/${PN}.envd 70${PN}
