@@ -1,8 +1,9 @@
 # Copyright 2012-2016 Gentoo Foundation
-# Copyright 2016 Jan Chren (rindeal)
+# Copyright 2016-2017 Jan Chren (rindeal)
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
+inherit rindeal
 
 PYTHON_COMPAT=( python2_7 )
 DISTUTILS_SINGLE_IMPL=true
@@ -19,7 +20,7 @@ LICENSE="GPL-2"
 SLOT="0"
 SRC_URI="https://mat.boum.org/files/${P}.tar.xz"
 
-# TODO: arm is missing KEYWORD in 'python-distutils-extra'
+# TODO: arm/arm64 is missing KEYWORD in 'python-distutils-extra'
 KEYWORDS="~amd64"
 IUSE="+audio +exif gui nls pdf"
 
@@ -49,7 +50,7 @@ python_prepare_all() {
 
 	# this app contains too many locales to bother to manage them all, thus
 	# use nls flag to either keep or remove all
-	use nls || { rm -vfr po/*.po || die ; }
+	use nls || erm -r po/*.po
 
 	# fix doc path
 	sed -i "s|share/doc/${PN}|share/doc/${PF}|" setup.py || die
@@ -62,12 +63,12 @@ python_install_all() {
 	distutils-r1_python_install_all
 
 	if ! use gui ; then
-		pushd "${ED}" >/dev/null || die
+		epushd "${ED}"
 		local rm_locs=(
 			usr/bin/${PN}-gui
 			usr/share/{applications,man/man1/${PN}-gui*,nautilus-python,pixmaps}
 		)
-		rm -vr "${rm_locs[@]}" || die
-		popd >/dev/null || die
+		erm -r "${rm_locs[@]}"
+		epopd
 	fi
 }
