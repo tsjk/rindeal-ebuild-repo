@@ -1,22 +1,31 @@
 # Copyright 1999-2014 Gentoo Foundation
-# Copyright 2016 Jan Chren (rindeal)
+# Copyright 2016-2017 Jan Chren (rindeal)
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
+inherit rindeal
 
 GH_URI="gitlab/rindeal"
 EGIT_CLONE_TYPE="shallow"
 EGIT_BRANCH="master"
 
-inherit autotools eutils linux-info user git-hosting
+# functions: eautoreconf
+inherit autotools
+# functions: prune_libtool_files
+inherit eutils
+# EXPORT_FUNCTIONS: pkg_setup
+inherit linux-info
+# functions: enewgroup, enewuser
+inherit user
+inherit git-hosting
 
 DESCRIPTION="Miredo is an open-source Teredo IPv6 tunneling software"
-HOMEPAGE="http://www.remlab.net/miredo/ ${HOMEPAGE}"
+HOMEPAGE="http://www.remlab.net/miredo/ ${GH_HOMEPAGE}"
 LICENSE="GPL-2"
 
 SLOT="0"
 
-KEYWORDS="amd64 arm"
+KEYWORDS="amd64 arm arm64"
 IUSE="+caps +client nls +assert judy"
 
 RDEPEND="
