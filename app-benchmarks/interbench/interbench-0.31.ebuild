@@ -1,7 +1,9 @@
 # Copyright 1999-2016 Gentoo Foundation
+# Copyright 2016-2017 Jan Chren (rindeal)
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
+inherit rindeal
 
 DESCRIPTION="Con Kolivas' Benchmarking Suite -- Successor to Contest"
 HOMEPAGE="http://users.tpg.com.au/ckolivas/interbench/"
@@ -10,7 +12,7 @@ LICENSE="GPL-2"
 SLOT="0"
 SRC_URI="http://ck.kolivas.org/apps/interbench/${P}.tar.bz2"
 
-KEYWORDS="~amd64 ~arm ~x86"
+KEYWORDS="~amd64 ~arm ~arm64"
 
 src_prepare() {
 	default
