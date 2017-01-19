@@ -1,8 +1,14 @@
-# Copyright 2016 Jan Chren (rindeal)
+# Copyright 2016-2017 Jan Chren (rindeal)
 # Distributed under the terms of the GNU General Public License v2
 
 if [ -z "${LT_RASTERBAR_ECLASS}" ] ; then
 
+case "${EAPI:-0}" in
+	6) ;;
+	*) die "Unsupported EAPI='${EAPI}' for '${ECLASS}'" ;;
+esac
+
+inherit rindeal
 
 [[ -z "${PYTHON_COMPAT}" ]] && \
 	PYTHON_COMPAT=( python{2_7,3_{4,5}} )
@@ -26,15 +32,15 @@ inherit git-hosting
 inherit distutils-r1
 
 DESCRIPTION='C++ BitTorrent implementation focusing on efficiency and scalability'
-HOMEPAGE="http://libtorrent.org ${HOMEPAGE}"
+HOMEPAGE="http://libtorrent.org ${GH_HOMEPAGE}"
 LICENSE='BSD'
 
 [[ -z "${LT_SONAME}" ]] && die "LT_SONAME not defined or empty"
 SLOT="0/${LT_SONAME}"
 SRC_URI="${GH_BASE_URI}/releases/download/libtorrent-${PV//./_}/${P}.tar.gz"
 
-[[ "${PV}" == *9999* ]] || \
-	KEYWORDS='~amd64 ~arm'
+[[ "${PV}" != *9999* ]] && [[ -z "${KEYWORDS}" ]] && \
+	KEYWORDS='~amd64 ~arm ~arm64'
 IUSE='+crypt debug +dht doc examples python static-libs test'
 
 RDEPEND="
@@ -74,7 +80,7 @@ libtorrent_rasterbar_src_prepare() {
 
 libtorrent_rasterbar_src_configure() {
 	local myeconfargs=(
-		--disable-silent-rules # bug 441842
+		--disable-silent-rules # gentoo#441842
 		# hardcode boost system to skip "lookup heuristic"
 		--with-boost-system='mt'
 		--with-libiconv
@@ -130,7 +136,6 @@ libtorrent_rasterbar_src_install() {
 
 	prune_libtool_files
 }
-
 
 LT_RASTERBAR_ECLASS=1
 fi
