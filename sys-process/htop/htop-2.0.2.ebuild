@@ -1,23 +1,27 @@
 # Copyright 1999-2016 Gentoo Foundation
-# Copyright 2016 Jan Chren (rindeal)
+# Copyright 2016-2017 Jan Chren (rindeal)
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
+inherit rindeal
 
 GH_URI="github/hishamhm"
 
-# linux-info: pkg_setup
-# git-hosting: src_unpack
-# xdg: src_prepare, pkg_preinst, pkg_postinst, pkg_postrm
-inherit autotools linux-info git-hosting xdg
+inherit autotools
+# EXPORT_FUNCTIONS: pkg_setup
+inherit linux-info
+# EXPORT_FUNCTIONS: src_unpack
+inherit git-hosting
+# EXPORT_FUNCTIONS: src_prepare, pkg_preinst, pkg_postinst, pkg_postrm
+inherit xdg
 
 DESCRIPTION="Interactive text-mode process viewer for Unix systems aiming to be a better top"
-HOMEPAGE="https://hisham.hm/htop/ ${HOMEPAGE}"
+HOMEPAGE="https://hisham.hm/htop/ ${GH_HOMEPAGE}"
 LICENSE="GPL-2"
 
 SLOT="0"
 
-KEYWORDS="~amd64 ~arm"
+KEYWORDS="amd64 arm ~arm64"
 IUSE="+cgroup hwloc +linux-affinity openvz unicode taskstats vserver"
 
 RDEPEND="
