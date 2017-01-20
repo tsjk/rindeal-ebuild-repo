@@ -29,14 +29,18 @@ src_compile() {
 src_install() {
 	dodoc README ChangeLog
 
-	insinto "/usr/share/${PN}"
-	doins -r build-aux
-	doins -r doc
-	doins -r lib
-	doins -r m4
-	doins -r modules
-	doins -r tests
-	doins -r top
+	mkdir -p "${ED}/usr/share/${PN}" || die
+	cp -a \
+        build-aux \
+        doc \
+        lib \
+        m4 \
+        modules \
+        tests \
+        top \
+        ChangeLog \
+        "${ED}/usr/share/${PN}" || die
+# 	doins ChangeLog # parsed by `gnulib-tool --version`
 
 	# install the real script
 	exeinto "/usr/share/${PN}"
