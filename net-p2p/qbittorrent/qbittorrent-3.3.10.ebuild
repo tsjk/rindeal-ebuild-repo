@@ -1,4 +1,4 @@
-# Copyright 2016 Jan Chren (rindeal)
+# Copyright 2016-2017 Jan Chren (rindeal)
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
@@ -24,17 +24,18 @@ inherit systemd
 inherit multibuild
 
 DESCRIPTION="BitTorrent client in C++/Qt based on libtorrent-rasterbar"
-HOMEPAGE="http://www.qbittorrent.org/ ${GH_HOMEPAGE}"
+HOMEPAGE="https://www.qbittorrent.org/ ${GH_HOMEPAGE}"
 LICENSE="GPL-2"
 
 SLOT="0"
 
-KEYWORDS="~amd64 ~arm"
+KEYWORDS="~amd64 ~arm ~arm64"
 IUSE="+dbus debug nls +qt5 +gui webui"
 
 CDEPEND_A=(
 	"dev-libs/boost:="
 	# libtorrent >= 1.1 is not yet officially supported, segfaults may occur
+	# TODO: allow >= 1.1.2 after it's released
 	"<net-libs/libtorrent-rasterbar-1.1:0"
 	"sys-libs/zlib"
 
@@ -115,7 +116,7 @@ multibuild_src_configure() {
 		--with-qtsingleapplication=system
 		--disable-systemd # we have a service of our own
 
-		$(use_enable dbus qt-dbus)
+		$(use_enable dbus qt-dbus) # introduced for macOS
 		$(use_enable debug)
 		$(use_with !qt5 qt4)
 	)
