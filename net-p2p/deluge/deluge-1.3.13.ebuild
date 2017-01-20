@@ -1,4 +1,4 @@
-# Copyright 2016 Jan Chren (rindeal)
+# Copyright 2016-2017 Jan Chren (rindeal)
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI='6'
@@ -6,7 +6,9 @@ EAPI='6'
 PYTHON_COMPAT=( python2_7 )
 DISTUTILS_SINGLE_IMPL=true
 
-inherit distutils-r1 eutils systemd
+inherit distutils-r1
+inherit eutils
+inherit systemd
 
 DESCRIPTION='BitTorrent client with a client/server model'
 HOMEPAGE='http://deluge-torrent.org/'
@@ -15,7 +17,7 @@ LICENSE='GPL-2'
 SLOT='0'
 SRC_URI="http://git.deluge-torrent.org/deluge/snapshot/${P}.tar.bz2"
 
-KEYWORDS='~amd64 ~arm'
+KEYWORDS='~amd64 ~arm ~arm64'
 IUSE='console +daemon geoip +gtk +libnotify +setproctitle +sound webui'
 
 CDEPEND_A=(
