@@ -17,8 +17,7 @@ file ownership, access right.
         Use <pkg>sys-fs/fuse</pkg> library instead of internal one. Must be disabled
 		for unprivileged mounting to work.
 	</flag>
-    <flag name="ntfsdecrypt">Build and install the ntfsdecrypt application.</flag>
-    <flag name="ntfsprogs">Include internal version of ntfsprogs.</flag>
+    <flag name="ntfsprogs">Include internal version of ntfsprogs utilities</flag>
 
     <flag name="ldscript">Use ldscript instead of .so symlink</flag>
     <flag name="pedantic">Enable compiler's pedantic mode</flag>
@@ -28,11 +27,10 @@ file ownership, access right.
     <flag name="mount-helper">Install mount helper</flag>
     <flag name="library">Install libntfs-3g</flag>
     <flag name="mtab">Use /etc/mtab</flag>
-    <flag name="posix-acls">POSIX ACL support</flag>
+    <flag name="acl">POSIX ACL support</flag>
     <flag name="xattr">Enable system extended attributes mappings</flag>
     <flag name="device-default-io-ops">Install default IO ops</flag>
     <flag name="ntfs-3g">Enable the ntfs-3g FUSE driver</flag>
-    <flag name="ntfsprogs">ntfsprogs utilities</flag>
     <flag name="quarantined">Install quarantined (non functional) ntfsprogs utilities</flag>
     <flag name="crypto">Enable crypto related code and utilities (ntfsdecrypt)</flag>
     <flag name="extras">Enable extra ntfsprogs utilities</flag>
