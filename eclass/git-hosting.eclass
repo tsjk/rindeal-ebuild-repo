@@ -311,7 +311,7 @@ declare -g -r -- GH_HOMEPAGE="${GH_BASE_URI}"
 # @DESCRIPTION:
 # Name of the distfile (without any extensions).
 ##
-: "${GH_DISTFILE:="${P}-${GH_PROVIDER}"}"
+: "${GH_DISTFILE:="${GH_USER}--${GH_REPO}--${GH_REF}--${GH_PROVIDER}"}"
 declare -g -r -- GH_DISTFILE
 
 case "${GH_FETCH_TYPE}" in
