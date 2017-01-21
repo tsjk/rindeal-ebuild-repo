@@ -19,7 +19,7 @@ SLOT="0/5"
 MY_PV="v$(get_version_component_range 1-2)"
 SRC_URI="https://www.open-mpi.org/software/${PN}/${MY_PV}/downloads/${P}.tar.bz2"
 
-KEYWORDS="amd64 ~arm ~arm64"
+KEYWORDS="amd64 arm arm64"
 IUSE="cairo debug gl +numa opencl +pci plugins svg static-libs xml X"
 
 # TODO opencl only works with AMD so no virtual
