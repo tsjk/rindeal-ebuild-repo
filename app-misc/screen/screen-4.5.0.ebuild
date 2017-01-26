@@ -2,6 +2,14 @@
 # Copyright 2017 Jan Chren (rindeal)
 # Distributed under the terms of the GNU General Public License v2
 
+
+
+##
+## TODO: ~copy http://pkgs.fedoraproject.org/cgit/rpms/screen.git/tree/screen.spec
+##
+
+
+
 EAPI=6
 inherit rindeal
 
@@ -46,7 +54,7 @@ src_prepare() {
 
 	# sched.h is a system header and causes problems with some C libraries
 	mv sched.h _sched.h || die
-	sed -i '/include/ s:sched.h:_sched.h:' screen.h || die
+	sed -e '/include/ s:sched.h:_sched.h:' -i -- screen.h || die
 
 	# Fix manpage.
 	sed -i \
@@ -90,63 +98,58 @@ src_compile() {
 }
 
 src_install() {
-	local tmpfiles_perms tmpfiles_group
-
-	dobin screen
-
-	if use multiuser || use prefix
-	then
-		fperms 4755 /usr/bin/screen
-		tmpfiles_perms="0755"
-		tmpfiles_group="root"
-	else
-		fowners root:utmp /usr/bin/screen
-		fperms 2755 /usr/bin/screen
-		tmpfiles_perms="0775"
-		tmpfiles_group="utmp"
-	fi
-
-	dodir /etc/tmpfiles.d
-	echo "d /tmp/screen ${tmpfiles_perms} root ${tmpfiles_group}" \
-		> "${ED}"/etc/tmpfiles.d/screen.conf
-
-	insinto /usr/share/screen
-	doins terminfo/{screencap,screeninfo.src}
-	insinto /usr/share/screen/utf8encodings
-	doins utf8encodings/??
-	insinto /etc
-	doins "${FILESDIR}"/screenrc
-
-	pamd_mimic_system screen auth
+	dobin "${PN}"
 
 	dodoc \
 		README ChangeLog INSTALL TODO NEWS* patchlevel.h \
 		doc/{FAQ,README.DOTSCREEN,fdpat.ps,window_to_display.ps}
 
-	doman doc/screen.1
-	doinfo doc/screen.info
+	doman	"doc/${PN}.1"
+	doinfo	"doc/${PN}.info"
+
+	insinto /usr/share/screen
+	doins terminfo/{screencap,screeninfo.src}
+	insinto /usr/share/screen/utf8encodings
+	doins utf8encodings/??
+
+	# default settings
+	insinto /etc
+	doins "${FILESDIR}"/screenrc
+
+	# FIXME: ??
+	pamd_mimic_system screen auth
+
+	src_install_tmpfiles
+}
+
+src_install_tmpfiles() {
+	declare -gr -- SCREEN_RUNDIR="${EROOT%/}/tmp/screen"
+	screen_rundir_perms= screen_rundir_group=
+
+	if use multiuser || use prefix
+	then
+		fperms 4755 "/usr/bin/${PN}"
+		screen_rundir_perms="0755"
+		screen_rundir_group="root"
+	else
+		fowners root:utmp "/usr/bin/${PN}"
+		fperms 2755 "/usr/bin/${PN}"
+		screen_rundir_perms="0775"
+		screen_rundir_group="utmp"
+	fi
+
+	readonly screen_rundir_perms screen_rundir_group
+
+	dodir /etc/tmpfiles.d
+	echo "d ${SCREEN_RUNDIR} ${screen_rundir_perms} root ${screen_rundir_group}" \
+		> "${ED}"/etc/tmpfiles.d/screen.conf
 }
 
 pkg_postinst() {
-	if [[ -z ${REPLACING_VERSIONS} ]]
-	then
-		elog "Some dangerous key bindings have been removed or changed to more safe values."
-		elog "We enable some xterm hacks in our default screenrc, which might break some"
-		elog "applications. Please check /etc/screenrc for information on these changes."
-	fi
-
-	# Add /tmp/screen in case it doesn't exist yet. This should solve
+	# Add ${SCREEN_RUNDIR} in case it doesn't exist yet. This should solve
 	# problems like bug #508634 where tmpfiles.d isn't in effect.
-	local rundir="${EROOT%/}/tmp/screen"
-	if [[ ! -d ${rundir} ]] ; then
-		if use multiuser || use prefix ; then
-			tmpfiles_group="root"
-		else
-			tmpfiles_group="utmp"
-		fi
-		mkdir -m 0775 "${rundir}"
-		chgrp ${tmpfiles_group} "${rundir}"
+	if [[ ! -d "${rundir}" ]] ; then
+		mkdir -m ${screen_rundir_perms} "${SCREEN_RUNDIR}" || die
+		chgrp ${screen_rundir_group} "${SCREEN_RUNDIR}" || die
 	fi
-
-	ewarn "This revision changes the screen socket location to ${rundir}"
 }
