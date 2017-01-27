@@ -1,5 +1,5 @@
 # Copyright 1999-2016 Gentoo Foundation
-# Copyright 2016 Jan Chren (rindeal)
+# Copyright 2016-2017 Jan Chren (rindeal)
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
@@ -11,19 +11,19 @@ GH_REF="v${PV}"
 # python-.eclass
 PYTHON_COMPAT=( python2_7 python3_{3,4,5} )
 
-# functions: eautoreconf()
+# functions: eautoreconf
 inherit autotools
-# functions: getpam_mod_dir()
+# functions: getpam_mod_dir
 inherit pam
 # functions: tc-*()
 inherit toolchain-funcs
-# functions: enewuser()/enewgroup()
+# functions: enewuser,/enewgroup
 inherit user
 # functions: get_bashcompdir()
 inherit bash-completion-r1
-# functions: systemd_update_catalog()
+# functions: systemd_update_catalog
 inherit systemd
-# functions: udev_reload()
+# functions: udev_reload
 inherit udev
 # EXPORT_FUNCTIONS: pkg_setup
 inherit linux-info
@@ -51,28 +51,28 @@ IUSE_A=(
 	+man nls python sysv-utils test vanilla
 
 	## daemons
-	+hostnamed importd +localed +logind machined networkd +resolved +timedated +timesyncd
+	+d_hostnamed d_importd +d_localed +d_logind d_machined d_networkd d_resolved +d_timedated d_timesyncd
 
 	## utils
-	backlight +coredump +firstboot quotacheck randomseed rfkill +sysusers +tmpfiles
+	u_backlight +u_coredump +u_firstboot u_quotacheck +u_randomseed u_rfkill +u_sysusers +u_tmpfiles
 
-	## security modules
-	apparmor audit ima seccomp selinux smack
-	## security modules2
-	acl +pam policykit tpm
+	## security modules (kernel)
+	s1_apparmor s1_audit s1_ima s1_seccomp s1_selinux s1_smack
+	## security modules2 (userspace)
+	s2_acl +s2_pam s2_polkit s2_tpm
 
 	## compression
-	bzip2 +lz4 +lzma +zlib
+	c_bzip2 +c_lz4 +c_lzma +c_zlib
 
 	## EFI
-	efi gnuefi
+	e_efi e_gnuefi
 
 	## gimmick
-	-qrcode -http -ssl
+	-g_qrcode -g_microhttpd -g_gnutls
 
 	## misc
-	binfmt +blkid cryptsetup curl +elfutils gcrypt hibernate +hwdb idn +kmod libiptc myhostname
-	nat +utmp +vconsole xkb
+	u_binfmt +m_blkid u_cryptsetup m_curl +m_elfutils m_gcrypt m_hibernate +u_hwdb m_idn +m_kmod m_libiptc m_myhostname
+	+m_utmp +m_vconsole m_xkb
 )
 
 # deps are specified in 'README' file
@@ -84,37 +84,37 @@ CDEPEND_A=(
 	# TODO: how to enforce the above condition?
 	">=sys-apps/util-linux-2.27.1:0="
 
-	"acl? ( sys-apps/acl:0= )"
-	"apparmor? ( sys-libs/libapparmor:0= )"
-	"audit? ( >=sys-process/audit-2:0= )"
-	"cryptsetup? ( sys-fs/cryptsetup:0= )"
-	"curl? ( net-misc/curl:0= )"
-	"elfutils? ( >=dev-libs/elfutils-158:0= )"
-	"gcrypt? ("
+	"s2_acl?	( sys-apps/acl:0= )"
+	"s1_apparmor?	( sys-libs/libapparmor:0= )"
+	"s1_audit?	( >=sys-process/audit-2:0= )"
+	"u_cryptsetup?	( sys-fs/cryptsetup:0= )"
+	"m_curl?	( net-misc/curl:0= )"
+	"m_elfutils?	( >=dev-libs/elfutils-158:0= )"
+	"m_gcrypt?	("
 		"dev-libs/libgcrypt:0="
 		"dev-libs/libgpg-error"
 	")"
-	"http? ("
+	"g_microhttpd?	("
 		"net-libs/libmicrohttpd:0="
-		"ssl? ( net-libs/gnutls:0= ) )"
-	"idn? ( net-dns/libidn:0= )"
-	"kmod? ( >=sys-apps/kmod-15:0= )"
+		"g_gnutls?	( net-libs/gnutls:0= ) )"
+	"m_idn?		( net-dns/libidn:0= )"
+	"m_kmod?	( >=sys-apps/kmod-15:0= )"
 
 	## compression
-	"bzip2?	( app-arch/bzip2:0= )"
-	"lz4?	( >=app-arch/lz4-0_p131:0= )"
-	"lzma?	( app-arch/xz-utils:0= )"
-	"zlib?	( sys-libs/zlib:0= )"
+	"c_bzip2?	( app-arch/bzip2:0= )"
+	"c_lz4?		( >=app-arch/lz4-0_p131:0= )"
+	"c_lzma?	( app-arch/xz-utils:0= )"
+	"c_zlib?	( sys-libs/zlib:0= )"
 
-	"nat? ( net-firewall/iptables:0= )"
-	"pam? ( virtual/pam:= )"
-	"qrcode? ( media-gfx/qrencode:0= )"
-	"seccomp? ( >=sys-libs/libseccomp-2.3.1:0= )"
-	"selinux? ( sys-libs/libselinux:0= )"
-	"sysv-utils? ("
+	"m_libiptc?		( net-firewall/iptables:0= )"
+	"s2_pam?	( virtual/pam:= )"
+	"g_qrcode?	( media-gfx/qrencode:0= )"
+	"s1_seccomp?	( >=sys-libs/libseccomp-2.3.1:0= )"
+	"s1_selinux?	( sys-libs/libselinux:0= )"
+	"sysv-utils?	("
 		"!sys-apps/systemd-sysv-utils"
 		"!sys-apps/sysvinit )"
-	"xkb? ( x11-libs/libxkbcommon:0= )"
+	"m_xkb?		( x11-libs/libxkbcommon:0= )"
 )
 DEPEND_A=( "${CDEPEND_A[@]}"
 	# for keymap; TODO: find out more
@@ -125,7 +125,7 @@ DEPEND_A=( "${CDEPEND_A[@]}"
 	"sys-devel/gettext" # localed, core-dbus
 	"virtual/pkgconfig"
 
-	"gnuefi? ( >=sys-boot/gnu-efi-3.0.2 )"
+	"e_gnuefi? ( >=sys-boot/gnu-efi-3.0.2 )"
 	"man? ("
 		# for creating the man pages (used in {less-variables,standard-options}.xml)
 		"app-text/docbook-xml-dtd:4.5"
@@ -144,8 +144,8 @@ DEPEND_A=( "${CDEPEND_A[@]}"
 	"test? ( sys-apps/dbus:0 )"
 )
 RDEPEND_A=( "${CDEPEND_A[@]}"
-	"selinux? ( sec-policy/selinux-base-policy[systemd] )"
-	"myhostname? ( !sys-auth/nss-myhostname )" # bundled since 197
+	"s1_selinux? ( sec-policy/selinux-base-policy[systemd] )"
+	"m_myhostname? ( !sys-auth/nss-myhostname )" # bundled since 197
 	"!<sys-kernel/dracut-044"
 	## udev is now part of systemd
 	"!sys-fs/eudev"
@@ -155,19 +155,19 @@ PDEPEND_A=(
 	# the daemon only (+ build-time lib dep for tests)
 	">=sys-apps/dbus-1.4.0:0[systemd]"
 	# Gentoo specific suplement of bundled hwdb.d rules + some more
-	"hwdb? ( sys-apps/hwids[udev] )"
+	"u_hwdb?	( sys-apps/hwids[udev] )"
 	# ">=sys-fs/udev-init-scripts-25" # required for systemd+OpenRC support only
-	"policykit? ( sys-auth/polkit[systemd] )"
-	"!vanilla? ( sys-apps/gentoo-systemd-integration )"
+	"s2_polkit? ( sys-auth/polkit[systemd] )"
+	"!vanilla?	( sys-apps/gentoo-systemd-integration )"
 )
 
 REQUIRED_USE_A=(
 	# specified in Makefile.am
-	"efi? ( blkid )"
-	"gnuefi? ( efi )"
-	"importd? ( curl lzma zlib bzip2 gcrypt )"
+	"e_efi?		( m_blkid )"
+	"e_gnuefi?	( e_efi )"
+	"d_importd?	( m_curl c_lzma c_zlib c_bzip2 m_gcrypt )"
 	# systemd-journal-remote requires systemd-sysusers
-	"http? ( sysusers )"
+	"g_microhttpd?	( u_sysusers )"
 )
 
 inherit arrays
@@ -224,15 +224,15 @@ pkg_pretend() {
 		'~AUTOFS4_FS'
 		# acl
 		'~TMPFS_XATTR'
-		"$(use acl && echo '~TMPFS_POSIX_ACL')"
+		"$(use s2_acl && echo '~TMPFS_POSIX_ACL')"
 		# seccomp
-		"$(use seccomp && echo '~SECCOMP')"
+		"$(use s1_seccomp && echo '~SECCOMP')"
 		# for the kcmp() syscall
 		'~CHECKPOINT_RESTORE'
 		# Required for CPUQuota= in resource control unit settings
 		'~CFS_BANDWIDTH'
 		# efi
-		"$(use efi && echo '~EFIVAR_FS ~EFI_PARTITION')"
+		"$(use e_efi && echo '~EFIVAR_FS ~EFI_PARTITION')"
 		# real-time group scheduling - see 'README'
 		'~!RT_GROUP_SCHED'
 		# systemd doesn't like it - see 'README'
@@ -301,7 +301,17 @@ src_configure() {
 	tc-export CC
 
 	# safe defaults
-	export EFI_CFLAGS="${EFI_CFLAGS-"-O1 -g"}"
+	export EFI_CFLAGS="${EFI_CFLAGS-"-O2"}"
+	export CTARGET="${CTARGET:-"${CHOST}"}" # `configure: WARNING: you should use --build, --host, --target`
+
+	my_use() {
+		local -r mode="${1}" prefix="${2}" flag="${3}" option="${4}" value="${5}"
+		if [[ -n "${value}" ]] ; then
+			use_${mode} ${prefix}_${flag} ${option:-${flag}} "${value}"
+		else
+			use_${mode} ${prefix}_${flag} ${option:-${flag}}
+		fi
+	}
 
 	local econf_args=(
 		# Disable -fuse-ld=gold since Gentoo supports explicit linker
@@ -368,95 +378,102 @@ src_configure() {
 		"$(use_with python)"
 
 		## systemd daemons
-		"$(use_enable hostnamed)"	# systemd-hostnamed(8)
-		"$(use_enable importd)"		# systemd-importd(8)
-		"$(use_enable localed)"		# systemd-localed(8)
-		"$(use_enable logind)"		# systemd-logind(8)
-		"$(use_enable machined)"	# systemd-machined(8)
-		"$(use_enable networkd)"	# systemd-networkd(8)
-		"$(use_enable resolved)"	# systemd-resolved(8)
-		"$(use_enable timedated)"	# systemd-timedated(8)
-		"$(use_enable timesyncd)"	# systemd-timesyncd(8)
+		"$(my_use enable d hostnamed)"	# systemd-hostnamed(8)
+		"$(my_use enable d importd)"	# systemd-importd(8)
+		"$(my_use enable d localed)"	# systemd-localed(8)
+		"$(my_use enable d logind)"		# systemd-logind(8)
+		"$(my_use enable d machined)"	# systemd-machined(8)
+		"$(my_use enable d networkd)"	# systemd-networkd(8)
+		"$(my_use enable d resolved)"	# systemd-resolved(8)
+		"$(my_use enable d timedated)"	# systemd-timedated(8)
+		"$(my_use enable d timesyncd)"	# systemd-timesyncd(8)
 
 		## systemd utils
-		"$(use_enable backlight)"	# systemd-backlight(8)
-		"$(use_enable coredump)"	# systemd-coredump(8)
-		"$(use_enable firstboot)"	# systemd-firstboot(1)
-		"$(use_enable quotacheck)"	# systemd-quotacheck(8)
-		"$(use_enable randomseed)"	# systemd-randomseed(8)
-		"$(use_enable rfkill)"		# systemd-rfkill(8)
-		"$(use_enable sysusers)"	# sysusers.d(5)
-		"$(use_enable tmpfiles)"	# tmpfiles.d(5)
+		"$(my_use enable u backlight)"	# systemd-backlight(8)
+		"$(my_use enable u binfmt)"		# systemd-binfmt (8) - emulators (Wine, qemu, ...)
+		"$(my_use enable u coredump)"	# systemd-coredump(8)
+		"$(my_use enable u cryptsetup libcryptsetup)"
+		"$(my_use enable u firstboot)"	# systemd-firstboot(1)
+		"$(my_use enable u hwdb)"
+		"$(my_use enable u quotacheck)"	# systemd-quotacheck(8)
+		"$(my_use enable u randomseed)"	# systemd-randomseed(8)
+		"$(my_use enable u rfkill)"		# systemd-rfkill(8)
+		"$(my_use enable u sysusers)"	# sysusers.d(5)
+		"$(my_use enable u tmpfiles)"	# tmpfiles.d(5)
 
 		## kernel-space security modules
-		"$(use_enable apparmor)"
-		"$(use_enable audit)"
-		"$(use_enable ima)"
-		"$(use_enable seccomp)"
-		"$(use_enable selinux)"
-		"$(use_enable smack)"
+		"$(my_use enable s1 apparmor)"
+		"$(my_use enable s1 audit)"
+		"$(my_use enable s1 ima)"
+		"$(my_use enable s1 seccomp)"
+		"$(my_use enable s1 selinux)"
+		"$(my_use enable s1 smack)"
 
 		## user-space security modules
-		"$(use_enable acl)"
-		"$(use_enable pam)"
-		"$(use_enable policykit polkit)"
-		"$(use_enable tpm)"
+		"$(my_use enable s2 acl)"
+		"$(my_use enable s2 pam)"
+		"$(my_use enable s2 polkit)"
+		"$(my_use enable s2 tpm)"
 
 		## compression algorithms
-		"$(use_enable bzip2)"
-		"$(use_enable lz4)"
-		"$(use_enable lzma xz)"
-		"$(use_enable zlib)"
+		"$(my_use enable c bzip2)"
+		"$(my_use enable c lz4)"
+		"$(my_use enable c lzma xz)"
+		"$(my_use enable c zlib)"
 
 		## EFI
-		"$(use_enable efi)"
-		"$(use_enable gnuefi)"
+		"$(my_use enable e efi)"
+		"$(my_use enable e gnuefi)"
 
 		## gimmick
-		"$(use_enable http microhttpd)"
+		"$(my_use enable g microhttpd)"
 		# if use_http && use_ssl then --enable-gnutls else --disable-gnutls
-		"$(use_enable "$(usex http ssl http)" gnutls)"
-		"$(use_enable qrcode qrencode)"
+		"$(my_use enable g "$(usex g_microhttpd gnutls microhttpd)" gnutls)"
+		"$(my_use enable g qrcode qrencode)"
 
 		## misc
-		"$(use_enable binfmt)"	# emulators (Wine, qemu, ...)
-		"$(use_enable blkid)"
-		"$(use_enable cryptsetup libcryptsetup)"
-		"$(use_enable curl libcurl)"
-		"$(use_enable elfutils)"
-		"$(use_enable gcrypt)"
-		"$(use_enable hibernate)"
-		"$(use_enable hwdb)"
-		"$(use_enable idn libidn)"
-		"$(use_enable kmod)"
-		"$(use_enable libiptc)"
-		"$(use_enable myhostname)"
-		"$(use_enable utmp)"
-		"$(use_enable vconsole)"
+		"$(my_use enable m blkid)"
+		"$(my_use enable m curl libcurl)"
+		"$(my_use enable m elfutils)"
+		"$(my_use enable m gcrypt)"
+		"$(my_use enable m hibernate)"
+		"$(my_use enable m idn libidn)"
+		"$(my_use enable m kmod)"
+		"$(my_use enable m libiptc)"
+		"$(my_use enable m myhostname)"
+		"$(my_use enable m utmp)"
+		"$(my_use enable m vconsole)"
 		# - NEWS: "systemd-localed will verify x11 keymap settings by compiling the given keymap"
 		# - enable for desktops
-		"$(use_enable xkb xkbcommon)"
+		"$(my_use enable m xkb xkbcommon)"
 	)
 
 	: "${SYSTEMD_WITH_NTP_SERVERS:="$( echo {0..3}'.gentoo.pool.ntp.org' )"}"
 	# Google DNS servers by default, alternatives: https://www.opennicproject.org/ or leave empty
 	: "${SYSTEMD_WITH_DNS_SERVERS:="$( echo 8.8.{8.8,4.4} 2001:4860:4860::88{88,44} )"}"
 
-	# used for options which can be modified based on env vars
+	# used for options which can be modified with env vars
+	# Example:
+	#     my_with debug-shell
+	# Prints:
+	#     --with-debug-shell="${SYSTEMD_WITH_DEBUG_SHELL}"
 	my_with() {
-		local use_flag="${1}" option_name="${2}"
-		local var="SYSTEMD_WITH_${use_flag^^}"
-		local with="${option_name:-"${use_flag,,}"}"
-		var="${var//-/_}" ; with="${with//_/-}"
+		local -r -- use_flag="${1}" option_name="${2}"
 
-		[[ -v "${var}" ]] && \
-			printf "%s-%s=%s\n" "--with" "${with}" "${!var}"
+		local var="${use_flag^^}" ;						var="${var//-/_}"
+		local with="${option_name:-"${use_flag,,}"}" ;	with="${with//_/-}"
+		readonly var with
+
+		local -r full_var_name="SYSTEMD_WITH_${var}"
+
+		[[ -v "${full_var_name}" ]] && \
+			printf "%s-%s=%s\n" "--with" "${with}" "${!full_var_name}"
 
 		return 0
 	}
 
 	econf_args+=(
-		"$(my_with debug-shell)"	# Path to debug shell binary
+		"$(my_with debug-shell)"	# Path to debug shell binary, defaults to `/bin/sh`
 		"$(my_with debug-tty)"		# Specify the tty device for debug shell
 		"$(my_with certificate-root)"	# Specify the prefix for TLS certificates [/etc/ssl]
 
@@ -466,7 +483,7 @@ src_configure() {
 		"$(my_with smack-default-process-label)"	# default SMACK label for executed processes
 
 		"$(my_with ntp-servers)"	# systemd-timesyncd default servers
-		"$(my_with time-epoch)"	# minimal clock value specified as UNIX timestamp
+		"$(my_with time-epoch)"		# minimal clock value specified as UNIX timestamp
 
 		"$(my_with tpm-pcrindex)"	# TPM PCR register number to use
 
@@ -478,8 +495,8 @@ src_configure() {
 
 		"$(my_with tty-gid)"
 
-#  		"$(my_with nobody-user)"	# Specify the name of the nobody user (the one with UID 65534)
-#  		"$(my_with nobody-group)"	# Specify the name of the nobody group (the one with GID 65534)
+ 		"$(my_with nobody-user)"	# Specify the name of the nobody user (the one with UID 65534)
+ 		"$(my_with nobody-group)"	# Specify the name of the nobody group (the one with GID 65534)
 	)
 
 	econf "${econf_args[@]}"
@@ -514,12 +531,13 @@ src_install() {
 		dosym ".."$(my_get_rootprefix)"/lib/systemd/systemd" '/sbin/init'
 	elif use man ; then
 		## we just keep sysvinit tools, so no need for the mans
-		erm "${ED}"/usr/share/man/man8/{halt,poweroff,reboot,runlevel,shutdown,telinit}.8
-		erm "${ED}"/usr/share/man/man1/init.1
+		erm "${D}"/usr/share/man/man8/{halt,poweroff,reboot,runlevel,shutdown,telinit}.8
+		erm "${D}"/usr/share/man/man1/init.1
 	fi
 
 	# Preserve empty dirs in /etc & /var, (gentoo#437008)
-	keepdir /etc/binfmt.d \
+	keepdir \
+		/etc/binfmt.d \
 		/etc/kernel/install.d \
 		/etc/modules-load.d \
 		/etc/systemd/network \
@@ -538,12 +556,14 @@ src_install() {
 
 	## If we install these symlinks, there is no way for the sysadmin to remove
 	## them permanently.
-	epushd "${ED}"/etc/systemd/system # {
-	use sysv-utils && erm -r sysinit.target.wants
-	use networkd && erm -r \
+	epushd "${D}"/etc/systemd/system # {
+	use sysv-utils && erm -r \
+		sysinit.target.wants
+	use d_networkd && erm -r \
 		multi-user.target.wants/systemd-networkd.service \
 		{network-online,sockets}.target.wants
-	use resolved && erm -r multi-user.target.wants/systemd-resolved.service
+	use d_resolved && erm -r \
+		multi-user.target.wants/systemd-resolved.service
 	epopd # }
 }
 
@@ -636,19 +656,24 @@ pkg_postinst() {
 		eerror
 	fi
 
-	#if use resolved && [[ "$(readlink "${ROOT}"etc/resolv.conf)" == */run/systemd/* ]]; then
-	#	ewarn "You should replace the resolv.conf symlink:"
-	#	ewarn "ln -snf "$(my_get_rootprefix)"/lib/systemd/resolv.conf ${ROOT}etc/resolv.conf"
-	#fi
+	if use d_resolved ; then
+		local resolv_conf_path="$(my_get_rootprefix)/lib/systemd/resolv.conf"
+		if [[ "$(readlink "${ROOT}etc/resolv.conf")" != "${resolv_conf_path}" ]] ; then
+			ewarn "To allow apps that use '${ROOT}etc/resolv.conf' to conenct to resolved,"
+			ewarn "you should replace the resolv.conf symlink:"
+			ewarn "    ln -snf '${resolv_conf_path}' '${ROOT}etc/resolv.conf'"
+			echo
+		fi
+	fi
 
-	if ! [[ "$(readlink "${ROOT}/etc/mtab")" == *"/proc/self/mounts" ]] ; then
-		ewarn "'${ROOT}/etc/mtab' is not a symlink to '/proc/self/mounts'!"
+	if ! [[ "$(readlink "${ROOT}etc/mtab")" == */proc/self/mounts ]] ; then
+		ewarn "'${ROOT}etc/mtab' is not a symlink to '/proc/self/mounts'! ${PN} may fail to work."
 	fi
 }
 
 pkg_prerm() {
 	# If removing systemd completely, remove the catalog database.
 	if [[ -z "${REPLACED_BY_VERSION}" ]] ; then
-		nonfatal erm "${ROOT}/var/lib/systemd/catalog/database"
+		nonfatal erm -f "${ROOT}var/lib/systemd/catalog/database"
 	fi
 }
