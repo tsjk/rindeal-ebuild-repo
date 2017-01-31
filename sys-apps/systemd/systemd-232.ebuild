@@ -263,6 +263,12 @@ pkg_pretend() {
 pkg_setup() {
 	linux-info_pkg_setup
 	python-any-r1_pkg_setup
+
+	# check if get_udevdir() returns sane value
+	local udevdir="$(get_udevdir)"
+	if [[ "${udevdir}" == *"/lib/udev"*"/lib/udev"* ]] ; then
+		die
+	fi
 }
 
 src_prepare() {
@@ -277,8 +283,7 @@ src_prepare() {
 	# default to https (support/bug report/etc. urls)
 	sed -e 's,http://,https://,g' \
 		-i -- configure.ac || die
-	# use an eclass when we have it, the result is the same, but hey, it's an eclass
-	sed -e "s,\(udevlibexecdir=\),\1"$(get_udevdir)"," \
+	sed -e "s,^\(udevlibexecdir=\).*,\1"$(get_udevdir)"," \
 		-i -- Makefile.am || die
 	# Avoid the log bloat to the user
 	sed -e 's,#SystemMaxUse=,SystemMaxUse=500M,' \
