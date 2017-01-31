@@ -10,7 +10,7 @@ ExecStartPre=/bin/sh -c '/usr/bin/fusermount -z -u "${MNT_POINT}" ; true'
 
 ExecStart=/usr/bin/rclone --checkers 8 --contimeout 5m --drive-use-trash --drive-upload-cutoff 20M --retries 10 --timeout 10m --transfers 8 $ARGS mount ${REMOTE_NAME}: ${MNT_POINT}
 
-ExecStopPost=/usr/bin/fusermount -z -u ${MNT_POINT}
+ExecStopPost=/bin/sh -c '/usr/bin/fusermount -z -u "${MNT_POINT}" ; true'
 
 
 [Install]
