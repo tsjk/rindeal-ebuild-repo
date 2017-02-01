@@ -17,7 +17,7 @@ Features that the vast majority of my ebuilds has in common:
  - sane **default configurations** (default USE-flags, config files, ...)
  - **locales** support (`nls`/`l10n_*` USE-flags)
      - _Gentoo™_ packages mostly install all locales unconditionally
- - **amd64**/**arm** architectures only
+ - **x86_64**/**armv6**/**armv7**/**armv8** architectures only
      - this allows me to remove clutter introduced by Gentoo devs for exotic arches
  - only the **native ABI** is supported, again to reduce the clutter
  - no _libav_, _libressl_, ... support
@@ -33,7 +33,7 @@ I highly encourage you to browse through the list as the chances are high for yo
 Quality Assurance
 ------------------
 
-You should be able to use any package from my overlay without regrets.
+You should be able to use any package from my overlay without regrets, because I do and I have quite high standards.
 To achieve this goal I'm using several safety guards:
 
 - my brain of course
@@ -41,7 +41,7 @@ To achieve this goal I'm using several safety guards:
     - _[repoman](https://wiki.gentoo.org/wiki/Repoman)_ checks
     - _[shellcheck](https://www.shellcheck.net/)_ checks
     - custom checks
-- all points of _GitHub_'s feature called [protected branches], which means that all merges to _master_ must pass CI tests
+- all points of _GitHub_'s feature called _[protected branches]_, which means that all merges to _master_ must pass CI tests
 
 This all, of course, doesn't prevent build failures, missing dependencies, etc. So, should you find
 some issues, please send me a PR (if you know how to fix it), or at least [file an issue][New issue].
@@ -50,7 +50,7 @@ some issues, please send me a PR (if you know how to fix it), or at least [file 
 How to install this overlay
 ----------------------------
 
-### Manually (preferred)
+### Manually (recommended)
 
 #### 1. Add an entry to [`/etc/portage/repos.conf`](https://wiki.gentoo.org/wiki//etc/portage/repos.conf):
 
@@ -58,12 +58,13 @@ How to install this overlay
 [rindeal]
 ## set this to any location you want
 location = /var/cache/portage/repos/rindeal
-## prefer gentoo-mirror which includes metadata cache, but introduces a delay for hotfixes (<1hour)
+## prefer gentoo-mirror which includes metadata cache, but introduces a delay (<6hours) for hotfixes
 sync-uri =  https://github.com/gentoo-mirror/rindeal.git
+## otherwise use the one and only original source
 #sync-uri = https://github.com/rindeal/gentoo-overlay.git
 sync-type = git
 auto-sync = yes
-## prefer my packages over the official ones to improve UX and stability
+## prefer my packages over the Gentoo™ ones to improve UX and stability (recommended by 9/10 IT experts)
 #priority = 9999
 ```
 
