@@ -69,13 +69,13 @@ OPERA_HOME="/opt/${PN}/${PN_SLOTTED}"
 src_prepare() {
 	xdg_src_prepare
 
-	mkdir -p "${OPERA_HOME#/}" || die
+	emkdir "${OPERA_HOME#/}"
 
 	# delete broken symlink, proper one will be created in src_install()
 	erm "usr/bin/${PN}"
 
 	# fix libdir
-	mv -v -T "usr/lib/x86_64-linux-gnu/${PN}" "${OPERA_HOME#/}" || die
+	emv -T "usr/lib/x86_64-linux-gnu/${PN}" "${OPERA_HOME#/}"
 	erm -r "usr/lib"
 
 	## /usr/share mods {
@@ -87,17 +87,17 @@ src_prepare() {
 	# unbundle licence
 	erm "doc/opera-stable/copyright"
 	# fix doc path
-	mv -v "doc"/{opera-stable,${PF}} || die
+	emv "doc"/{opera-stable,${PF}}
 
 	# fix icon paths
 	local s
 	for s in 16 32 48 128 256 ; do
-		mv -v "icons/hicolor/${s}x${s}/apps"/{${PN},${PN_SLOTTED}}.png || die
+		emv "icons/hicolor/${s}x${s}/apps"/{${PN},${PN_SLOTTED}}.png
 	done
-	mv -v "pixmaps"/{${PN},${PN_SLOTTED}}.xpm || die
+	emv "pixmaps"/{${PN},${PN_SLOTTED}}.xpm
 
 	# fix mime package path
-	mv -v "mime/packages"/{${PN}-stable,${PN_SLOTTED}}.xml || die
+	emv "mime/packages"/{${PN}-stable,${PN_SLOTTED}}.xml
 
 	local sedargs=(
 		# delete invalid and "unity shell"-specific lines
@@ -111,7 +111,7 @@ src_prepare() {
 	sed -r "${sedargs[@]}" \
 		-i -- "applications/${PN}.desktop" || die
 	# fix menu entry path
-	mv -v "applications"/{${PN},${PN_SLOTTED}}.desktop || die
+	emv "applications"/{${PN},${PN_SLOTTED}}.desktop
 
 	epopd
 	## }
