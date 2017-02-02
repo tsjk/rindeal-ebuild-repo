@@ -87,5 +87,18 @@ erm() {
 }
 
 
+ecp() {
+	cp -v "${@}" || die
+}
+
+emv() {
+	mv -v "${@}" || die
+}
+
+emkdir() {
+	mkdir -p -v "${@}" || die
+}
+
+
 _RINDEAL_ECLASS=1
 fi
