@@ -1,16 +1,21 @@
-# Copyright 2016 Jan Chren (rindeal)
+# Copyright 2016-2017 Jan Chren (rindeal)
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
+inherit rindeal
 
 CHROMIUM_LANGS="
 	af az be bg bn ca cs da de el en-GB en-US es-419 es fil fi fr-CA fr fy gd
 	he hi hr hu id it ja kk ko lt lv me mk ms nb nl nn pa pl pt-BR pt-PT ro ru
 	sk sr sr-ME sv sw ta te th tr uk uz vi zh-CN zh-TW zu
 "
-inherit rindeal chromium-2 unpacker pax-utils versionator xdg
+inherit chromium-2
+inherit unpacker
+inherit pax-utils
+inherit versionator
+inherit xdg
 
-DESCRIPTION="A fast and secure web browser"
+DESCRIPTION="A proprietary cross-platofmr web browser by Opera Software ASA"
 HOMEPAGE="https://www.opera.com/"
 LICENSE="OPERA-2014"
 
@@ -21,7 +26,7 @@ SRC_URI="
 	amd64? ( ${SRC_URI_BASE}_amd64.deb )
 "
 
-KEYWORDS="~amd64"
+KEYWORDS="-* ~amd64"
 IUSE="autoupdate"
 
 RDEPEND="
@@ -62,26 +67,25 @@ QA_PREBUILT="*"
 OPERA_HOME="/opt/${PN}/${PN_SLOTTED}"
 
 src_prepare() {
-	eapply_user
 	xdg_src_prepare
 
 	mkdir -p "${OPERA_HOME#/}" || die
 
 	# delete broken symlink, proper one will be created in src_install()
-	rm -v "usr/bin/${PN}" || die
+	erm "usr/bin/${PN}"
 
 	# fix libdir
 	mv -v -T "usr/lib/x86_64-linux-gnu/${PN}" "${OPERA_HOME#/}" || die
-	rm -r -v "usr/lib" || die
+	erm -r "usr/lib"
 
 	## /usr/share mods {
-	pushd "usr/share" >/dev/null || die
+	epushd "usr/share"
 
 	# delete debian-specific files
-	rm -r -v {lintian,menu} || die
+	erm -r {lintian,menu}
 
 	# unbundle licence
-	rm -v "doc/opera-stable/copyright" || die
+	erm "doc/opera-stable/copyright"
 	# fix doc path
 	mv -v "doc"/{opera-stable,${PF}} || die
 
@@ -109,16 +113,16 @@ src_prepare() {
 	# fix menu entry path
 	mv -v "applications"/{${PN},${PN_SLOTTED}}.desktop || die
 
-	popd >/dev/null || die
+	epopd
 	## }
 
 	# optionally delete autoupdater
-	use autoupdate || { rm -v "${OPERA_HOME#/}/opera_autoupdate" || die ; }
+	use autoupdate || erm "${OPERA_HOME#/}/opera_autoupdate"
 
 	## locales
-	pushd "${OPERA_HOME#/}/localization" >/dev/null || die
+	epushd "${OPERA_HOME#/}/localization"
 	chromium_remove_language_paks
-	popd >/dev/null || die
+	epopd
 }
 
 src_install() {
