@@ -89,7 +89,7 @@ CDEPEND_A=(
 	"s1_audit?	( >=sys-process/audit-2:0= )"
 	"u_cryptsetup?	( sys-fs/cryptsetup:0= )"
 	"m_curl?	( net-misc/curl:0= )"
-	"m_elfutils?	( >=dev-libs/elfutils-158:0= )"
+	"m_elfutils?	( >=dev-libs/elfutils-0.158:0= )"
 	"m_gcrypt?	("
 		"dev-libs/libgcrypt:0="
 		"dev-libs/libgpg-error"
