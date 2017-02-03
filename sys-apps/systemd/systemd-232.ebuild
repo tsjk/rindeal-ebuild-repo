@@ -73,6 +73,9 @@ IUSE_A=(
 	## misc
 	u_binfmt +m_blkid u_cryptsetup m_curl +m_elfutils m_gcrypt m_hibernate +u_hwdb m_idn +m_kmod m_libiptc m_myhostname
 	+m_utmp +m_vconsole m_xkb
+
+	## compatibility USE-flags with `gentoo` repo
+	acl audit pam policykit
 )
 
 # deps are specified in 'README' file
@@ -168,6 +171,12 @@ REQUIRED_USE_A=(
 	"d_importd?	( m_curl c_lzma c_zlib c_bzip2 m_gcrypt )"
 	# systemd-journal-remote requires systemd-sysusers
 	"g_microhttpd?	( u_sysusers )"
+
+	## compatibility USE-flags
+	"acl? ( s2_acl )"
+	"audit? ( s1_audit )"
+	"pam? ( s2_pam )"
+	"policykit? ( s2_polkit )"
 )
 
 inherit arrays
