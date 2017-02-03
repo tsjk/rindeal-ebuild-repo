@@ -20,17 +20,14 @@ LICENSE="BSD"
 SLOT="0"
 
 KEYWORDS="~amd64 ~arm ~arm64"
-IUSE="+drop-root libressl smi ssl samba suid test"
+IUSE="+drop-root smi ssl samba suid test"
 
 CDEPEND="
 	net-libs/libpcap
 
 	drop-root? ( sys-libs/libcap-ng )
 	smi? ( net-libs/libsmi )
-	ssl? (
-		dev-libs/openssl:0
-		dev-libs/libressl
-	)
+	ssl? ( dev-libs/openssl:0 )
 "
 DEPEND="${CDEPEND}
 	drop-root? ( virtual/pkgconfig )
