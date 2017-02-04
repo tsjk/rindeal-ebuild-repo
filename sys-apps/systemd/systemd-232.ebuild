@@ -289,6 +289,23 @@ src_prepare() {
 	eapply "${FILESDIR}/231-manager-ignore_0_length_notification_messages.patch"
 	eapply "${FILESDIR}/232-build_sys_check_for_lz4_in_the_old_and_new_numbering.patch"
 	eapply "${FILESDIR}/232-build_sys_add_check_for_gperf_lookup_function_signature.patch"
+	eapply "${FILESDIR}/232-journal_make_sure_to_initially_populate_the_space_info_cache_4807.patch"
+	eapply "${FILESDIR}/232-build_sys_define_arm_as_secondary_architecture_for_arm64.patch"
+	eapply "${FILESDIR}/232-core_downgrade_Time_has_been_changed_to_debug_4906.patch"
+	eapply "${FILESDIR}/232-units_fix_condition_for_systemd-journal-catalog-update.service_4990.patch"
+	eapply "${FILESDIR}/232-core_fix_sockaddr_length_calculation_for_sockaddr_pretty_4966.patch"
+	eapply "${FILESDIR}/232-shared_fix_double_free_in_unmask_5005.patch"
+	eapply "${FILESDIR}/232-shared_fix_double_free_in_link.patch"
+	eapply "${FILESDIR}/232-shared_check_strdup_NULL.patch"
+	eapply "${FILESDIR}/232-shell_completion_redirect_all_errors_from_systemctl_to_dev_null.patch"
+	eapply "${FILESDIR}/232-systemctl_uninitalized_variable.patch"
+	eapply "${FILESDIR}/232-bash_completion_journalctl_add_missing_options.patch"
+	eapply "${FILESDIR}/232-Fix_caching_in_zsh_completion_5122.patch"
+	eapply "${FILESDIR}/232-core_dbus_fix_two_strv_memleaks.patch"
+	eapply "${FILESDIR}/232-core_execute_fix_strv_memleak.patch"
+	eapply "${FILESDIR}/232-resolve_fix_strv_memleak.patch"
+	eapply "${FILESDIR}/232-systemctl_ignore_SIGTERM_after_switch-root.patch"
+	eapply "${FILESDIR}/232-resolved_create_etc_resolv.conf_symlink_at_runtime.patch"
 	eapply_user
 
 	# 'uucp' group is prefered for this purpose in Gentoo (gentoo#463376)
