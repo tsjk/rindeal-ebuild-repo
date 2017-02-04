@@ -108,8 +108,6 @@ CDEPEND_A=(
 	"c_lz4?		("
 		# `PKG_CHECK_MODULES(LZ4, [ liblz4 >= 125 ],`
 		">=app-arch/lz4-0_p131:0="
-		# versions above 1 do not specify version in the pkgconfig spec and thus ./configure fails
-		"<app-arch/lz4-1"
 	")"
 	"c_lzma?	( app-arch/xz-utils:0= )"
 	"c_zlib?	( sys-libs/zlib:0= )"
@@ -289,6 +287,8 @@ src_prepare() {
 	eapply "${FILESDIR}/218-Dont-enable-audit-by-default.patch"
 	eapply "${FILESDIR}/228-noclean-tmp.patch"
 	eapply "${FILESDIR}/231-manager-ignore_0_length_notification_messages.patch"
+	eapply "${FILESDIR}/232-build_sys_check_for_lz4_in_the_old_and_new_numbering.patch"
+	eapply "${FILESDIR}/232-build_sys_add_check_for_gperf_lookup_function_signature.patch"
 	eapply_user
 
 	# 'uucp' group is prefered for this purpose in Gentoo (gentoo#463376)
@@ -537,6 +537,7 @@ src_install() {
 	prune_libtool_files --modules
 
 	einstalldocs
+	dodoc "${FILESDIR}/nsswitch.conf"
 
 	# python script generates the index
 	use python && \
