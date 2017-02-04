@@ -10,7 +10,7 @@ GH_URI="github/andlabs"
 inherit git-hosting
 inherit cmake-utils
 
-DESCRIPTION="Example package"
+DESCRIPTION="Simple and portable GUI library in C that uses the native GUI technologies"
 LICENSE="MIT"
 
 # subslots follow SONAME
