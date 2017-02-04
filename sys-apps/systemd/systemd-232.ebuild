@@ -45,7 +45,7 @@ LICENSE_A=(
 # Explanation: "incremented for ABI breaks in libudev or libsystemd".
 SLOT="0/2"
 
-KEYWORDS=""
+# KEYWORDS=""
 IUSE_A=(
 	## generic
 	+man nls python sysv-utils test vanilla
@@ -105,7 +105,12 @@ CDEPEND_A=(
 
 	## compression
 	"c_bzip2?	( app-arch/bzip2:0= )"
-	"c_lz4?		( >=app-arch/lz4-0_p131:0= )"
+	"c_lz4?		("
+		# `PKG_CHECK_MODULES(LZ4, [ liblz4 >= 125 ],`
+		">=app-arch/lz4-0_p131:0="
+		# versions above 1 do not specify version in the pkgconfig spec and thus ./configure fails
+		"<app-arch/lz4-1"
+	")"
 	"c_lzma?	( app-arch/xz-utils:0= )"
 	"c_zlib?	( sys-libs/zlib:0= )"
 
@@ -509,8 +514,8 @@ src_configure() {
 
 		"$(my_with tty-gid)"
 
- 		"$(my_with nobody-user)"	# Specify the name of the nobody user (the one with UID 65534)
- 		"$(my_with nobody-group)"	# Specify the name of the nobody group (the one with GID 65534)
+		"$(my_with nobody-user)"	# Specify the name of the nobody user (the one with UID 65534)
+		"$(my_with nobody-group)"	# Specify the name of the nobody group (the one with GID 65534)
 	)
 
 	econf "${econf_args[@]}"
