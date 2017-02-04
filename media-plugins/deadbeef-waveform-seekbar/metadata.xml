@@ -5,4 +5,8 @@
     <email>dev.rindeal+gentoo-overlay@gmail.com</email>
     <name>Jan Chren (rindeal)</name>
   </maintainer>
+  <use>
+    <flag name="gtk2">Build GTK2 version</flag>
+    <flag name="gtk3">Build GTK3 version</flag>
+  </use>
 </pkgmetadata>
