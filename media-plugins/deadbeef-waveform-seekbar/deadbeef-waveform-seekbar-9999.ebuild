@@ -8,6 +8,7 @@ GH_URI="github/cboxdoerfer/ddb_waveform_seekbar"
 
 # EXPORT_FUNCTIONS: src_unpack
 inherit git-hosting
+inherit deadbeef-plugin
 
 DESCRIPTION="Waveform Seekbar plugin for DeaDBeeF audio player"
 LICENSE="GPL-2"
@@ -43,9 +44,8 @@ src_compile() {
 }
 
 src_install() {
-	exeinto "/usr/$(get_libdir)/deadbeef"
-	use gtk2 && doexe gtk2/ddb_misc_waveform_GTK2.so
-	use gtk3 && doexe gtk3/ddb_misc_waveform_GTK3.so
+	use gtk2 && ddb_plugin_doins gtk2/ddb_misc_waveform_GTK2.so
+	use gtk3 && ddb_plugin_doins gtk3/ddb_misc_waveform_GTK3.so
 
 	dodoc README.md
 }
