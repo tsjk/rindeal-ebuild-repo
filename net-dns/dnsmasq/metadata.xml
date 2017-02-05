@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "http://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+  <maintainer type="person">
+    <email>dev.rindeal+gentoo-overlay@gmail.com</email>
+    <name>Jan Chren (rindeal)</name>
+  </maintainer>
+  <use>
+    <flag name="auth-dns">Add support for acting as an authorative DNS server</flag>
+    <flag name="broken-rtc">Enable for embedded systems without RTC; WARNING: dangerous to arbitrarily toggle</flag>
+    <flag name="dns-loop">Probe for and remove DNS forwarding loops</flag>
+    <flag name="ipset">Selectively add resolved ip addresses to given ipsets</flag>
+    <flag name="conntrack">Add support for Linux conntrack connection marking</flag>
+    <flag name="dhcp-tools">Install extra command line tools for manually managing DHCP leases</flag>
+    <flag name="dhcp">Enable support for acting as a DHCP server</flag>
+    <flag name="dnssec">Enable support DNSSEC validation and caching</flag>
+    <flag name="script">Enable support for calling scripts when leases change</flag>
+    <flag name="tftp">Enables built in TFTP server for netbooting</flag>
+  </use>
+  <upstream>
+    <remote-id type="cpe">cpe:/a:thekelleys:dnsmasq</remote-id>
+  </upstream>
+</pkgmetadata>
