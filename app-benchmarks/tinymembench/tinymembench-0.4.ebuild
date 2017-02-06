@@ -15,7 +15,7 @@ LICENSE="MIT"
 
 SLOT="0"
 
-KEYWORDS="~amd64 ~arm ~arm64"
+KEYWORDS="amd64 arm ~arm64"
 
 src_prepare() {
 	# https://wiki.gentoo.org/wiki/Hardened/GNU_stack_quickstart
@@ -25,5 +25,5 @@ src_prepare() {
 }
 
 src_install() {
-	dobin "$PN"
+	dobin "${PN}"
 }
