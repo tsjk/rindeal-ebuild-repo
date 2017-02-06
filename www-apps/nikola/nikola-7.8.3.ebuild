@@ -9,7 +9,7 @@ GH_URI="github/getnikola"
 GH_REF="v${PV}"
 
 # nikola support python3_6, but it's deps do not
-PYTHON_COMPAT=( python2_7 python3_{4,5} )
+PYTHON_COMPAT=( python3_{4,5} )
 
 inherit distutils-r1
 inherit git-hosting
@@ -21,7 +21,7 @@ LICENSE="MIT Apache-2.0 CC0-1.0 public-domain"
 MY_PN="Nikola"
 SLOT="0"
 
-KEYWORDS="~amd64 ~arm ~arm64"
+KEYWORDS="~amd64" # lots of deps are missing `arm`/`arm64` arch kws
 IUSE_A=(
 	assets charts ghpages hyphenation ipython jinja markdown watchdog webmedia websocket posts-section-colors
 )
@@ -31,7 +31,6 @@ DEPEND_A=( "${CDEPEND_A[@]}" )
 RDEPEND_A=( "${CDEPEND_A[@]}"
 	## `setup.py`:
 	">=dev-python/doit-0.28.0[${PYTHON_USEDEP}]"
-	"python_targets_python2_7? ( <dev-python/doit-0.30.0[${PYTHON_USEDEP}] )"
 
 	## `requirements.txt`:
 	">=dev-python/pygments-1.6[${PYTHON_USEDEP}]"
@@ -63,7 +62,7 @@ RDEPEND_A=( "${CDEPEND_A[@]}"
 	# "wordpress-import? ( >=dev-python/phpserialize-1.3[${PYTHON_USEDEP}] )"
 	"assets? ( >=dev-python/webassets-0.10.1[${PYTHON_USEDEP}] )"
 	"ghpages? ( >=dev-python/ghp-import-0.4.1[${PYTHON_USEDEP}] )"
-	"websocket? ( ~dev-python/ws4py-0.3.5[${PYTHON_USEDEP}] )"
+	"websocket? ( =dev-python/ws4py-0.3.5*[${PYTHON_USEDEP}] )"
 	"watchdog? ( ~dev-python/watchdog-0.8.3[${PYTHON_USEDEP}] )"
 	"ipython? ("
 		">=dev-python/ipython-2.0.0[notebook,${PYTHON_USEDEP}]"
