@@ -299,5 +299,13 @@ src_install() {
 
 	prune_libtool_files --modules
 
-	dodoc NEWS help.txt about.txt translators.txt
+	## make items in the `Help` menu available
+	local d
+	for d in help.txt ChangeLog about.txt translators.txt ; do
+		dodoc "${d}"
+		# exclude from the compression list
+		docompress -x "/usr/share/doc/${PF}/${d}"
+	done
+	dosym "${PORTDIR}/licenses/GPL-2" "/usr/share/doc/${PF}/COPYING.GPLv2"
+	dosym "${PORTDIR}/licenses/LGPL-2.1" "/usr/share/doc/${PF}/COPYING.LGPLv2.1"
 }
