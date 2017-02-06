@@ -1,7 +1,8 @@
-# Copyright 2016 Jan Chren (rindeal)
+# Copyright 2016-2017 Jan Chren (rindeal)
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
+inherit rindeal
 
 GH_URI="github/rindeal/Amalgamate"
 
@@ -12,7 +13,8 @@ LICENSE="MIT"
 
 SLOT="0"
 
-[[ "${PV}" == *9999* ]] || KEYWORDS="~amd64 ~arm"
+[[ "${PV}" == *9999* ]] || \
+	KEYWORDS="amd64 arm arm64"
 
 src_install() {
 	dobin "${PN}"
