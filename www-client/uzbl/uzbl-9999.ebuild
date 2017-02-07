@@ -1,16 +1,16 @@
-# Copyright 2016 Jan Chren (rindeal)
+# Copyright 2016-2017 Jan Chren (rindeal)
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
 inherit rindeal
 
-# git-hosting.eclass
+## git-hosting.eclass
 GH_URI="github"
-# GH_REF="master"
+## git-r3.eclass
 EGIT_BRANCH="next"
-# python-*.eclass
+## python-*.eclass
 PYTHON_COMPAT=( python2_7 python3_{4,5} pypy )
-# distutils-*.eclass
+## distutils-*.eclass
 # event-manager is required and is written in python
 # DISTUTILS_OPTIONAL=true
 
@@ -22,8 +22,6 @@ DESCRIPTION="A web browser that adheres to the unix philosophy"
 LICENSE="GPL-2"
 
 SLOT="0"
-
-KEYWORDS="~amd64 ~arm"
 
 CDEPEND_A=(
 	# gtk+-3.0
@@ -79,6 +77,8 @@ src_prepare() {
 	sed -e "s|^COMMIT_HASH.*|COMMIT_HASH=${PVR}|" \
 		-i -- Makefile || die
 
+	# NOTE: examples must be installed as they're used in startup scripts
+
 	# fix examples path
 	# NOTE: this path is hard-coded in startup scripts
 	# sed -e "s|\(cp -rv examples\) \$(SHAREDIR)/uzbl/|\1 \$(SHAREDIR)/${PF}/|" \
@@ -91,8 +91,6 @@ src_prepare() {
 	# fix default ca-cert path
 	sed -e "s|/etc/ssl/certs/ca-bundle.crt|${EPREFIX}/etc/ssl/certs/ca-certificates.crt|" \
 		-i -- examples/config/config || die
-
-	# NOTE: examples must be installed as they're used in startup scripts
 
 	distutils-r1_src_prepare
 }
