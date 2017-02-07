@@ -1,15 +1,17 @@
-# Copyright 2016 Jan Chren (rindeal)
+# Copyright 2016-2017 Jan Chren (rindeal)
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
+inherit rindeal
 
 JBIJ_PN_PRETTY='PyCharm'
-JBIJ_URI="python/pycharm-professional-${PV}"
-
-inherit jetbrains-intellij
 
 DESCRIPTION="${JBIJ_PN_PRETTY} is a Python IDE for professional developers"
 
+JBIJ_URI="python/pycharm-professional-${PV}"
+
 JBIJ_DESKTOP_EXTRAS=(
-	# "MimeType=text/x-php;text/html;" # MUST end with semicolon # TODO
+	"MimeType=text/x-python;application/x-python;" # MUST end with semicolon
 )
+
+inherit jetbrains-intellij
