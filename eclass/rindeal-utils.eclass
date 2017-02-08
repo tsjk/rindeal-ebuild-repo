@@ -208,13 +208,13 @@ _rindeal:dsf:tokenize() {
 		'\)'
 		'\&'
 		'\|'
-		'[a-zA-Z0-9_]+'
+		'[a-zA-Z0-9_-]+'
 	)
 	local regex="^\s*($(IFS=\|; echo "${token_regexes[*]}"))\s*"
 
 	while (( ${#str} )) ; do
 		# regex match the token
-		[[ "${str}" =~ ${regex} ]]
+		[[ "${str}" =~ ${regex} ]] || die
 		local m="${BASH_REMATCH[1]}"
 		local whole_match="${BASH_REMATCH[0]}"
 
