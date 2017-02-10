@@ -53,7 +53,7 @@ IUSE_A=(
 
 	+agetty
 	bfs
-	cal
+	+cal
 	chfn-chsh chfn-chsh-password +chsh-only-listed
 	cramfs
 	eject
@@ -84,12 +84,12 @@ IUSE_A=(
 	+raw
 	+rename
 	reset
-	+runuser
+	runuser # bound to su
 	+schedutils
 	+setpriv
 	+setterm
-	su
-	sulogin
+	su # bound to runuser
+	+sulogin
 	switch_root
 	tunelp
 	ul
@@ -120,6 +120,17 @@ IUSE_A=(
 	user
 	utempter
 	+util
+
+	# extras:
+	+fdisk +sfdisk +cfdisk
+	+uuidgen +blkid +findfs +wipefs +findmnt
+	+mkfs isosize +fstrim +swapon +lsblk +lscpu
+	chcpu
+	swaplabel +mkswap
+	look mcookie +namei +whereis +getopt +blockdev +prlimit +lslocks
+	+flock ipcmk
+	lsipc +lsns +renice +setsid readprofile +dmesg ctrlaltdel +fsfreeze +blkdiscard ldattach rtcwake setarch +script +scriptreplay col colcrt colrm +column +hexdump rev tailf
+	+ionice +taskset +chrt
 )
 
 CDEPEND_A=(
@@ -169,6 +180,7 @@ RDEPEND_A=( "${CDEPEND_A[@]}"
 	"schedutils? ( !sys-process/schedutils )"
 	"eject? ( !sys-block/eject )"
 	"!<app-shells/bash-completion-2.3-r2"
+	# TODO: make these utils in sys-apps/shadow optional
 	"$(rindeal:dsf:eval \
 		'chfn-chsh|login|su|vipw|nologin|newgrp' \
 			'!sys-apps/shadow' )"
@@ -186,11 +198,14 @@ REQUIRED_USE_A=(
 	"libmount? ( libblkid )"
 	# `UL_REQUIRES_BUILD([fdisk], [libfdisk])`
 	# `UL_REQUIRES_BUILD([fdisk], [libsmartcols])`
+	"fdisk? ( libfdisk libsmartcols )"
 	# `UL_REQUIRES_BUILD([sfdisk], [libfdisk])`
 	# `UL_REQUIRES_BUILD([sfdisk], [libsmartcols])`
+	"sfdisk? ( libfdisk libsmartcols )"
 	# `UL_REQUIRES_BUILD([cfdisk], [libfdisk])`
 	# `UL_REQUIRES_BUILD([cfdisk], [libsmartcols])`
-	# TODO
+	# `UL_REQUIRES_HAVE([cfdisk], [ncursesw,slang,ncurses], [ncursesw, ncurses or slang library])`
+	"cfdisk? ( libfdisk libsmartcols || ( ncurses slang ) )"
 	# `UL_REQUIRES_BUILD([mount], [libmount])`
 	"mount? ( libmount )"
 	# `UL_REQUIRES_BUILD([losetup], [libsmartcols])`
@@ -205,13 +220,17 @@ REQUIRED_USE_A=(
 	# `UL_REQUIRES_BUILD([uuidd], [libuuid])`
 	"uuidd? ( libuuid )"
 	# `UL_REQUIRES_BUILD([uuidgen], [libuuid])`
+	"uuidgen? ( libuuid )"
 	# `UL_REQUIRES_BUILD([blkid], [libblkid])`
+	"blkid? ( libblkid )"
 	# `UL_REQUIRES_BUILD([findfs], [libblkid])`
+	"findfs? ( libblkid )"
 	# `UL_REQUIRES_BUILD([wipefs], [libblkid])`
+	"wipefs? ( libblkid )"
 	# `UL_REQUIRES_BUILD([findmnt], [libmount])`
 	# `UL_REQUIRES_BUILD([findmnt], [libblkid])`
 	# `UL_REQUIRES_BUILD([findmnt], [libsmartcols])`
-	# TODO
+	"findmnt? ( libmount libblkid libsmartcols )"
 	# `UL_REQUIRES_BUILD([mountpoint], [libmount])`
 	"mountpoint? ( libmount )"
 	# `UL_REQUIRES_HAVE([setpriv], [cap_ng], [libcap-ng library])`
@@ -221,25 +240,32 @@ REQUIRED_USE_A=(
 	# `UL_REQUIRES_HAVE([cramfs], [z], [z library])`
 	"cramfs? ( libz )"
 	# `UL_REQUIRES_BUILD([fstrim], [libmount])`
+	"fstrim? ( libmount )"
 	# `UL_REQUIRES_BUILD([swapon], [libblkid])`
 	# `UL_REQUIRES_BUILD([swapon], [libmount])`
 	# `UL_REQUIRES_BUILD([swapon], [libsmartcols])`
+	"swapon? ( libblkid libmount libsmartcols )"
 	# `UL_REQUIRES_BUILD([lsblk], [libblkid])`
 	# `UL_REQUIRES_BUILD([lsblk], [libmount])`
 	# `UL_REQUIRES_BUILD([lsblk], [libsmartcols])`
+	"lsblk? ( libblkid libmount libsmartcols )"
 	# `UL_REQUIRES_BUILD([lscpu], [libsmartcols])`
-	# TODO
+	"lscpu? ( libsmartcols )"
 	# `UL_REQUIRES_BUILD([lslogins], [libsmartcols])`
 	"lslogins? ( libsmartcols )"
 	# `UL_REQUIRES_BUILD([wdctl], [libsmartcols])`
 	"wdctl? ( libsmartcols )"
 	# `UL_REQUIRES_BUILD([swaplabel], [libblkid])`
+	"swaplabel? ( libblkid )"
 	# `UL_REQUIRES_BUILD([prlimit], [libsmartcols])`
+	"prlimit? ( libsmartcols )"
 	# `UL_REQUIRES_BUILD([lslocks], [libmount])`
 	# `UL_REQUIRES_BUILD([lslocks], [libsmartcols])`
+	"lslocks? ( libmount libsmartcols )"
 	# `UL_REQUIRES_BUILD([lsipc], [libsmartcols])`
+	"lsipc? ( libsmartcols )"
 	# `UL_REQUIRES_BUILD([lsns], [libsmartcols])`
-	# TODO
+	"lsns? ( libsmartcols )"
 	# `UL_REQUIRES_HAVE([chfn_chsh], [security_pam_appl_h], [PAM header file])`
 	"$(rindeal:dsf:eval 'chfn-chsh-password|user' 'pam')"
 	# `UL_REQUIRES_HAVE([login], [security_pam_appl_h], [PAM header file])`
@@ -257,9 +283,11 @@ REQUIRED_USE_A=(
 	# `UL_REQUIRES_HAVE([setterm], [ncursesw, ncurses], [ncursesw or ncurses library])`
 	"setterm? ( ncurses )"
 	# `UL_REQUIRES_BUILD([ionice], [schedutils])`
+	"ionice? ( schedutils )"
 	# `UL_REQUIRES_BUILD([taskset], [schedutils])`
+	"taskset? ( schedutils )"
 	# `UL_REQUIRES_BUILD([chrt], [schedutils])`
-	# TODO
+	"chrt? ( schedutils )"
 	# `UL_REQUIRES_HAVE([pylibmount], [libpython], [libpython])`
 	# `UL_REQUIRES_BUILD([pylibmount], [libmount])`
 	"pylibmount? ( libpython libmount )"
@@ -279,6 +307,13 @@ pkg_setup() {
 	use libpython && python-single-r1_pkg_setup
 }
 
+my_use_build_init() {
+	local flag="${1}" option="${2:-"${1}"}"
+	egrep -q "UL_BUILD_INIT.*\[${option}\]" configure.ac || die
+	sed -r -e "s@^(UL_BUILD_INIT *\( *\[${option}\])(, *\[[a-z]{2,}\])?@\1, [$(usex ${flag})]@" \
+		-i -- configure.ac || die
+}
+
 src_prepare-locales() {
 	local l locales dir="po" pre="lang_" post=".po"
 
@@ -292,6 +327,86 @@ src_prepare-locales() {
 
 src_prepare() {
 	eapply_user
+
+	## although my_use_build_init is src_configure-type function,
+	## it edits configure.ac, therefore it must be here
+	my_use_build_init fdisk
+	my_use_build_init sfdisk
+	my_use_build_init cfdisk
+
+	my_use_build_init uuidgen
+	my_use_build_init blkid
+	my_use_build_init findfs
+	my_use_build_init wipefs
+	my_use_build_init findmnt
+
+	my_use_build_init mkfs
+	my_use_build_init isosize
+	my_use_build_init fstrim
+	my_use_build_init swapon
+	my_use_build_init lsblk
+	my_use_build_init lscpu
+
+	my_use_build_init chcpu
+
+	my_use_build_init swaplabel
+	my_use_build_init mkswap
+
+	my_use_build_init look
+	my_use_build_init mcookie
+	my_use_build_init namei
+	my_use_build_init whereis
+	my_use_build_init getopt
+	my_use_build_init blockdev
+	my_use_build_init prlimit
+	my_use_build_init lslocks
+
+	my_use_build_init flock
+	my_use_build_init ipcmk
+
+	my_use_build_init lsipc
+	my_use_build_init lsns
+	my_use_build_init renice
+	my_use_build_init setsid
+	my_use_build_init readprofile
+	my_use_build_init dmesg
+	my_use_build_init ctrlaltdel
+	my_use_build_init fsfreeze
+	my_use_build_init blkdiscard
+	my_use_build_init ldattach
+	my_use_build_init rtcwake
+	my_use_build_init setarch
+	my_use_build_init script
+	my_use_build_init scriptreplay
+	my_use_build_init col
+	my_use_build_init colcrt
+	my_use_build_init colrm
+	my_use_build_init column
+	my_use_build_init hexdump
+	my_use_build_init rev
+	my_use_build_init tailf
+
+	my_use_build_init ionice
+	my_use_build_init taskset
+	my_use_build_init chrt
+
+	cat <<-_EOF_ >> configure.ac || die
+	AC_MSG_RESULT([
+	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+	The resulting build status:
+
+	$( egrep -o '\$build_[a-zA-Z0-9_-]{2,}' configure.ac | \
+		gawk '{ a[$0]=$0 }
+			END {
+				asorti(a)
+				for (s in a)
+					printf "%-12s = %s\n",substr(a[s],8),a[s]
+			}'
+	)
+	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	])
+_EOF_
 
 	if use nls ; then
 		src_prepare-locales
@@ -318,8 +433,8 @@ src_configure() {
 		--enable-bash-completion
 		--with-systemdsystemunitdir="$(systemd_get_systemunitdir)"
 
-		# prevent leaks
-		--disable-all-programs
+		# do not ever set this, it disables utils even if all their deps are met
+ 		# --disable-all-programs
 
 		## TODO: reorganize these options according to ./configure --help
 
