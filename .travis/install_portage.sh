@@ -11,6 +11,7 @@ set -e
 
 source "$(dirname "${BASH_SOURCE[0]}")/travis-functions.sh" || exit 1
 
+
 get_archive() {
     local url="${1?}" dir="${2?}"
     local tmpd="$(mktemp -d)" file="${url##*/}"
@@ -22,8 +23,9 @@ get_archive() {
     tar xf "${file}" -C "${dir}" --strip-components=1 || return 2
 
     popd >/dev/null
-    rm -r -f "${tmpd}"
+    rm -r "${tmpd}"
 }
+
 
 ## prepare env
 ## ------------
@@ -58,13 +60,14 @@ run_module() {
         postinst
     )
 
+    # run in a subshell in order to sandbox environment
     (
     fold_start "${mod_name}" "Running module '${mod_name}'"
 
     for ph in "${phases[@]}" ; do
         local fn="${mod_name}:${ph}"
 
-        [[ "${ph}" == prepare ]] && [ -d "${S}" ] && cd "${S}"
+        [[ "${ph}" == prepare ]] && [[ -d "${S}" ]] && cd "${S}"
 
         if declare -f "${fn}" >/dev/null ; then
             fold_start "${fn//:/.}" "${ph^}"
@@ -77,7 +80,7 @@ run_module() {
     )
 
     popd >/dev/null
-    rm -rf "${WORKDIR}"
+    rm -r "${WORKDIR}"
 }
 
 ## BEGIN -- portage -----------------------------------------------------------
@@ -109,8 +112,6 @@ repoman:fetch() {
 }
 
 repoman:prepare() {
-    :
-
     # allow to have arbitrary copyright holder name and deprecate $Id$ header
     sed -e 's|if num > 2:|if num >= 0:|' \
         -i -- pym/repoman/modules/scan/ebuild/checks.py
