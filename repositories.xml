@@ -3,7 +3,7 @@
 <repositories version="1.0">
   <repo quality="stable" status="unofficial">
     <name>rindeal</name>
-    <description lang="en">Rindeal's overlay, the best overlay you have ever seen</description>
+    <description lang="en">Rindeal's collection of solid ebuilds and whatnot</description>
     <homepage>https://github.com/rindeal/gentoo-overlay</homepage>
     <owner type="person">
       <name>Jan Chren (rindeal)</name>
