@@ -27,7 +27,7 @@ env:
         ## configurable variables
         - OVERLAY_NAME='rindeal'
     matrix:
-        - PORTAGE_VER="2.3.0" REPOMAN_VER="2.3.0"
+        - PORTAGE_VER="2.3.3" REPOMAN_VER="2.3.1"
         - SHELLCHECK=1
 ## final touches to the matrix
 matrix:
