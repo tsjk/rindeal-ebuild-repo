@@ -7,7 +7,7 @@ USE_RUBY="ruby21"
 
 inherit ruby-fakegem
 
-DESCRIPTION="A flexible and intuitive table generator"
+DESCRIPTION="Flexible and intuitive table generator"
 HOMEPAGE="http://peter-murach.github.io/tty/"
 LICENSE="MIT"
 

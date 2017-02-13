@@ -7,7 +7,7 @@ GH_URI="github/fsphil"
 
 inherit git-hosting autotools
 
-DESCRIPTION="A neat and simple webcam app"
+DESCRIPTION="Neat and simple webcam app"
 HOMEPAGE="http://www.sanslogic.co.uk/fswebcam/ ${HOMEPAGE}"
 LICENSE="GPL-2"
 

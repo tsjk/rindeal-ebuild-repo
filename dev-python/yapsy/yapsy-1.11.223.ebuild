@@ -13,7 +13,7 @@ PYTHON_COMPAT=( python2_7 python3_{4,5} )
 inherit git-hosting
 inherit distutils-r1
 
-DESCRIPTION="A fat-free DIY Python plugin management toolkit"
+DESCRIPTION="Fat-free DIY Python plugin management toolkit"
 HOMEPAGE="http://yapsy.sourceforge.net/ ${GH_HOMEPAGE}"
 LICENSE="BSD"
 

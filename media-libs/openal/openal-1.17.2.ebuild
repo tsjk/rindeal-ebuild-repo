@@ -13,7 +13,7 @@ inherit git-hosting
 inherit xdg
 inherit eutils
 
-DESCRIPTION="A software implementation of the OpenAL 3D audio API"
+DESCRIPTION="Software implementation of the OpenAL 3D audio API"
 HOMEPAGE="http://kcat.strangesoft.net/openal.html ${GH_HOMEPAGE}"
 LICENSE="LGPL-2+"
 

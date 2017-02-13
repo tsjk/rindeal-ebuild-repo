@@ -9,7 +9,7 @@ GH_URI='github/ariya'
 
 inherit python-any-r1 multiprocessing pax-utils qmake-utils virtualx git-hosting
 
-DESCRIPTION='A headless WebKit scriptable with a JavaScript API'
+DESCRIPTION='Headless WebKit scriptable with a JavaScript API'
 HOMEPAGE='http://phantomjs.org'
 LICENSE='BSD'
 

@@ -7,7 +7,7 @@ USE_RUBY="ruby21"
 
 inherit ruby-fakegem
 
-DESCRIPTION="The purpose of this library is to help move terminal cursor around using intu"
+DESCRIPTION="Purpose of this library is to help move terminal cursor around using intu"
 HOMEPAGE="http://peter-murach.github.io/tty/"
 LICENSE="MIT"
 

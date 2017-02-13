@@ -7,7 +7,7 @@ USE_RUBY="ruby21"
 
 inherit ruby-fakegem
 
-DESCRIPTION="A terminal spinner for tasks that have non-deterministic time frame."
+DESCRIPTION="Terminal spinner for tasks that have non-deterministic time frame."
 HOMEPAGE="https://github.com/peter-murach/tty-spinner"
 LICENSE="MIT"
 

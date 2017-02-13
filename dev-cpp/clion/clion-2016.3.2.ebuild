@@ -8,7 +8,7 @@ JBIJ_URI="cpp/CLion-${PV}"
 
 inherit jetbrains-intellij
 
-DESCRIPTION="A complete toolset for C and C++ development"
+DESCRIPTION="Complete toolset for C and C++ development"
 
 IUSE="+python system-cmake system-gdb system-lldb"
 

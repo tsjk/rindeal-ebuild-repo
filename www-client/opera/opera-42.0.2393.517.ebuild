@@ -15,7 +15,7 @@ inherit pax-utils
 inherit versionator
 inherit xdg
 
-DESCRIPTION="A proprietary cross-platofmr web browser by Opera Software ASA"
+DESCRIPTION="Proprietary cross-platofmr web browser by Opera Software ASA"
 HOMEPAGE="https://www.opera.com/"
 LICENSE="OPERA-2014"
 

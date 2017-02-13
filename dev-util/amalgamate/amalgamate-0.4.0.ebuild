@@ -8,7 +8,7 @@ GH_URI="github/rindeal/Amalgamate"
 
 inherit git-hosting
 
-DESCRIPTION="A tool for creating an amalgamation from C and C++ sources"
+DESCRIPTION="Tool for creating an amalgamation from C and C++ sources"
 LICENSE="MIT"
 
 SLOT="0"

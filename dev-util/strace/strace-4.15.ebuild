@@ -9,7 +9,7 @@ inherit flag-o-matic
 inherit eutils
 inherit toolchain-funcs
 
-DESCRIPTION="A useful diagnostic, instructional, and debugging tool"
+DESCRIPTION="Useful diagnostic, instructional, and debugging tool"
 HOMEPAGE="https://sourceforge.net/projects/strace/"
 LICENSE="BSD"
 

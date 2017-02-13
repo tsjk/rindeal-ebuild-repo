@@ -7,7 +7,7 @@ GH_URI="github/cboxdoerfer"
 
 inherit rindeal git-hosting autotools xdg
 
-DESCRIPTION="A fast file search utility for GNU/Linux based on GTK+3"
+DESCRIPTION="Fast file search utility for GNU/Linux based on GTK+3"
 HOMEPAGE="https://cboxdoerfer.github.io/fsearch/ ${HOMEPAGE}"
 LICENSE="GPL-2+"
 

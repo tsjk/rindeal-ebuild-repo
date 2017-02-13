@@ -7,7 +7,7 @@ USE_RUBY="ruby21"
 
 inherit ruby-fakegem
 
-DESCRIPTION="A flexible progress bars drawing in terminal emulators."
+DESCRIPTION="Flexible progress bars drawing in terminal emulators."
 HOMEPAGE="http://peter-murach.github.io/tty/"
 LICENSE="MIT"
 

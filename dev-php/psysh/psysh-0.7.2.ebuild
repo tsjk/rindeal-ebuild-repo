@@ -8,7 +8,7 @@ GH_REF="v${PV}"
 
 inherit git-hosting composer
 
-DESCRIPTION="A REPL for PHP"
+DESCRIPTION="REPL for PHP"
 HOMEPAGE="http://psysh.org/"
 LICENSE="MIT"
 

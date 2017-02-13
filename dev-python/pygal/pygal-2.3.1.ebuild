@@ -12,7 +12,7 @@ PYTHON_COMPAT=( python3_{4,5} )
 inherit git-hosting
 inherit distutils-r1
 
-DESCRIPTION="A python SVG charts generator"
+DESCRIPTION="Python SVG charts generator"
 HOMEPAGE="http://pygal.org/ ${GH_HOMEPAGE}"
 LICENSE="LGPL-3+"
 

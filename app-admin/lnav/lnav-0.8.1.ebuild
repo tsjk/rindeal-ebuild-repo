@@ -13,7 +13,7 @@ inherit git-hosting
 inherit python-any-r1
 inherit autotools
 
-DESCRIPTION="A curses-based tool for viewing and analyzing log files"
+DESCRIPTION="Curses-based tool for viewing and analyzing log files"
 HOMEPAGE="http://lnav.org ${GH_HOMEPAGE}"
 LICENSE="BSD-2"
 

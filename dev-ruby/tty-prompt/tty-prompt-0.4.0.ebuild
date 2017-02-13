@@ -7,7 +7,7 @@ USE_RUBY="ruby21"
 
 inherit ruby-fakegem
 
-DESCRIPTION="A beautiful and powerful interactive command line prompt with a robust API fo"
+DESCRIPTION="Beautiful and powerful interactive command line prompt with a robust API fo"
 HOMEPAGE="http://peter-murach.github.io/tty"
 LICENSE="MIT"
 

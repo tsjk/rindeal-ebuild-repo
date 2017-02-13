@@ -14,7 +14,7 @@ PYTHON_COMPAT=( python3_{4,5} )
 inherit distutils-r1
 inherit git-hosting
 
-DESCRIPTION="A static website and blog generator"
+DESCRIPTION="Static website and blog generator"
 HOMEPAGE="https://getnikola.com/ ${GH_HOMEPAGE} https://pypi.python.org/pypi/Nikola"
 LICENSE="MIT Apache-2.0 CC0-1.0 public-domain"
 

@@ -17,7 +17,7 @@ inherit git-hosting
 inherit distutils-r1
 inherit xdg
 
-DESCRIPTION="A web browser that adheres to the unix philosophy"
+DESCRIPTION="Web browser that adheres to the unix philosophy"
 LICENSE="GPL-2"
 
 SLOT="0"

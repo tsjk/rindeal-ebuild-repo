@@ -11,7 +11,7 @@ GH_REF="8094ce7c99d5c45fb34ec349c8cb16de5077048d"
 
 inherit git-hosting cmake-utils toolchain-funcs xdg
 
-DESCRIPTION="A powerful cross-platform raw image processing program"
+DESCRIPTION="Powerful cross-platform raw image processing program"
 HOMEPAGE="http://www.rawtherapee.com/ ${HOMEPAGE}"
 LICENSE="GPL-3"
 

@@ -7,7 +7,7 @@ inherit rindeal
 inherit versionator
 inherit xdg
 
-DESCRIPTION="The world's definitive system for modern technical computing"
+DESCRIPTION="World's definitive system for modern technical computing"
 HOMEPAGE="https://www.wolfram.com/mathematica/"
 LICENSE="Wolfram-Mathematica"
 

@@ -13,7 +13,7 @@ GH_REF="v${PV}"
 inherit git-hosting
 inherit distutils-r1
 
-DESCRIPTION='A utility to accurately report the in core memory usage for a program'
+DESCRIPTION='Utility to accurately report the in core memory usage for a program'
 LICENSE='LGPL-2.1'
 
 SLOT='0'

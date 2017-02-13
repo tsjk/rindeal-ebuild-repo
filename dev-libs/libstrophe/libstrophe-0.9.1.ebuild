@@ -12,7 +12,7 @@ inherit autotools
 # functions: prune_libtool_files
 inherit eutils
 
-DESCRIPTION="A simple, lightweight C library for writing XMPP clients"
+DESCRIPTION="Simple, lightweight C library for writing XMPP clients"
 HOMEPAGE="http://strophe.im/libstrophe ${GH_HOMEPAGE}"
 LICENSE="MIT GPL-3"
 

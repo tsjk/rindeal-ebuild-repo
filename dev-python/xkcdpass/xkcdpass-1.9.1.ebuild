@@ -13,7 +13,7 @@ inherit git-hosting
 inherit distutils-r1
 inherit bash-completion-r1
 
-DESCRIPTION="A flexible and scriptable password generator, inspired by XKCD 936"
+DESCRIPTION="Flexible and scriptable password generator, inspired by XKCD 936"
 LICENSE="GPL-2"
 
 SLOT="0"

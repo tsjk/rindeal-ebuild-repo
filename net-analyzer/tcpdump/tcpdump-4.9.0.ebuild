@@ -13,7 +13,7 @@ inherit toolchain-funcs
 inherit user
 inherit git-hosting
 
-DESCRIPTION="A Tool for network monitoring and data acquisition"
+DESCRIPTION="Tool for network monitoring and data acquisition"
 HOMEPAGE="http://www.tcpdump.org/ ${GH_HOMEPAGE}"
 LICENSE="BSD"
 

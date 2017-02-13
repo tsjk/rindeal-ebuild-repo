@@ -10,7 +10,7 @@ GH_URI='github/eranif'
 
 inherit cmake-utils wxwidgets git-hosting
 
-DESCRIPTION="A Free, open source, cross platform C,C++,PHP and Node.js IDE"
+DESCRIPTION="Free, open source, cross platform C,C++,PHP and Node.js IDE"
 HOMEPAGE="http://www.codelite.org"
 LICENSE="GPL-2"
 

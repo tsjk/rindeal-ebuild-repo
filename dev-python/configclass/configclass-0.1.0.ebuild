@@ -12,7 +12,7 @@ PYTHON_COMPAT=( python2_7 python3_{4,5} pypy )
 inherit git-hosting
 inherit distutils-r1
 
-DESCRIPTION="A Python to class to hold configuration values"
+DESCRIPTION="Python to class to hold configuration values"
 LICENSE="MIT"
 
 SLOT="0"

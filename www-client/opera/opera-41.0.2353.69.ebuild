@@ -10,7 +10,7 @@ CHROMIUM_LANGS="
 "
 inherit rindeal chromium-2 unpacker pax-utils versionator xdg
 
-DESCRIPTION="A fast and secure web browser"
+DESCRIPTION="Fast and secure web browser"
 HOMEPAGE="https://www.opera.com/"
 LICENSE="OPERA-2014"
 

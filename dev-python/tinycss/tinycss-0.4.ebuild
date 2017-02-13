@@ -13,7 +13,7 @@ PYTHON_COMPAT=( python2_7 python3_{4,5} )
 inherit git-hosting
 inherit distutils-r1
 
-DESCRIPTION="A complete yet simple CSS parser for Python"
+DESCRIPTION="Complete yet simple CSS parser for Python"
 LICENSE="BSD"
 
 SLOT="0"

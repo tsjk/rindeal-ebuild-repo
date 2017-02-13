@@ -10,7 +10,7 @@ inherit autotools
 # functions: prune_libtool_files
 inherit eutils
 
-DESCRIPTION="The Ogg Vorbis sound file format library"
+DESCRIPTION="Ogg Vorbis sound file format library"
 HOMEPAGE="https://xiph.org/vorbis/"
 LICENSE="BSD"
 

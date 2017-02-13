@@ -12,7 +12,7 @@ PYTHON_COMPAT=( python2_7 python3_{4,5} )
 inherit git-hosting
 inherit distutils-r1
 
-DESCRIPTION="A small library for extracting rich content from urls"
+DESCRIPTION="Small library for extracting rich content from urls"
 HOMEPAGE="https://micawber.readthedocs.io ${GH_HOMEPAGE}"
 LICENSE="MIT"
 

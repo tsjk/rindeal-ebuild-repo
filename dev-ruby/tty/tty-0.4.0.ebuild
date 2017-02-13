@@ -7,7 +7,7 @@ USE_RUBY="ruby21"
 
 inherit ruby-fakegem
 
-DESCRIPTION="A toolbox for developing beautiful command line clients."
+DESCRIPTION="Toolbox for developing beautiful command line clients."
 HOMEPAGE="http://peter-murach.github.io/tty/"
 LICENSE="MIT"
 

@@ -14,7 +14,7 @@ PYTHON_COMPAT=( python2_7 python3_{4,5} pypy )
 inherit git-hosting
 inherit distutils-r1
 
-DESCRIPTION="A logging replacement for Python"
+DESCRIPTION="Logging replacement for Python"
 HOMEPAGE="${GH_HOMEPAGE} https://pypi.python.org/pypi/Logbook"
 LICENSE="BSD"
 

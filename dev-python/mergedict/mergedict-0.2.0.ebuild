@@ -11,7 +11,7 @@ PYTHON_COMPAT=( python2_7 python3_{4,5} pypy )
 inherit git-hosting
 inherit distutils-r1
 
-DESCRIPTION="A Python 'dict' with a merge() method"
+DESCRIPTION="Python 'dict' with a merge() method"
 LICENSE="MIT"
 
 SLOT="0"
