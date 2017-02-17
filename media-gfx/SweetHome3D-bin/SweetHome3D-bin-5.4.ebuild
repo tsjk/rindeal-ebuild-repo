@@ -15,9 +15,9 @@ LICENSE="GPL-2+"
 SLOT="0"
 PN_NB="${PN%"-bin"}"
 P_NB="${PN_NB}-${PV}"
-SRC_URI="amd64? ( https://sourceforge.net/projects/${PN_NB,,}/files/${PN_NB}/${P_NB}/${P_NB}-linux-x64.tgz )"
+SRC_URI="https://sourceforge.net/projects/${PN_NB,,}/files/${PN_NB}/${P_NB}/${P_NB}.jar"
 
-KEYWORDS="-* ~amd64"
+KEYWORDS="~amd64"
 IUSE_A=( )
 
 CDEPEND_A=()
@@ -29,18 +29,14 @@ RESTRICT+=""
 
 inherit arrays
 
-S="${WORKDIR}/${P_NB}"
+S="${WORKDIR}"
 
 INST_DIR="/opt/${P}"
 
 src_prepare() {
 	default
 
-	sed  \
-		-e "s@\"\$PROGRAM_DIR\"/jre8/bin/java@\"${EPREFIX}\"/usr/bin/java@g" \
-		-e "s@\"\$PROGRAM_DIR\"/jre8/lib@\"\$(java-config-2 -o)\"/lib@g" \
-		-e "s@\"\$PROGRAM_DIR\"/lib@\"${EPREFIX}${INST_DIR}\"/lib@g" \
-		-i -- "${PN_NB}" || die
+	erm -r linux/ macosx/ windows/
 }
 
 src_configure() {
@@ -48,26 +44,32 @@ src_configure() {
 }
 
 src_compile() {
-	:
+	jar cMf ${PN_NB,,}.jar * || die
 }
 
 src_install() {
 	insinto "${INST_DIR}"
-	doins -r "lib/"
+	doins "${PN_NB,,}.jar"
 
 	## launcher
-	exeinto "${INST_DIR}/bin"
-	doexe "${PN_NB}"
-	dosym "${INST_DIR}/bin/${PN_NB}" "/usr/bin/${PN_NB,,}"
+	cat <<-_EOF_ > "${PN_NB}.sh" || die
+	#!/bin/sh
+	java -jar "${EPREFIX}/${INST_DIR}/${PN_NB,,}.jar" "\${@}"
+	_EOF_
 
-	newicon -s 128 "${PN_NB}Icon.png" "${PN_NB}.png"
+	exeinto "${INST_DIR}/bin"
+	doexe "${PN_NB}.sh"
+
+	dosym "${INST_DIR}/bin/${PN_NB}.sh" "/usr/bin/${PN_NB,,}"
+
+	doicon -s 128 "${FILESDIR}/${PN_NB}.png"
 
 	## .desktop file
 	local make_desktop_entry_args=(
 		"${EPREFIX}/usr/bin/${PN_NB,,} %f"	# exec
 		"${PN_NB}"	# name
 		"${PN_NB}"	# icon
-		'Graphics;2DGraphics;3DGraphics;Java' # categories
+		'Graphics;3DGraphics;Java' # categories
 	)
 	local make_desktop_entry_extras=(
 		'MimeType=application/x-sweethome3d;application/x-sh3-design;application/x-sh3-library;application/x-sh3-plugin;'
@@ -79,5 +81,3 @@ src_install() {
 	insinto /usr/share/mime/packages
 	doins "${FILESDIR}/${PN_NB,,}.xml"
 }
-
-QA_PRESTRIPPED="${INST_DIR}/lib/java3d-1.6/.*\.so"
