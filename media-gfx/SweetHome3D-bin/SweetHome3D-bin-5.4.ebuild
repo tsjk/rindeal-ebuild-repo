@@ -4,7 +4,7 @@
 EAPI=6
 inherit rindeal
 
-# functions: newicon, make_desktop_entry
+# functions: doicon, make_desktop_entry
 inherit eutils
 inherit xdg
 
@@ -20,12 +20,9 @@ SRC_URI="https://sourceforge.net/projects/${PN_NB,,}/files/${PN_NB}/${P_NB}/${P_
 KEYWORDS="~amd64"
 IUSE_A=( )
 
-CDEPEND_A=()
+CDEPEND_A=( "virtual/jre:1.8" )
 DEPEND_A=( "${CDEPEND_A[@]}" )
 RDEPEND_A=( "${CDEPEND_A[@]}" )
-
-REQUIRED_USE_A=( )
-RESTRICT+=""
 
 inherit arrays
 
