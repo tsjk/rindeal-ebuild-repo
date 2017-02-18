@@ -1,25 +1,28 @@
 # Copyright 1999-2016 Gentoo Foundation
-# Copyright 2016 Jan Chren (rindeal)
+# Copyright 2016-2017 Jan Chren (rindeal)
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
+inherit rindeal
 
 GH_URI="github"
 
-inherit cmake-utils xdg git-hosting
+inherit cmake-utils
+inherit xdg
+inherit git-hosting
 
 DESCRIPTION="Qt-based image viewer"
-HOMEPAGE="https://www.nomacs.org/ ${HOMEPAGE}"
+HOMEPAGE="https://www.nomacs.org/ ${GH_HOMEPAGE}"
 LICENSE="GPL-3+"
 
 plugins_commit="fd199cf231257bd91fc9fd9aabc36d91d4a28ccd" # 2016-07-22
 SLOT="0"
+git-hosting_gen_snapshot_uri "github/${PN}/${PN}-plugins" "${plugins_commit}" plugins_snapshot_uri plugins_snapshot_ext
 SRC_URI+="
-	plugins? ( https://github.com/${PN}/${PN}-plugins/archive/${plugins_commit}.tar.gz
-		-> ${PN}-plugins-${PV}.tar.gz )"
+	plugins? ( ${plugins_snapshot_uri} -> ${PN}-plugins-${PV}${plugins_snapshot_ext} )"
 
 KEYWORDS="~amd64"
-IUSE="debug opencv +plugins raw tiff zip"
+IUSE_A=( debug opencv +plugins raw tiff zip )
 
 CDEPEND_A=(
 	# qt deps specified in '${S}/cmake/Utils.cmake'
@@ -44,10 +47,10 @@ DEPEND_A=( "${CDEPEND_A[@]}"
 )
 RDEPEND_A=( "${CDEPEND_A[@]}" )
 
-REQUIRED_USE="
-	raw? ( opencv )
-	tiff? ( opencv )
-"
+REQUIRED_USE_A=(
+	"raw? ( opencv )"
+	"tiff? ( opencv )"
+)
 
 inherit arrays
 
@@ -62,7 +65,7 @@ src_unpack() {
 	default
 
 	[[ -d "${S}"/plugins ]] && die
-	mv "${WORKDIR}"/*plugins* "${S}/plugins" || die
+	emv "${WORKDIR}"/*plugins* "${S}/plugins"
 }
 
 src_prepare-locales() {
@@ -72,14 +75,14 @@ src_prepare-locales() {
 
 	l10n_get_locales locales app off
 	for l in ${locales} ; do
-		rm -v -f "${dir}/${pre}${l}${post}" || die
+		erm "${dir}/${pre}${l}${post}"
 	done
 }
 
 src_prepare() {
 	# prevent these from interfering with the build
-	rm -rf "${S_OLD}"/{LibRaw-*,exiv2-*,expat,herqq,installer,zlib-*} || die
-	rm -rf "${S}"/3rdparty/quazip-* || die
+	rm -r "${S_OLD}"/{LibRaw-*,exiv2-*,expat,herqq,installer,zlib-*} || die
+	rm -r "${S}"/3rdparty/quazip-* || die
 
 	sed -e "s|@EPREFIX@|${EPREFIX}|g" \
 		-e "s|@libdir@|$(get_libdir)|g" \
@@ -88,7 +91,7 @@ src_prepare() {
 
 	if use plugins ; then
 		sed -e "s|DESTINATION lib/nomacs-plugins|DESTINATION $(get_libdir)/nomacs-plugins|" \
-			-i plugins/cmake/Utils.cmake || die
+			-i -- plugins/cmake/Utils.cmake || die
 	fi
 
 	eapply "${T}"/3.4-fix_plugins_dir.patch
