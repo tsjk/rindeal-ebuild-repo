@@ -13,7 +13,7 @@ inherit toolchain-funcs
 inherit xdg
 
 DESCRIPTION="Tool for ripping and streaming Blu-ray, HD-DVD and DVD discs"
-HOMEPAGE="http://www.makemkv.com/"
+HOMEPAGE="http://www.makemkv.com/" # https version is not working correctly
 LICENSE="LGPL-2.1 MPL-1.1 MakeMKV-EULA openssl"
 
 SLOT="0"
