@@ -1,45 +1,52 @@
 # Copyright 1999-2015 Gentoo Foundation
-# Copyright 2016 Jan Chren (rindeal)
+# Copyright 2016-2017 Jan Chren (rindeal)
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
+inherit rindeal
 
 inherit xdg
+# functions: eautoreconf
+inherit autotools
 
 DESCRIPTION="Pulseaudio Volume Control, GTK based mixer for Pulseaudio"
 HOMEPAGE="https://freedesktop.org/software/pulseaudio/pavucontrol/"
 LICENSE="GPL-2"
 
 SLOT="0"
-SRC_URI="${HOMEPAGE}/${P}.tar.xz"
+SRC_URI="https://freedesktop.org/software/pulseaudio/pavucontrol/${P}.tar.xz"
 
-KEYWORDS="~amd64"
-IUSE="gtk3 nls"
+KEYWORDS="amd64"
+IUSE_A=( gtk3 nls )
 
-CDEPEND="
-	>=dev-libs/libsigc++-2.0:2
-	>=media-sound/pulseaudio-3[glib]
+CDEPEND_A=(
+	">=dev-libs/libsigc++-2.0:2"
+	">=media-sound/pulseaudio-3[glib]"
 
-	gtk3? (
-		>=dev-cpp/gtkmm-2.99:3.0
-		>=media-libs/libcanberra-0.16[gtk3]
-	)
-	!gtk3? (
-		>=dev-cpp/gtkmm-2.16:2.4
-		>=media-libs/libcanberra-0.16[gtk]
-	)
-"
-DEPEND="${RDEPEND}
-	virtual/pkgconfig
-	nls? (
-		dev-util/intltool
-		sys-devel/gettext
-	)
-"
-RDEPEND="${CDEPEND}
-	virtual/freedesktop-icon-theme"
+	"gtk3? ("
+		">=dev-cpp/gtkmm-2.99:3.0"
+		">=media-libs/libcanberra-0.16[gtk3]"
+	")"
+	"!gtk3? ("
+		">=dev-cpp/gtkmm-2.16:2.4"
+		">=media-libs/libcanberra-0.16[gtk]"
+	")"
+)
+DEPEND_A=( "${CDEPEND_A[@]}"
+	"virtual/pkgconfig"
+	"nls? ("
+		"dev-util/intltool"
+		"sys-devel/gettext"
+	")"
+)
+RDEPEND_A=( "${CDEPEND_A[@]}"
+	"virtual/freedesktop-icon-theme"
+)
 
-L10N_LOCALES=( as ru pt_BR uk nl de bn_IN es hu da or gu hi zh_CN el sr@latin kn fr sk pt mr cs tr pa th ca te sr ml fi pl ta sv ja it )
+inherit arrays
+
+L10N_LOCALES=( as ru pt_BR uk nl de bn_IN es hu da or gu hi zh_CN el sr@latin kn fr sk pt mr cs tr
+	pa th ca te sr ml fi pl ta sv ja it )
 inherit l10n-r1
 
 src_prepare-locales() {
@@ -49,7 +56,7 @@ src_prepare-locales() {
 
 	l10n_get_locales locales app off
 	for l in ${locales} ; do
-		rm -v -f "${dir}/${pre}${l}${post}" || die
+		erm "${dir}/${pre}${l}${post}"
 		sed -e "/${l}/d" -i -- "${dir}"/LINGUAS || die
 	done
 }
@@ -64,14 +71,16 @@ src_prepare() {
 	# TODO: remove in >3.0
 	sed -e '/AC_PROG_CXX/a AX_CXX_COMPILE_STDCXX_11' \
 		-i -- configure.ac || die
+
+	eautoreconf
 }
 
 src_configure() {
-	local myeconfargs=(
+	local my_econf_args=(
 		--disable-lynx	# Turn off lynx usage for documentation generation
 
 		$(use_enable gtk3)
 		$(use_enable nls)
 	)
-	econf "${myeconfargs[@]}"
+	econf "${my_econf_args[@]}"
 }
