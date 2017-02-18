@@ -10,6 +10,7 @@ esac
 
 inherit rindeal
 
+
 [[ -z "${PYTHON_COMPAT}" ]] && \
 	PYTHON_COMPAT=( python{2_7,3_{4,5}} )
 [[ -z "${PYTHON_REQ_USE}" ]] && \
@@ -23,6 +24,7 @@ inherit rindeal
 GH_URI='github/arvidn/libtorrent'
 GH_FETCH_TYPE='manual'
 
+
 inherit eutils
 # vcs-snapshot: src_unpack
 inherit vcs-snapshot
@@ -31,17 +33,21 @@ inherit git-hosting
 # distutils-r1: TODO
 inherit distutils-r1
 
+
 DESCRIPTION='C++ BitTorrent implementation focusing on efficiency and scalability'
 HOMEPAGE="http://libtorrent.org ${GH_HOMEPAGE}"
 LICENSE='BSD'
+
 
 [[ -z "${LT_SONAME}" ]] && die "LT_SONAME not defined or empty"
 SLOT="0/${LT_SONAME}"
 SRC_URI="${GH_BASE_URI}/releases/download/libtorrent-${PV//./_}/${P}.tar.gz"
 
+
 [[ "${PV}" != *9999* ]] && [[ -z "${KEYWORDS}" ]] && \
 	KEYWORDS='~amd64 ~arm ~arm64'
 IUSE='+crypt debug +dht doc examples python static-libs test'
+
 
 RDEPEND="
 	!!net-libs/rb_libtorrent
@@ -59,11 +65,15 @@ DEPEND="${RDEPEND}
 REQUIRED_USE="python? ( ${PYTHON_REQUIRED_USE} )"
 RESTRICT+=" test"
 
-libtorrent_rasterbar_src_unpack() {
+
+EXPORT_FUNCTIONS src_unpack src_prepare src_configure src_compile src_install
+
+
+libtorrent-rasterbar_src_unpack() {
 	vcs-snapshot_src_unpack
 }
 
-libtorrent_rasterbar_src_prepare() {
+libtorrent-rasterbar_src_prepare() {
 	default
 
 	# https://github.com/rindeal/gentoo-overlay/issues/28
@@ -73,12 +83,12 @@ libtorrent_rasterbar_src_prepare() {
 
 	# respect optimization flags
 	sed -e '/FLAGS *=/ s|-Os||' \
-		-i configure CMakeLists.txt || die
+		-i -- configure CMakeLists.txt || die
 
 	use python && distutils-r1_src_prepare
 }
 
-libtorrent_rasterbar_src_configure() {
+libtorrent-rasterbar_src_configure() {
 	local myeconfargs=(
 		--disable-silent-rules # gentoo#441842
 		# hardcode boost system to skip "lookup heuristic"
@@ -109,7 +119,7 @@ libtorrent_rasterbar_src_configure() {
 	fi
 }
 
-libtorrent_rasterbar_src_compile() {
+libtorrent-rasterbar_src_compile() {
 	default
 
 	if use python ; then
@@ -121,7 +131,7 @@ libtorrent_rasterbar_src_compile() {
 	fi
 }
 
-libtorrent_rasterbar_src_install() {
+libtorrent-rasterbar_src_install() {
 	use doc && local HTML_DOCS+=( ./docs )
 
 	default
@@ -136,6 +146,7 @@ libtorrent_rasterbar_src_install() {
 
 	prune_libtool_files
 }
+
 
 LT_RASTERBAR_ECLASS=1
 fi
