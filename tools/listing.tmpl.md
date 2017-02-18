@@ -25,25 +25,24 @@ Category | Packages
     ##}
     {{-''}}<a id="{{ catid(cat) }}"></a>**{{ cat }}**
 
+    {#- delimiter #}
     {{- ' | ' -}}
 
     {##
         second column
             - package names enum
     ##}
-    {% set first_pkg = True %}
     {% for pkg in categories[cat] | sort %}
         {# do not print comma for the first package #}
-        {% if first_pkg %}
-            {% set first_pkg = False %}
-        {% else %}
+        {% if loop.index > 1 %}
             {{- ', ' -}}
-        {% endif %}
-    {# package name with an embedded link to the package location in the full list #}
-    {{-''}}[{{ pkg }}](#{{ pkgid(cat, pkg) }}){{''-}}
+        {% endif -%}
 
+        {# package name with an embedded link to the package location in the full list #}
+        {{-''}}[{{ pkg }}](#{{ pkgid(cat, pkg) }}){{''-}}
     {% endfor %}
-    {# new line #}
+
+    {#- new line #}
     {{''}}
 {% endfor %}
 
