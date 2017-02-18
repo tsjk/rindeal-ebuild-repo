@@ -19,7 +19,7 @@ LICENSE="BSD"
 
 SLOT="0"
 
-KEYWORDS="~amd64 ~arm ~arm64"
+KEYWORDS="amd64 arm arm64"
 IUSE="+drop-root smi ssl samba suid test"
 
 CDEPEND="
