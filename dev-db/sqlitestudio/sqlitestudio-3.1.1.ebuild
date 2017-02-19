@@ -1,4 +1,4 @@
-# Copyright 2016 Jan Chren (rindeal)
+# Copyright 2016-2017 Jan Chren (rindeal)
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
@@ -10,11 +10,11 @@ inherit eutils
 inherit qt-pro-formatter
 
 DESCRIPTION="SQLiteStudio3 is a powerful cross-platform SQLite database manager"
-HOMEPAGE="http://sqlitestudio.pl"
+HOMEPAGE="https://sqlitestudio.pl"
 LICENSE="GPL-3"
 
 SLOT="0"
-SRC_URI="http://sqlitestudio.pl/files/sqlitestudio3/complete/tar/${P}.tar.gz"
+SRC_URI="https://sqlitestudio.pl/files/sqlitestudio3/complete/tar/${P}.tar.gz"
 
 KEYWORDS="~amd64"
 IUSE="cli cups nls tcl test"
