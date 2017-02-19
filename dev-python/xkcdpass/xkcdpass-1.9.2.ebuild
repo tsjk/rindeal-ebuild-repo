@@ -11,6 +11,7 @@ PYTHON_COMPAT=( python{2_7,3_3,3_4,3_5} )
 
 inherit git-hosting
 inherit distutils-r1
+# functions: newbashcomp
 inherit bash-completion-r1
 
 DESCRIPTION="Flexible and scriptable password generator, inspired by XKCD 936"
@@ -25,6 +26,7 @@ python_install_all() {
 	distutils-r1_python_install_all
 
 	doman "${PN}.1"
+
 	newbashcomp "contrib/${PN}.bash-completion" "${PN}"
 
 	use examples && dodoc -r examples
