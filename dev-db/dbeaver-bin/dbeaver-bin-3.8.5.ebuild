@@ -1,52 +1,66 @@
-# Copyright 2016 Jan Chren (rindeal)
+# Copyright 2016-2017 Jan Chren (rindeal)
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
+inherit rindeal
 
-inherit eutils xdg
-
-PN_NOBIN="${PN%-bin}"
+# functions: newicon, make_desktop_entry
+inherit eutils
+inherit xdg
+# functions: get_major_version
+inherit versionator
 
 DESCRIPTION="Free universal database manager and SQL client"
-HOMEPAGE="http://dbeaver.jkiss.org/"
-LICENSE="GPL-2"
+HOMEPAGE="http://dbeaver.jkiss.org/ https://github.com/serge-rider/dbeaver"
+LICENSE="GPL-2.0"
 
-SLOT="0"
-src_uri_base="https://github.com/serge-rider/dbeaver/releases/download/${PV}/dbeaver-ce-${PV}-linux.gtk"
-SRC_URI="
-	amd64? ( ${src_uri_base}.x86_64.tar.gz )"
-RESTRICT="mirror strip test"
+PN_NB="${PN%-bin}"
+
+DBEAVER_SLOT="$(get_major_version)"
+SLOT="${DBEAVER_SLOT}"
+src_uri_base="https://github.com/serge-rider/${PN_NB}/releases/download/${PV}/${PN_NB}-ce-${PV}-linux.gtk"
+SRC_URI_A=(
+	"amd64? ( ${src_uri_base}.x86_64.tar.gz )"
+)
 
 KEYWORDS="-* ~amd64"
 
-RDEPEND="
-	|| ( >=virtual/jdk-1.7 >=virtual/jre-1.7 )
-	!dev-db/dbeaver"
+RDEPEND_A=(
+	">=virtual/jre-1.7"
+	"!dev-db/dbeaver"
+)
 
-S="${WORKDIR}/${PN_NOBIN}"
+RESTRICT="mirror strip test"
+
+inherit arrays
+
+S="${WORKDIR}/${PN_NB}"
 
 src_compile() { : ;}
 
 src_install (){
-	local install_dir="/opt/${PN_NOBIN}"
-	local bin="/usr/bin/${PN_NOBIN}"
+	local install_dir="/opt/${PN_NB}${DBEAVER_SLOT}"
+	local bin="/usr/bin/${PN_NB}${DBEAVER_SLOT}"
 
 	insinto "${install_dir}"
 	doins -r *
 
-	fperms a+x "${install_dir}/${PN_NOBIN}"
-	dosym "${install_dir}/${PN_NOBIN}" "${bin}"
+	fperms a+x "${install_dir}/${PN_NB}"
+	dosym "${install_dir}/${PN_NB}" "${bin}"
 
-	newicon -s 256 "icon.xpm" "${PN_NOBIN}.xpm"
+	newicon -s 128 "${PN_NB}.png" "${bin##*/}.png"
 
 	local make_desktop_entry_args=(
 		"${EPREFIX}${bin} %U" # exec
-		"DBeaver"	# name
-		"${PN_NOBIN}"	# icon
-		"Development;Database"	# categories
+		"DBeaver ${DBEAVER_SLOT}"	# name
+		"${bin##*/}"	# icon
+		"Development;Database;IDE;"	# categories
 	)
 	local make_desktop_entry_extras=(
 		"MimeType=application/x-sqlite3;"	# MUST end with semicolon
+		"StartupWMClass=DBeaver"
+		"StartupNotify=true"
+		"GenericName=SQL Database Client"
 	)
 	make_desktop_entry \
 		"${make_desktop_entry_args[@]}" \
