@@ -12,7 +12,7 @@ inherit versionator
 
 DESCRIPTION="Free universal database manager and SQL client"
 HOMEPAGE="http://dbeaver.jkiss.org/ https://github.com/serge-rider/dbeaver"
-LICENSE="GPL-2.0"
+LICENSE="GPL-2"
 
 PN_NB="${PN%-bin}"
 
