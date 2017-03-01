@@ -197,6 +197,7 @@ _EOF_
 mkdir -p "${PORTAGE_CONF_DIR}/make.profile"
 announce tee "${PORTAGE_CONF_DIR}/make.profile/parent" << _EOF_
 gentoo:base
+gentoo:arch/base
 gentoo:default/linux
 gentoo:targets/systemd
 rindeal:
