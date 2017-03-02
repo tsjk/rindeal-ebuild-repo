@@ -438,7 +438,7 @@ src_configure() {
 		--with-systemdsystemunitdir="$(systemd_get_systemunitdir)"
 
 		# do not ever set this, it disables utils even if all their deps are met
- 		# --disable-all-programs
+		# --disable-all-programs
 
 		## TODO: reorganize these options according to ./configure --help
 
