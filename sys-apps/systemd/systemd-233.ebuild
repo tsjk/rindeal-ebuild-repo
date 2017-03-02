@@ -147,7 +147,10 @@ DEPEND_A=( "${CDEPEND_A[@]}"
 	"nls? ( dev-util/intltool )"
 	"python? ( ${PYTHON_DEPS} )"
 	# tests use dbus
-	"test? ( sys-apps/dbus:0 )"
+	"test? ("
+		"sys-apps/dbus:0"
+		">=dev-lang/python-3" # since v233
+	")"
 )
 RDEPEND_A=( "${CDEPEND_A[@]}"
 	"s1_selinux? ( sec-policy/selinux-base-policy[systemd] )"
@@ -194,8 +197,6 @@ python_check_deps() {
 }
 
 pkg_pretend() {
-	# TODO: ewarn of bugs that are in this release
-
 	[[ -n "${EPREFIX}" ]] && \
 		die "Gentoo Prefix is not supported"
 
@@ -287,25 +288,8 @@ src_prepare() {
 	eapply "${FILESDIR}/218-Dont-enable-audit-by-default.patch"
 	eapply "${FILESDIR}/228-noclean-tmp.patch"
 	eapply "${FILESDIR}/231-manager-ignore_0_length_notification_messages.patch"
-	eapply "${FILESDIR}/232-build_sys_check_for_lz4_in_the_old_and_new_numbering.patch"
-	eapply "${FILESDIR}/232-build_sys_add_check_for_gperf_lookup_function_signature.patch"
-	eapply "${FILESDIR}/232-journal_make_sure_to_initially_populate_the_space_info_cache_4807.patch"
-	eapply "${FILESDIR}/232-build_sys_define_arm_as_secondary_architecture_for_arm64.patch"
-	eapply "${FILESDIR}/232-core_downgrade_Time_has_been_changed_to_debug_4906.patch"
-	eapply "${FILESDIR}/232-units_fix_condition_for_systemd-journal-catalog-update.service_4990.patch"
-	eapply "${FILESDIR}/232-core_fix_sockaddr_length_calculation_for_sockaddr_pretty_4966.patch"
-	eapply "${FILESDIR}/232-shared_fix_double_free_in_unmask_5005.patch"
-	eapply "${FILESDIR}/232-shared_fix_double_free_in_link.patch"
-	eapply "${FILESDIR}/232-shared_check_strdup_NULL.patch"
-	eapply "${FILESDIR}/232-shell_completion_redirect_all_errors_from_systemctl_to_dev_null.patch"
-	eapply "${FILESDIR}/232-systemctl_uninitalized_variable.patch"
-	eapply "${FILESDIR}/232-bash_completion_journalctl_add_missing_options.patch"
-	eapply "${FILESDIR}/232-Fix_caching_in_zsh_completion_5122.patch"
-	eapply "${FILESDIR}/232-core_dbus_fix_two_strv_memleaks.patch"
-	eapply "${FILESDIR}/232-core_execute_fix_strv_memleak.patch"
-	eapply "${FILESDIR}/232-resolve_fix_strv_memleak.patch"
-	eapply "${FILESDIR}/232-systemctl_ignore_SIGTERM_after_switch-root.patch"
-	eapply "${FILESDIR}/232-resolved_create_etc_resolv.conf_symlink_at_runtime.patch"
+	eapply "${FILESDIR}/233-357e1b17b901b48714fa5301c745ae5389661798.patch" # dhcp-server: add two missing OOM checks
+	eapply "${FILESDIR}/232-dcce98a4bdc302a5efeb3a5c35b6cbf6d16a3efc.patch" # Avoid strict DM interface version dependencies (#5519)
 	eapply_user
 
 	# 'uucp' group is prefered for this purpose in Gentoo (gentoo#463376)
@@ -533,6 +517,8 @@ src_configure() {
 
 		"$(my_with nobody-user)"	# Specify the name of the nobody user (the one with UID 65534)
 		"$(my_with nobody-group)"	# Specify the name of the nobody group (the one with GID 65534)
+
+		"$(my_with fallback-hostname)" # fallback hostname to use if none is configured in /etc/hostname
 	)
 
 	econf "${econf_args[@]}"
