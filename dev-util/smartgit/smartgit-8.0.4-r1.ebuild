@@ -1,32 +1,35 @@
-# Copyright 2015-2016 Jan Chren (rindeal)
+# Copyright 2015-2017 Jan Chren (rindeal)
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
+inherit rindeal
 
+# functions: newicon, make_desktop_entry
 inherit eutils
 # xdg: src_prepare, pkg_preinst, pkg_postinst, pkg_postrm
 inherit xdg
-
-VENDOR="syntevo"
+# functions: get_major_version
+inherit versionator
 
 DESCRIPTION="Git client with support for GitHub Pull Requests+Comments, SVN and Mercurial"
-HOMEPAGE="https://www.${VENDOR}.com/${PN}"
-LICENSE="${PN}"
+HOMEPAGE="https://www.syntevo.com/smartgit"
+LICENSE="smartgit"
 
 # slot number is based on the upstream slotting mechanism which creates a new subdir
-# in `~/.smartgit` for each new major release. The subdir name corresponds with SLOT.
-SLOT="8"
+# in `~/.smartgit/` for each new major release. The subdir name corresponds with SLOT.
+SLOT="$(get_major_version)"
 PN_SLOTTED="${PN}${SLOT}"
-# upstream use these types of download uris so far:
-# 	https://www.syntevo.com/static/smart/download/smartgit/smartgit-linux-8_0_1.tar.gz
-# 	https://www.syntevo.com/static/smart/download/smartgithg/archive/smartgit-linux-7_1_4.tar.gz
-SRC_URI="https://www.${VENDOR}.com/static/smart/download/${PN}/${PN}-linux-${PV//./_}.tar.gz"
+ARCHIVED=1
+if (( ARCHIVED )) ; then
+	SRC_URI="https://www.syntevo.com/static/smart/download/${PN}hg/archive/${PN}-linux-${PV//./_}.tar.gz"
+else
+	SRC_URI="https://www.syntevo.com/static/smart/download/${PN}/${PN}-linux-${PV//./_}.tar.gz"
+fi
 
 KEYWORDS="~amd64"
 
 RDEPEND="
 	>=virtual/jre-1.7
-	|| ( dev-vcs/git dev-vcs/mercurial )
 "
 
 RESTRICT+=" mirror strip"
@@ -34,6 +37,7 @@ RESTRICT+=" mirror strip"
 S="${WORKDIR}/${PN}"
 
 src_install() {
+	local VENDOR="syntevo"
 	local install_dir="/opt/${VENDOR}/${PN_SLOTTED}"
 
 	## copy files to the install image
