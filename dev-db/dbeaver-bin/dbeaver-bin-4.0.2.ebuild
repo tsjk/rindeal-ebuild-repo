@@ -7,6 +7,7 @@ inherit rindeal
 # functions: newicon, make_desktop_entry
 inherit eutils
 inherit xdg
+# functions: get_major_version
 inherit versionator
 
 DESCRIPTION="Free universal database manager and SQL client"
