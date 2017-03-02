@@ -328,6 +328,10 @@ src_prepare-locales() {
 src_prepare() {
 	eapply_user
 
+	# AC_PACKAGE_VERSION, PACKAGE_VERSION get initialized from this file via `./tools/git-version-gen` script
+	# fixes https://github.com/rindeal/gentoo-overlay/issues/157
+	echo "${PV}" > .tarball-version || die
+
 	## although my_use_build_init is src_configure-type function,
 	## it edits configure.ac, therefore it must be here
 	my_use_build_init fdisk
