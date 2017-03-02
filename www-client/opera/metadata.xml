@@ -5,11 +5,6 @@
     <email>dev.rindeal+gentoo-overlay@gmail.com</email>
     <name>Jan Chren (rindeal)</name>
   </maintainer>
-  <longdescription>
-Opera is a graphical Web browser available on several platforms. The desktop
-version runs on GNU/Linux and FreeBSD. Versions for Macintosh and
-Windows are also available.
-</longdescription>
   <use>
     <flag name="autoupdate">Install opera_autoupdate executable</flag>
     <!-- TODO: locale flags should be pushed to the Gentoo l10n.desc file -->
