@@ -45,7 +45,7 @@ LICENSE_A=(
 # Explanation: "incremented for ABI breaks in libudev or libsystemd".
 SLOT="0/2"
 
-# KEYWORDS=""
+KEYWORDS="~amd64 ~arm ~arm64"
 IUSE_A=(
 	## generic
 	+man nls python sysv-utils test vanilla
