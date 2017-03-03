@@ -1,18 +1,21 @@
-# Copyright 2016 Jan Chren (rindeal)
+# Copyright 2016-2017 Jan Chren (rindeal)
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
+inherit rindeal
 
 GH_URI="github/shundhammer"
 
-inherit rindeal git-hosting qmake-utils xdg
+inherit git-hosting
+inherit qmake-utils
+inherit xdg
 
 DESCRIPTION="GUI app to show where your disk space has gone and to help you to clean it up"
 LICENSE="GPL-2"
 
 SLOT="0"
 
-KEYWORDS="~amd64 ~arm"
+KEYWORDS="~amd64"
 IUSE="doc"
 
 CDEPEND="
@@ -24,10 +27,14 @@ RDEPEND="${CDEPEND}"
 
 src_prepare() {
 	eapply_user
+	xdg_src_prepare
 
+	# no debug CXXFLAGS
 	sed -e '/CONFIG.*=.* debug/d' -i -- src/src.pro || die
 
-	sed -e '/SUBDIRS/ s| doc||' -i -- qdirstat.pro || die
+	if ! use doc ; then
+		sed -e '/SUBDIRS/ s| doc||' -i -- qdirstat.pro || die
+	fi
 }
 
 src_configure() {
