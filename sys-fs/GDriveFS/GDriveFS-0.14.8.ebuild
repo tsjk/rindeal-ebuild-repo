@@ -1,4 +1,4 @@
-# Copyright 2016 Jan Chren (rindeal)
+# Copyright 2016-2017 Jan Chren (rindeal)
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
@@ -12,12 +12,11 @@ inherit git-hosting
 inherit distutils-r1
 
 DESCRIPTION="Innovative FUSE wrapper for Google Drive"
-HOMEPAGE="${GH_HOMEPAGE}"
 LICENSE="GPL-2"
 
 SLOT="0"
 
-KEYWORDS="~amd64 ~arm"
+KEYWORDS="~amd64 ~arm ~arm64"
 
 # requirements are in `gdrivefs/resources/requirements.txt`
 CDEPEND_A=(
