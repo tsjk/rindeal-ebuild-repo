@@ -40,6 +40,16 @@ src_install() {
 
 	insinto /lib/modprobe.d/
 	doins "${FILESDIR}"/modprobe.d/50-snd_hda_intel.conf
+
+	# `[QLibraryInfo::DataPath]/qtlogging.ini`
+	# hardcoded in qt5-build.eclass
+	QT5_DATADIR="${EPREFIX}/usr/share/qt5"
+
+	## Silence debugging messages in KDE (and possible other Qt-based) apps.
+	## User customizations can be made to `~/.config/QtProject/qtlogging.ini` file manually
+	## or with the kdebugsettings GUI app.
+	insinto "${QT5_DATADIR}"
+	doins "${FILESDIR}"/qt5/qtlogging.ini
 }
 
 pkg_postinst() {
