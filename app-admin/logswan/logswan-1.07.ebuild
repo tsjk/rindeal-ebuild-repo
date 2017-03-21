@@ -1,4 +1,4 @@
-# Copyright 2016 Jan Chren (rindeal)
+# Copyright 2016-2017 Jan Chren (rindeal)
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
@@ -28,6 +28,7 @@ RDEPEND="${CDEPEND}"
 src_prepare() {
 	default
 
+	# https://github.com/fcambus/logswan/pull/12
 	sed -r -e '/^add_definitions/ s,(-Werror|-pedantic),,g' -i -- CMakeLists.txt || die
 }
 
