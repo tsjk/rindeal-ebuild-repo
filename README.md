@@ -26,7 +26,7 @@ In most package directories there is a _README_ file that says why is my package
 
 > _If you find a package superior to mine, please [report it here][New issue], so that I can improve it even more._
 
-User friendly list of packages is available [here][LISTING].
+You can also visit a user-friendly [list of packages][LISTING].
 I highly encourage you to browse through the list as the chances are high for you to discover some great new software.
 
 
