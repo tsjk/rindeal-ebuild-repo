@@ -288,8 +288,11 @@ src_prepare() {
 	eapply "${FILESDIR}/218-Dont-enable-audit-by-default.patch"
 	eapply "${FILESDIR}/228-noclean-tmp.patch"
 	eapply "${FILESDIR}/231-manager-ignore_0_length_notification_messages.patch"
-	eapply "${FILESDIR}/233-357e1b17b901b48714fa5301c745ae5389661798.patch" # dhcp-server: add two missing OOM checks
-	eapply "${FILESDIR}/232-dcce98a4bdc302a5efeb3a5c35b6cbf6d16a3efc.patch" # Avoid strict DM interface version dependencies (#5519)
+	eapply "${FILESDIR}/233-357e1b17b901b48714fa5301c745ae5389661798.patch"	# dhcp-server: add two missing OOM checks
+	eapply "${FILESDIR}/232-dcce98a4bdc302a5efeb3a5c35b6cbf6d16a3efc.patch"	# Avoid strict DM interface version dependencies (#5519)
+	eapply "${FILESDIR}/233-6f94e420e8355421fc31713a0df760d6b20473ac.patch"	# journal: prevent integer overflow while validating header (#5569)
+	eapply "${FILESDIR}/233-d74dc4f2d00644c04ad9dc900ef43050fcadaa8b.patch"	# coredump: fix handling of premature-eof data for --backtrace
+	eapply "${FILESDIR}/233-60705040152c9953a200eea16fffb5fef894c613.patch"		# systemctl: fix broken vertical lines in list-dependencies --all (#5608)
 	eapply_user
 
 	# 'uucp' group is prefered for this purpose in Gentoo (gentoo#463376)
