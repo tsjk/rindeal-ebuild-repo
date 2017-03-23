@@ -34,6 +34,15 @@ RDEPEND_A=( "${CDEPEND_A[@]}" )
 
 inherit arrays
 
+src_prepare() {
+	default
+
+	# https://github.com/lxde/pavucontrol-qt/issues/31
+	sed -e 's|"changes-prevent"|"changes-prevent-symbolic"|' -i src/*.ui || die
+
+	cmake-utils_src_prepare
+}
+
 src_configure() {
 	local mycmakeargs=(
 		# prevent lxqt-build-tools from pulling translations from a remote git server
