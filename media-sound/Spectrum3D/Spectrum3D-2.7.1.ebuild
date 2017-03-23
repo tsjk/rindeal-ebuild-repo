@@ -1,4 +1,4 @@
-# Copyright 2016 Jan Chren (rindeal)
+# Copyright 2016-2017 Jan Chren (rindeal)
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
@@ -10,25 +10,23 @@ inherit autotools
 inherit eutils
 
 DESCRIPTION="Audio spectrum analyser in 3D"
-HOMEPAGE="http://spectrum3d.sourceforge.net"
+HOMEPAGE="http://spectrum3d.sourceforge.net https://sourceforge.net/projects/spectrum3d/"
 LICENSE="GPL-3"
 
+SLOT="0"
 MY_PN="${PN,,}"
 MY_P="${MY_PN}-${PV}"
-SLOT="0"
 SRC_URI="mirror://sourceforge/${MY_PN}/${MY_P}.tar.gz"
 
 KEYWORDS="~amd64"
-IUSE="gtk3 gtkglext jack gstreamer010"
+IUSE="gtk3 sdl jack gstreamer010"
 
 CDEPEND_A=(
 	"gtk3? ( x11-libs/gtk+:3 )"
-	"!gtk3? ("
-		"x11-libs/gtk+:2"
-		"gtkglext? ( x11-libs/gtkglext )"
-	")"
+	"!gtk3? ( x11-libs/gtk+:2 )"
 
-	"!gtkglext? ( media-libs/libsdl )"
+	"sdl? ( media-libs/libsdl )"
+	"!sdl? ( media-libs/libsdl2 )"
 
 	# libGL, libGLU
 	"virtual/opengl"
@@ -39,14 +37,6 @@ CDEPEND_A=(
 	"!gstreamer010? ( media-libs/gstreamer:1.0 )"
 
 	"jack? ( virtual/jack )"
-
-	# libraries not packaged
-# 	"geis? ("
-# 		# libbamf
-# 		"x11-libs/bamf"
-# 		# libgeis
-# 		"unity-base/geis"
-# 	")"
 )
 DEPEND_A=( "${CDEPEND_A[@]}" )
 RDEPEND_A=( "${CDEPEND_A[@]}"
@@ -58,11 +48,6 @@ RDEPEND_A=( "${CDEPEND_A[@]}"
 	"!gstreamer010? ( media-libs/gst-plugins-base:1.0 )"
 )
 
-REQUIRED_USE_A=(
-	# gtkglext-3.0 (https://github.com/tdz/gtkglext) is not packaged yet
-	"gtkglext? ( !gtk3 )"
-)
-
 inherit arrays
 
 S="${WORKDIR}/${MY_P}"
@@ -70,27 +55,20 @@ S="${WORKDIR}/${MY_P}"
 src_prepare() {
 	default
 
-	# .desktop contains duplicated Type=
+	# .desktop contains duplicated Type= (https://sourceforge.net/p/spectrum3d/discussion/bug-wishlist/thread/d429f757/)
 	gawk -i inplace '!seen[$0]++' "data/${MY_PN}.desktop.in" || die
 
-	# missing includes
-	#
-	#     gstreamer.c:192:3: warning: implicit declaration of function 'g_sprintf'
-	#
-	sed -e '1 i\ #include <glib.h>\n#include <glib/gprintf.h>' -i -- src/gstreamer.c || die
+	## fix icons path (https://sourceforge.net/p/spectrum3d/discussion/bug-wishlist/thread/8c685767/)
+	# the svg icon is used only in the desktop menu entry
+	sed -r -e "s|^(svgicondir =).*|\1 \$(datadir)/icons/hicolor/scalable/apps|" -i -- data/Makefile.am || die
 
-	#
-	#    events.c:224:5: warning: implicit declaration of function 'reset_view'
-	#    events.c:228:5: warning: implicit declaration of function 'front_view'
-	#
-	# NOTE: including "main.h" won't work, because it includes too much causing conflicts
-	sed -i '/#include "events.h"/ i\ void reset_view();\nvoid front_view();' src/events.c || die
-
-	# fix icons path
-	sed -e "s|icondir = .*|icondir = \$(datadir)/${PN}/icons|" -i -- data/Makefile.am || die
-	grep --files-with-matches -r "g_build_filename.*.png" |\
+	sed -e "1s|^|icondir = \$(datadir)/${PN}/icons\n|" -i -- src/Makefile.am || die
+	sed -r -e "s|^(icondir =).*|\1 \$(datadir)/${PN}/icons|" -i -- data/Makefile.am || die
+	# pass $(icondir) to source files
+	sed -e "/^AM_CPPFLAGS =/ s|$| -D ICONDIR='\"\$(icondir)\"'|" -i -- src/Makefile.am || die
+	grep --files-with-matches -r "g_build_filename.*DATADIR.*icons" |\
 		xargs \
-		sed -r -e '/g_build_filename.*\.png/ '"s|\"icons\"|\"${PN}/icons\"|" -i --
+		sed -r -e '/g_build_filename.*DATADIR.*icons/ '"s|DATADIR, \"icons\"|ICONDIR|" -i --
 
 	eautoreconf
 }
@@ -99,7 +77,8 @@ src_configure() {
 	local myeconfargs=(
 		$(use_enable gtk3)
 		$(use_enable '!gtk3' gtk2)
-		$(use_enable gtkglext)
+		$(use_enable sdl)
+		$(use_enable '!sdl' sdl2)
 		$(use_enable jack)
 
 	)
@@ -111,5 +90,4 @@ src_install() {
 
 	# 44x44
 	doicon data/${MY_PN}.png
-	doicon -s scalable data/${MY_PN}.svg
 }
