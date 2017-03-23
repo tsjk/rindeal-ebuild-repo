@@ -35,6 +35,8 @@ inherit git-hosting
 inherit distutils-r1
 # functions: version_compare()
 inherit versionator
+# functions: makeopts_jobs()
+inherit multiprocessing
 
 
 DESCRIPTION='C++ BitTorrent implementation focusing on efficiency and scalability'
@@ -88,6 +90,31 @@ libtorrent-rasterbar_src_prepare() {
 	# respect optimization flags
 	sed -e '/DEBUGFLAGS *=/ s|-O[a-z0-9]||' \
 		-i -- configure.ac || die
+
+	## compile python bindings in parallel
+	## https://stackoverflow.com/a/13176803/2566213
+	local build_py_monkey_patch
+	read -r -d '' build_py_monkey_patch <<_EOF_
+def parallelCCompile(self, sources, output_dir=None, macros=None, include_dirs=None, debug=0, extra_preargs=None, extra_postargs=None, depends=None):
+	# those lines are copied from distutils.ccompiler.CCompiler directly
+	macros, objects, extra_postargs, pp_opts, build = self._setup_compile(output_dir, macros, include_dirs, sources, depends, extra_postargs)
+	cc_args = self._get_cc_args(pp_opts, debug, extra_preargs)
+	# parallel code
+	N=$(makeopts_jobs) # number of parallel compilations
+	import multiprocessing.pool
+	def _single_compile(obj):
+		try: src, ext = build[obj]
+		except KeyError: return
+		self._compile(obj, src, ext, cc_args, extra_postargs, pp_opts)
+	# convert to list, imap is evaluated on-demand
+	list(multiprocessing.pool.ThreadPool(N).imap(_single_compile,objects))
+	return objects
+import distutils.ccompiler
+distutils.ccompiler.CCompiler.compile=parallelCCompile
+_EOF_
+	gawk -i inplace -vmonkey_patch="${build_py_monkey_patch}" \
+		'/^setup\(/ { print monkey_patch ; print ; next }1' \
+		bindings/python/setup.py || die
 
 	use python && distutils-r1_src_prepare
 }
