@@ -25,12 +25,13 @@ GH_URI='github/arvidn/libtorrent'
 GH_FETCH_TYPE='manual'
 
 
+# functions: prune_libtool_files()
 inherit eutils
-# vcs-snapshot: src_unpack
+# EXPORT_FUNCTIONS: src_unpack
 inherit vcs-snapshot
-# git-hosting: src_unpack
+# EXPORT_FUNCTIONS: src_unpack
 inherit git-hosting
-# distutils-r1: TODO
+# EXPORT_FUNCTIONS: src_prepare, src_configure, src_compile, src_test, src_install
 inherit distutils-r1
 
 
