@@ -1,5 +1,5 @@
 # Copyright 1999-2014 Gentoo Foundation
-# Copyright 2016 Jan Chren (rindeal)
+# Copyright 2016-2017 Jan Chren (rindeal)
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
@@ -7,7 +7,7 @@ inherit rindeal
 
 GH_URI="github/Beep6581/RawTherapee"
 # check http://rawtherapee.com/downloads for a new commit number
-GH_REF="8094ce7c99d5c45fb34ec349c8cb16de5077048d"
+GH_REF="50114c1a3658cb08dec16f4a3e33c1611e08aa98"
 
 inherit git-hosting cmake-utils toolchain-funcs xdg
 
