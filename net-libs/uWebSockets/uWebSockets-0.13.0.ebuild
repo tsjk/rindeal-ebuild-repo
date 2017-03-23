@@ -27,7 +27,4 @@ CDEPEND_A=(
 DEPEND_A=( "${CDEPEND_A[@]}" )
 RDEPEND_A=( "${CDEPEND_A[@]}" )
 
-REQUIRED_USE_A=(  )
-RESTRICT+=""
-
 inherit arrays
