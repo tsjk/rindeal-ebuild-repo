@@ -92,7 +92,7 @@ libtorrent-rasterbar_src_prepare() {
 }
 
 libtorrent-rasterbar_src_configure() {
-	local myeconfargs=(
+	local my_econf_args=(
 		--disable-silent-rules # gentoo#441842
 		# hardcode boost system to skip "lookup heuristic"
 		--with-boost-system='mt'
@@ -112,15 +112,15 @@ libtorrent-rasterbar_src_configure() {
 		my_econf_args+=( $(use_enable debug statistics) )
 	fi
 
-	econf "${myeconfargs[@]}"
+	econf "${my_econf_args[@]}"
 
 	if use python ; then
 		python_configure() {
-			local myeconfargs=( "${myeconfargs[@]}"
+			local my_econf_args=( "${my_econf_args[@]}"
 				--enable-python-binding
 				--with-boost-python
 			)
-			econf "${myeconfargs[@]}"
+			econf "${my_econf_args[@]}"
 		}
 		distutils-r1_src_configure
 	fi
