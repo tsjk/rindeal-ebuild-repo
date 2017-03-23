@@ -1,37 +1,44 @@
-# Copyright 2016 Jan Chren (rindeal)
+# Copyright 2016-2017 Jan Chren (rindeal)
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
+inherit rindeal
 
 GH_URI="github/lxde"
 
-inherit git-hosting cmake-utils
+inherit git-hosting
+inherit cmake-utils
 
 DESCRIPTION="Qt port of pavucontrol"
 LICENSE="GPL-2"
 
 SLOT="0"
 
-[[ "${PV}" == *9999* ]] || KEYWORDS="~amd64 ~arm"
+KEYWORDS="~amd64"
 IUSE="doc"
 
-CDEPEND="
-	dev-libs/glib:2
-	lxqt-base/liblxqt
-	media-sound/pulseaudio[glib]
-	dev-qt/qtdbus:5
-	dev-qt/qtwidgets:5"
-DEPEND="${CDEPEND}
-	dev-qt/linguist-tools:5
-	virtual/pkgconfig
-	x11-misc/xdg-user-dirs"
-RDEPEND="${CDEPEND}"
+CDEPEND_A=(
+	"dev-libs/glib:2"
+	">=lxqt-base/liblxqt-0.10"
+	"media-sound/pulseaudio[glib]"
+	"dev-qt/qtdbus:5"
+	"dev-qt/qtwidgets:5"
+)
+DEPEND_A=( "${CDEPEND_A[@]}"
+	">=dev-util/lxqt-build-tools-${PV}"
+	"dev-qt/linguist-tools:5"
+	"virtual/pkgconfig"
+	"x11-misc/xdg-user-dirs"
+)
+RDEPEND_A=( "${CDEPEND_A[@]}" )
+
+inherit arrays
 
 src_configure() {
 	local mycmakeargs=(
-		# workaround for missing cmake modules
-		# TODO: remove this once lxqt-base/liblxqt>10.0 hits the tree
-		-DCMAKE_MODULE_PATH="${FILESDIR}/cmake-find-modules"
+		# prevent lxqt-build-tools from pulling translations from a remote git server
+		-D PULL_TRANSLATIONS=''
 	)
+
 	cmake-utils_src_configure
 }
