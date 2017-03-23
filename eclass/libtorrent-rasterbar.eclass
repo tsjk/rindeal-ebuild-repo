@@ -44,6 +44,7 @@ LICENSE='BSD'
 
 [[ -z "${LT_SONAME}" ]] && die "LT_SONAME not defined or empty"
 SLOT="0/${LT_SONAME}"
+# prepared tarball saves eautoreconf() call. Repo snapshot is not needed for now.
 SRC_URI="${GH_BASE_URI}/releases/download/libtorrent-${PV//./_}/${P}.tar.gz"
 
 
@@ -85,8 +86,8 @@ libtorrent-rasterbar_src_prepare() {
 		-i -- bindings/python/link_flags.in || die
 
 	# respect optimization flags
-	sed -e '/FLAGS *=/ s|-Os||' \
-		-i -- configure CMakeLists.txt || die
+	sed -e '/DEBUGFLAGS *=/ s|-O[a-z0-9]||' \
+		-i -- configure.ac || die
 
 	use python && distutils-r1_src_prepare
 }
