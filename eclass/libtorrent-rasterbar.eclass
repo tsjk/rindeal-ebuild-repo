@@ -33,6 +33,8 @@ inherit vcs-snapshot
 inherit git-hosting
 # EXPORT_FUNCTIONS: src_prepare, src_configure, src_compile, src_test, src_install
 inherit distutils-r1
+# functions: version_compare()
+inherit versionator
 
 
 DESCRIPTION='C++ BitTorrent implementation focusing on efficiency and scalability'
@@ -100,12 +102,16 @@ libtorrent-rasterbar_src_configure() {
 		$(use_enable debug)
 		$(use_enable debug disk-stats)
 		$(use_enable debug logging verbose)
-		$(use_enable debug statistics)
 		$(use_enable dht dht $(usex debug logging yes))
 		$(use_enable examples)
 		$(use_enable static-libs static)
 		$(use_enable test tests)
 	)
+
+	if (( $(version_compare "${PV}" 1.1.0 ) = 1 )) ; then
+		my_econf_args+=( $(use_enable debug statistics) )
+	fi
+
 	econf "${myeconfargs[@]}"
 
 	if use python ; then
