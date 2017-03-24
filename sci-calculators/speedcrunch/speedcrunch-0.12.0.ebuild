@@ -1,15 +1,18 @@
 # Copyright 1999-2014 Gentoo Foundation
-# Copyright 2016 Jan Chren (rindeal)
+# Copyright 2016-2017 Jan Chren (rindeal)
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
+inherit rindeal
 
 GH_URI="bitbucket/heldercorreia"
+GH_REF="release-${PV}"
 
-inherit cmake-utils git-hosting
+inherit git-hosting
+inherit cmake-utils
 
 DESCRIPTION="Fast and usable calculator for power users"
-HOMEPAGE="http://speedcrunch.org/ ${HOMEPAGE}"
+HOMEPAGE="http://speedcrunch.org/ ${GH_HOMEPAGE}"
 LICENSE="GPL-2"
 
 SLOT="0"
@@ -17,15 +20,19 @@ SLOT="0"
 KEYWORDS="~amd64"
 IUSE="doc"
 
-DEPEND="
+CDEPEND_A=(
 	x11-libs/libX11
 	dev-qt/qtcore:4
-	dev-qt/qtgui:4"
-RDEPEND="${DEPEND}"
+	dev-qt/qtgui:4
+)
+DEPEND_A=( "${CDEPEND_A[@]}" )
+RDEPEND_A=( "${CDEPEND_A[@]}" )
 
-L10N_LOCALES=( ar_JO ca_ES cs_CZ de_DE en_GB en_US es_AR es_ES et_EE eu_ES fi_FI fr_FR he_IL hu_HU
-	id_ID it_IT ja_JP ko_KR lv_LV nb_NO nl_NL pl_PL pt_BR pt_PT ro_RO ru_RU sv_SE tr_TR uz_UZ vi_VN
-	zh_CN )
+inherit arrays
+
+L10N_LOCALES=( ar ca_ES cs_CZ da de_DE el en_GB en_US es_AR es_ES et_EE eu_ES fi_FI fr_FR he_IL hu_HU
+	id_ID it_IT ja_JP ko_KR lt lv_LV nb_NO nl_NL pl_PL pt_BR pt_PT ro_RO ru_RU sk sv_SE tr_TR uz_Latn_UZ
+	vi zh_CN )
 inherit l10n-r1
 
 S_OLD="${S}"
@@ -38,7 +45,7 @@ src_prepare-locales() {
 
 	l10n_get_locales locales app off
 	for l in ${locales} ; do
-		rm -v -f "${dir}/${pre}${l}${post}" || die
+		erm "${dir}/${pre}${l}${post}"
 		sed -e "s|<file>locale/${l}.qm</file>||" \
 			-i -- resources/speedcrunch.qrc || die
 		sed -e "s|map.insert(QString::fromUtf8(\".*, QLatin1String(\"${l}\"));||" \
@@ -47,9 +54,9 @@ src_prepare-locales() {
 }
 
 src_prepare() {
-	cmake-utils_src_prepare
-
 	src_prepare-locales
+
+	cmake-utils_src_prepare
 }
 
 src_install() {
@@ -58,5 +65,5 @@ src_install() {
 	cd "${S_OLD}" || die
 
 	doicon -s scalable gfx/${PN}.svg
-	use doc && dodoc doc/*{.pdf,.odt}
+	use doc && dodoc doc/*.{pdf,odt}
 }
