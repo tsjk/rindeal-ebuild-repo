@@ -6,8 +6,7 @@ EAPI=6
 inherit rindeal
 
 GH_URI="github/karelzak"
-[[ "${PV}" != *9999* ]] && \
-	GH_FETCH_TYPE="manual"
+GH_REF="v${PV}"
 
 PYTHON_COMPAT=( python{2_7,3_{3,4,5}} )
 
@@ -35,8 +34,6 @@ HOMEPAGE="https://www.kernel.org/pub/linux/utils/${PN}/ ${GH_HOMEPAGE}"
 LICENSE="GPL-2 LGPL-2.1 BSD-4 MIT public-domain"
 
 SLOT="0"
-distfile="${P}--snapshot.tar.bz2"
-SRC_URI="https://git.kernel.org/cgit/utils/util-linux/util-linux.git/snapshot/v${PV}.tar.bz2 -> ${distfile}"
 
 KEYWORDS="~amd64 ~arm ~arm64"
 IUSE_A=(
@@ -297,11 +294,6 @@ inherit arrays
 
 L10N_LOCALES=( ca cs da de es et eu fi fr gl hr hu id it ja nl pl pt_BR ru sl sv tr uk vi zh_CN zh_TW )
 inherit l10n-r1
-
-src_unpack() {
-	git-hosting_unpack "${DISTDIR}/${distfile}" "${S}"
-	default
-}
 
 pkg_setup() {
 	use libpython && python-single-r1_pkg_setup
