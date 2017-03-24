@@ -1,5 +1,5 @@
 # Copyright 1999-2016 Gentoo Foundation
-# Copyright 2016 Jan Chren (rindeal)
+# Copyright 2016-2017 Jan Chren (rindeal)
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
@@ -26,7 +26,7 @@ SLOT="0"
 
 KEYWORDS="~amd64 ~arm ~arm64"
 IUSE_A=(
-	curldebug +largefile libgcc +rt +symbol-hiding versioned-symbols static-libs test
+	curldebug +largefile libgcc +rt +symbol-hiding versioned-symbols static-libs test threads
 
 	libcurl-option manual +verbose
 
@@ -71,16 +71,16 @@ CDEPEND_A=(
 		"ssl_polarssl?	( net-libs/polarssl:0= )"
 	")"
 	"protocol_http2?	( net-libs/nghttp2 )"
-	"idn?	( net-dns/libidn2:0[static-libs?] )"
-	"dns_c-ares?	( net-dns/c-ares:0 )"
-	"auth_kerberos?	( >=virtual/krb5-0-r1 )"
-	"metalink?	( >=media-libs/libmetalink-0.1.1 )"
-	"protocol_rtmp?	( media-video/rtmpdump )"
-	"ssh2?	( net-libs/libssh2[static-libs?] )"
-	"zlib? ( sys-libs/zlib )"
-	"protocol_ldap? ( net-nds/openldap )"
-	"protocol_ldaps? ( net-nds/openldap[ssl] )"
-	"psl? ( net-libs/libpsl )"
+	"idn?				( net-dns/libidn2:0[static-libs?] )"
+	"dns_c-ares?		( net-dns/c-ares:0 )"
+	"auth_kerberos?		( >=virtual/krb5-0-r1 )"
+	"metalink?			( >=media-libs/libmetalink-0.1.1 )"
+	"protocol_rtmp?		( media-video/rtmpdump )"
+	"ssh2?				( net-libs/libssh2[static-libs?] )"
+	"zlib?				( sys-libs/zlib )"
+	"protocol_ldap?		( net-nds/openldap )"
+	"protocol_ldaps?	( net-nds/openldap[ssl] )"
+	"psl?				( net-libs/libpsl )"
 )
 DEPEND_A=( "${CDEPEND_A[@]}"
 	"virtual/pkgconfig"
@@ -93,6 +93,10 @@ RDEPEND_A=( "${CDEPEND_A[@]}" )
 
 REQUIRED_USE_A=(
 	"?? ( dns_threaded dns_c-ares )"
+	# `if test "$want_pthreads" = "yes" && test "$dontwant_rt" = "yes"; then AC_MSG_ERROR`
+	"?? ( threads !rt )"
+	# `dnl turn off pthreads if no threaded resolver	`
+	"threads? ( dns_threaded )"
 	"ssl? ("
 		"^^ ("
 			$(rindeal:dsf:prefix_flags \
@@ -124,11 +128,7 @@ src_prepare() {
 	eapply "${FILESDIR}/${PN}-7.30.0-prefix.patch"
 	eapply "${FILESDIR}/${PN}-respect-cflags-3.patch"
 	eapply "${FILESDIR}/${PN}-fix-gnutls-nettle.patch"
-	eapply "${FILESDIR}/7.52.1-vtls__s_SSLEAY_OPENSSL.patch"
 	eapply_user
-
-	# gentoo#382241
-	sed -e '/LD_LIBRARY_PATH=/d' -i -- configure.ac || die
 
 	eprefixify curl-config.in
 
