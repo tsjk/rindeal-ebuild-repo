@@ -9,8 +9,16 @@
     {{-''-}} cat-{{ cat }}
 {%- endmacro -%}
 
+{% macro catlink(cat) -%}
+    {{-''-}} #user-content-{{ catid(cat) }}
+{%- endmacro -%}
+
 {% macro pkgid(cat, pn) -%}
     {{-''-}} pkg-{{ cat }}---{{ pn }}
+{%- endmacro -%}
+
+{% macro pkglink(cat, pn) -%}
+    {{-''-}} #user-content-{{ pkgid(cat, pn) }}
 {%- endmacro -%}
 
 <a id="top"></a>
@@ -39,7 +47,7 @@ Category | Packages
         {% endif -%}
 
         {# package name with an embedded link to the package location in the full list #}
-        {{-''}}[{{ pkg }}](#{{ pkgid(cat, pkg) }}){{''-}}
+        {{-''}}[{{ pkg }}]({{ pkglink(cat, pkg) }}){{''-}}
     {% endfor %}
 
     {#- new line #}
@@ -60,7 +68,7 @@ Package | Description | :house: | :back:
         {{- ' | ' -}}
         [:house:]({{ pkg.home }})
         {{- ' | ' -}}
-        [:back:](#{{ catid(c) }})
+        [:back:]({{ catlink(c) }})
     {% endfor %}
 {% endfor %}
 
