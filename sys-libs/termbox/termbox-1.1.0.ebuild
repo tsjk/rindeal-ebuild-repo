@@ -1,7 +1,8 @@
-# Copyright 2016 Jan Chren (rindeal)
+# Copyright 2016-2017 Jan Chren (rindeal)
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
+inherit rindeal
 
 ## git-hosting.eclass
 GH_URI="github/nsf"
@@ -13,22 +14,31 @@ PYTHON_REQ_USE="threads"
 ## distutils-r1.eclass
 DISTUTILS_OPTIONAL=TRUE
 
-inherit git-hosting python-r1 distutils-r1 waf-utils
+inherit git-hosting
+inherit distutils-r1
+inherit waf-utils
 
 DESCRIPTION="Library for writing text-based user interfaces"
 LICENSE="MIT"
 
 SLOT="0"
 
-KEYWORDS="~amd64 ~arm"
-IUSE="examples python static-libs"
+KEYWORDS="~amd64 ~arm ~arm64"
+IUSE_A=( examples python static-libs )
 
-CDEPEND="python? ( ${PYTHON_DEPS} )"
-DEPEND="${CDEPEND}
-	python? ( dev-python/cython[${PYTHON_USEDEP}] )"
-RDEPEND="${CDEPEND}"
+CDEPEND_A=(
+	"python? ( ${PYTHON_DEPS} )"
+)
+DEPEND_A=( "${CDEPEND_A[@]}"
+	"python? ( dev-python/cython[${PYTHON_USEDEP}] )"
+)
+RDEPEND_A=( "${CDEPEND_A[@]}" )
 
-REQUIRED_USE="python? ( ${PYTHON_REQUIRED_USE} )"
+REQUIRED_USE_A=(
+	"python? ( ${PYTHON_REQUIRED_USE} )"
+)
+
+inherit arrays
 
 pkg_setup() {
 	python_setup
@@ -38,7 +48,7 @@ src_prepare() {
 	default
 
 	# respect flags
-	sed -e '/CFLAGS/ s@-O[0-9]@@' \
+	sed -e '/append.*CFLAGS/ s|-O[0-9]||' \
 		-i -- wscript || die
 	# fix compiler error
 	# https://github.com/nsf/termbox/issues/89
