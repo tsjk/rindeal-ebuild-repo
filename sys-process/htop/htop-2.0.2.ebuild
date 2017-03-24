@@ -22,15 +22,22 @@ LICENSE="GPL-2"
 SLOT="0"
 
 KEYWORDS="amd64 arm ~arm64"
-IUSE="+cgroup hwloc +linux-affinity openvz unicode taskstats vserver"
+IUSE_A=( +cgroup hwloc +linux-affinity openvz unicode taskstats vserver )
 
-RDEPEND="
-	hwloc? ( sys-apps/hwloc )
-	sys-libs/ncurses:0=[unicode?]"
-DEPEND="${RDEPEND}
-	virtual/pkgconfig"
+CDEPEND_A=(
+	"hwloc? ( sys-apps/hwloc )"
+	"sys-libs/ncurses:0=[unicode?]"
+)
+DEPEND_A=( "${CDEPEND_A[@]}"
+	"virtual/pkgconfig"
+)
+RDEPEND_A=( "${CDEPEND_A[@]}" )
 
-REQUIRED_USE="?? ( hwloc linux-affinity )"
+REQUIRED_USE_A=(
+	"?? ( hwloc linux-affinity )"
+)
+
+inherit arrays
 
 pkg_setup() {
 	if ! has_version sys-process/lsof ; then
@@ -49,20 +56,18 @@ pkg_setup() {
 }
 
 src_prepare() {
-	local PATCHES=(
-		"${FILESDIR}"/2.0.2-ncurses-tinfo.patch )
+	eapply "${FILESDIR}"/2.0.2-ncurses-tinfo.patch
 	xdg_src_prepare
 
-	# improve .desktop file
+	# improve .desktop file (https://github.com/hishamhm/htop/pull/609)
 	sed -e 's|\(Categories=\).*|\1System;Monitor;ConsoleOnly;|' \
-		-e 's|\(Keywords=\).*|\1system;process;task;|' \
 		-i -- "${PN}.desktop" || die
 
 	eautoreconf
 }
 
 src_configure() {
-	local myeconfargs=(
+	local my_econf_args=(
 		--enable-proc	# use Linux-compatible proc filesystem, disable only for non-Linux
 
 		$(use_enable hwloc)				# enable hwloc support for CPU affinity
@@ -74,7 +79,7 @@ src_configure() {
 		$(use_enable unicode)
 		$(use_enable vserver)
 	)
-	econf "${myeconfargs[@]}"
+	econf "${my_econf_args[@]}"
 }
 
 src_install() {
