@@ -5,16 +5,17 @@
 EAPI=6
 inherit rindeal
 
+# functions: eautoreconf
 inherit autotools
 # functions: prune_libtool_files
 inherit eutils
 
 DESCRIPTION="Standardized interface for manipulating and administering user/group accounts"
-HOMEPAGE="https://fedorahosted.org/libuser"
+HOMEPAGE="https://pagure.io/libuser"
 LICENSE="GPL-2"
 
 SLOT="0"
-SRC_URI="https://fedorahosted.org/releases/l/i/${PN}/${P}.tar.xz"
+SRC_URI="https://releases.pagure.org/${PN}/${P}.tar.xz"
 
 KEYWORDS="~amd64 ~arm ~arm64"
 IUSE_A=(
@@ -41,8 +42,9 @@ inherit arrays
 src_prepare() {
 	default
 
+	## change `man 1 lid` to `man 1 libuser-lid`
 	emv apps/{,libuser-}lid.1
-	sed -e 's: apps/lid\.1 : apps/libuser-lid.1 :' \
+	sed -e 's@ apps/lid\.1 @ apps/libuser-lid.1 @' \
 		-i -- Makefile.am || die
 
 	use doc || { sed -e '/^SUBDIRS/ s| docs| |' -i -- Makefile.am || die ; }
