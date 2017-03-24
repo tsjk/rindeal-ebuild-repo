@@ -1,12 +1,14 @@
 # Copyright 1999-2016 Gentoo Foundation
-# Copyright 2016 Jan Chren (rindeal)
+# Copyright 2016-2017 Jan Chren (rindeal)
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
+inherit rindeal
 
 GH_URI="github/Xfennec"
 GH_REF="v${PV}"
 
+# EXPORT_FUNCTIONS: src_unpack
 inherit git-hosting
 
 DESCRIPTION="Linux tool to show progress for cp, mv, dd, and virtually any command"
@@ -14,17 +16,25 @@ LICENSE="GPL-3"
 
 SLOT="0"
 
-KEYWORDS="~amd64 ~arm"
+KEYWORDS="~amd64 ~arm ~arm64"
 
-CDEPEND="sys-libs/ncurses:0="
-DEPEND="${CDEPEND}
-	virtual/pkgconfig"
-RDEPEND="${CDEPEND}"
+CDEPEND_A=(
+	"sys-libs/ncurses:0="
+)
+DEPEND_A=( "${CDEPEND_A[@]}"
+	"virtual/pkgconfig"
+)
+RDEPEND_A=( "${CDEPEND_A[@]}" )
+
+inherit arrays
+
+pkg_setup() {
+	export PREFIX="${EPREFIX}/usr"
+}
 
 src_prepare() {
 	default
 
-	sed -e '/CFLAGS/s:-g ::' \
-		-e '/^PREFIX / s@=.*@= /usr@' \
-		-i Makefile || die
+	# https://github.com/Xfennec/progress/pull/87
+	sed -e '/CFLAGS.*=/ s|-g ||' -i -- Makefile || die
 }
