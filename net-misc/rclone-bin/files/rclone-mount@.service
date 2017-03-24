@@ -17,6 +17,9 @@ ExecStart=/usr/bin/rclone --checkers 8 --contimeout 5m --drive-use-trash --drive
 
 ExecStopPost=/bin/sh -c '/usr/bin/fusermount -z -u "${MNT_POINT}" ; true'
 
+Restart=on-failure
+RestartSec=2min
+
 
 [Install]
 WantedBy=default.target
