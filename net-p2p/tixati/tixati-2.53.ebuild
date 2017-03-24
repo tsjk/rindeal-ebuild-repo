@@ -1,16 +1,18 @@
-# Copyright 2016 Jan Chren (rindeal)
+# Copyright 2016-2017 Jan Chren (rindeal)
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
+inherit rindeal
 
-inherit eutils xdg
+inherit eutils
+inherit xdg
 
 DESCRIPTION="Tixati is a New and Powerful P2P System"
 HOMEPAGE="https://www.tixati.com"
-LICENSE="${PN}" # bundled in the binary, available in menu "About -> License Agreement"
+LICENSE="tixati" # bundled in the binary, available in menu "About -> License Agreement"
 
 SLOT="0"
-src_uri_base="${HOMEPAGE}/download/${P}-1.<ARCH>.manualinstall.tar.gz"
+src_uri_base="https://www.tixati.com/download/${P}-1.<ARCH>.manualinstall.tar.gz"
 SRC_URI="
 	amd64?	( ${src_uri_base//<ARCH>/x86_64} )
 "
