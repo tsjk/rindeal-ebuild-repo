@@ -28,6 +28,8 @@ inherit systemd
 inherit eutils
 # functions: gen_usr_ldscript
 inherit toolchain-funcs
+# functions: newpamd
+inherit pam
 
 DESCRIPTION="Various useful system utilities for Linux"
 HOMEPAGE="https://www.kernel.org/pub/linux/utils/${PN}/ ${GH_HOMEPAGE}"
@@ -552,6 +554,12 @@ src_install() {
 	default
 
 	dodoc AUTHORS NEWS README* Documentation/{TODO,*.txt,releases/*}
+
+	if use runuser ; then
+		# files taken from sys-auth/pambase
+		newpamd "${FILESDIR}/runuser.pamd" runuser
+		newpamd "${FILESDIR}/runuser-l.pamd" runuser-l
+	fi
 
 	# e2fsprogs-libs didnt install .la files, and .pc work fine
 	prune_libtool_files
