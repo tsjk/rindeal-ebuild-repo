@@ -14,8 +14,9 @@ case "${EAPI:-0}" in
 	*) die "Unsupported EAPI='${EAPI}' for '${ECLASS}'" ;;
 esac
 
-
 inherit rindeal
+
+
 # functions: make_desktop_entry, newicon, eshopts_push
 inherit eutils
 # functions: get_version_component_range, get_major_version
@@ -169,8 +170,10 @@ jetbrains-intellij_src_install() {
 	[[ -n "${JBIJ_INSTALL_DIR}" ]] || die "JBIJ_INSTALL_DIR='${JBIJ_INSTALL_DIR}' not defined"
 
 	## first let's copy everything to the image dir
-	insinto "${JBIJ_INSTALL_DIR}"
-	doins -r ./*
+	emkdir "${ED}/${JBIJ_INSTALL_DIR}"
+	cp -r . "${ED}/${JBIJ_INSTALL_DIR}" || die
+	find "${ED}/${JBIJ_INSTALL_DIR}" -type f -print0 | xargs -0 chmod 644 --
+	assert
 
 	## now let's push into the image dir and change few things in there
 	pushd "${ED}/${JBIJ_INSTALL_DIR}" >/dev/null || die "JBIJ_INSTALL_DIR='${JBIJ_INSTALL_DIR}'"
