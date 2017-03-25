@@ -42,7 +42,7 @@ declare -g -r _JBIJ_PN_SLOTTED="${PN}${SLOT}"
 
 SRC_URI="https://download.jetbrains.com/${JBIJ_URI}.tar.gz"
 
-KEYWORDS="~amd64 ~arm ~x86"
+KEYWORDS="~amd64"
 IUSE="system-jre"
 RESTRICT+=" mirror strip test"
 
@@ -87,11 +87,13 @@ jetbrains-intellij_src_unpack() {
 		# This plugins has several QA violations, eg. https://github.com/rindeal/gentoo-overlay/issues/67.
 		# If someone needs it, it can be installed separately from JetBrains plugin repo.
 		'plugins/tfsIntegration'
+		## arm
+		'bin/fsnotifier-arm'
+		## x86
+		bin/{fsnotifier,libbreakgen.so,libyjpagent-linux.so}
 	)
 	use system-jre	 && excludes+=( 'jre' )
 	use amd64	|| excludes+=( bin/{fsnotifier64,libbreakgen64.so,libyjpagent-linux64.so,LLDBFrontend} )
-	use arm		|| excludes+=( bin/fsnotifier-arm )
-	use x86		|| excludes+=( bin/{fsnotifier,libbreakgen.so,libyjpagent-linux.so} )
 
 	excludes+=( "${JBIJ_TAR_EXCLUDE[@]}" )
 	# mark as readonly to prevent the user from mistakenly editing it in other phases
