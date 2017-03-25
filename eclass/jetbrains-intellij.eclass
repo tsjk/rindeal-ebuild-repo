@@ -1,4 +1,4 @@
-# Copyright 2016 Jan Chren (rindeal)
+# Copyright 2016-2017 Jan Chren (rindeal)
 # Distributed under the terms of the GNU General Public License v2
 
 # @ECLASS: jetbrains-intellij.eclass
@@ -71,7 +71,7 @@ jetbrains-intellij_src_unpack() {
 	(( ${#_A[@]} == 1 )) || die "Your SRC_URI contains too many archives"
 	local arch="${DISTDIR}/${_A[0]}"
 
-	mkdir -p "${S}" || die
+	emkdir "${S}"
 	local tar=(
 		tar --extract
 
@@ -181,7 +181,7 @@ jetbrains-intellij_src_install() {
 		chmod -v a+x bin/fsnotifier* || die
 		use system-jre || { chmod -v a+x jre/jre/bin/* || die ; }
 	}
-	popd >/dev/null || die
+	epopd
 
     ## install symlink
 	dosym "${JBIJ_INSTALL_DIR}/bin/${JBIJ_STARTUP_SCRIPT_NAME}" "/usr/bin/${_JBIJ_PN_SLOTTED}"
@@ -202,7 +202,7 @@ jetbrains-intellij_src_install() {
 		"$( printf '%s\n' "${make_desktop_entry_extras[@]}" )"
 
 	# recommended by: https://confluence.jetbrains.com/display/IDEADEV/Inotify+Watches+Limit
-	mkdir -p "${D}"/etc/sysctl.d || die
+	emkdir "${D}"/etc/sysctl.d
 	echo "fs.inotify.max_user_watches = 524288" \
 		>"${D}"/etc/sysctl.d/30-idea-inotify-watches.conf || die
 }
