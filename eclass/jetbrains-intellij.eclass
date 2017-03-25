@@ -18,7 +18,7 @@ esac
 inherit rindeal
 # functions: make_desktop_entry, newicon, eshopts_push
 inherit eutils
-# functions: get_version_component_range
+# functions: get_version_component_range, get_major_version
 inherit versionator
 # EXPORT_FUNCTIONS: src_prepare, pkg_preinst, pkg_postinst, pkg_postrm
 inherit xdg
@@ -179,7 +179,10 @@ jetbrains-intellij_src_install() {
 		## fix permissions
 		chmod -v a+x bin/${JBIJ_STARTUP_SCRIPT_NAME} || die
 		chmod -v a+x bin/fsnotifier* || die
-		use system-jre || { chmod -v a+x jre/jre/bin/* || die ; }
+		local jre_bin_dir=jre/jre/bin
+		# https://github.com/rindeal/gentoo-overlay/issues/160
+		(( $(get_major_version) >= 2017 )) && jre_bin_dir=jre/bin
+		use system-jre || { chmod -v a+x ${jre_bin_dir}/* || die ; }
 	}
 	epopd
 
