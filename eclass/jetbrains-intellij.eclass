@@ -2,8 +2,7 @@
 # Distributed under the terms of the GNU General Public License v2
 
 # @ECLASS: jetbrains-intellij.eclass
-# @MAINTAINER:
-# Jan Chren (rindeal) <dev.rindeal+gentoo-overlay@gmail.com>
+# @MAINTAINER: Jan Chren (rindeal) <dev.rindeal+gentoo-overlay@gmail.com>
 # @BLURB: Boilerplate for IntelliJ based IDEs
 # @DESCRIPTION:
 
@@ -58,7 +57,7 @@ RDEPEND="system-jre? ( >=virtual/jre-1.8 )"
 # @ECLASS-VARIABLE: JBIJ_PN_PRETTY
 # @DESCRIPTION:
 # 	Prettified PN.
-# 	This will be used in various user-facing places, eg. desktop menu entry.
+# 	This will be used in various user-facing places, eg. the desktop menu entry.
 : "${JBIJ_PN_PRETTY:="${PN^}"}"
 
 
@@ -85,7 +84,7 @@ jetbrains-intellij_src_unpack() {
 
 	local excludes=(
 		'license'
-		# This plugins has several QA violations, eg. https://github.com/rindeal/gentoo-overlay/issues/67.
+		# This plugin has several QA violations, eg. https://github.com/rindeal/gentoo-overlay/issues/67.
 		# If someone needs it, it can be installed separately from JetBrains plugin repo.
 		'plugins/tfsIntegration'
 		## arm
