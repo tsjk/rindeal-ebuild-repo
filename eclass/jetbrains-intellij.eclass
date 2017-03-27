@@ -123,6 +123,7 @@ jetbrains-intellij_src_compile() { : ; }
 # @DESCRIPTION:
 # 	An array of additional desktop menu entry categories.
 # 	Defaults are 'Development;IDE;Java', which cannot be unset.
+_JBIJ_DEFAULT_DESKTOP_CATEGORIES=( 'Development' 'IDE' 'Java' )
 
 # @ECLASS-VARIABLE: JBIJ_DESKTOP_EXTRAS=()
 # @DEFAULT_UNSET
@@ -199,7 +200,7 @@ jetbrains-intellij_src_install() {
 		"${EPREFIX}${JBIJ_INSTALL_DIR}/bin/${JBIJ_STARTUP_SCRIPT_NAME} %U"	# exec
 		"${JBIJ_PN_PRETTY} ${SLOT}"	# name
 		"${_JBIJ_PN_SLOTTED}"		# icon
-		"Development;IDE;Java;$(IFS=';'; echo "${JBIJ_DESKTOP_CATEGORIES[*]}")"	# categories
+		"$(printf '%s;' "${_JBIJ_DEFAULT_DESKTOP_CATEGORIES[@]}" "${JBIJ_DESKTOP_CATEGORIES[@]}")"	# categories
 	)
 	local make_desktop_entry_extras=(
 		"StartupWMClass=jetbrains-${PN}"
