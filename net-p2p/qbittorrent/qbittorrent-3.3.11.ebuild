@@ -78,18 +78,24 @@ L10N_LOCALES=( ar be bg ca cs da de el en en_AU en_GB eo es eu fi fr gl he hi_IN
 	ja ka ko lt lv_LV ms_MY nb nl oc pl pt_BR pt_PT ro ru sk sl sr sv tr uk uz@Latn vi zh zh_HK zh_TW )
 inherit l10n-r1
 
-src_prepare() {
-	xdg_src_prepare
-
-	declare -g -r -a MULTIBUILD_VARIANTS=( $(usev gui) $(usev webui) )
-
+src_prepare-locales() {
 	local l locales loc_dir='src/lang' loc_pre='qbittorrent_' loc_post='.ts'
+
 	l10n_find_changes_in_dir "${loc_dir}" "${loc_pre}" "${loc_post}"
+
 	l10n_get_locales locales app $(usex nls off all)
 	for l in ${locales} ; do
 		rm -vf "${loc_dir}/${loc_pre}${l}${loc_post}" || die
 		sed -e "/qbittorrent_${l}.qm/d" -i -- src/lang.qrc || die
 	done
+}
+
+src_prepare() {
+	xdg_src_prepare
+
+	declare -g -r -a MULTIBUILD_VARIANTS=( $(usev gui) $(usev webui) )
+
+	src_prepare-locales
 
 	# make build verbose
 	sed -r -e '/^CONFIG[ \+]*=/ s|silent||' -i -- src/src.pro || die
