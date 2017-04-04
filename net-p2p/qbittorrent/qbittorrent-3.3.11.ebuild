@@ -9,18 +9,20 @@ GH_REF="release-${PV}"
 
 # functions: append-cppflags
 inherit flag-o-matic
-# functions: eqmake(4|5)
+# functions: eqmake4 eqmake5
 inherit qmake-utils
+# EXPORT_FUNCTIONS: src_unpack
+# variables: GH_HOMEPAGE
 inherit git-hosting
-# EXPORT_FUNCTIONS: ...
+# EXPORT_FUNCTIONS: src_prepare pkg_preinst pkg_postinst pkg_postrm
 inherit xdg
 # functions: eautoreconf
 inherit autotools
 # functions: rindeal:expand_vars
 inherit rindeal-utils
-# functions: systemd_dounit
+# functions: systemd_dounit systemd_douserunit
 inherit systemd
-# functions: multibuild_copy_sources
+# functions: multibuild_foreach_variant multibuild_copy_sources run_in_build_dir
 inherit multibuild
 
 DESCRIPTION="BitTorrent client in C++/Qt based on libtorrent-rasterbar"
@@ -52,8 +54,8 @@ CDEPEND_A=(
 		"dev-qt/qtconcurrent:5"
 		"dev-qt/qtcore:5"
 		"dev-qt/qtnetwork:5[ssl]"
-		"dev-qt/qtxml:5"
 		"dev-qt/qtsingleapplication[qt5]"
+		"dev-qt/qtxml:5"
 		"gui? ("
 			"dev-qt/qtgui:5"
 			"dev-qt/qtwidgets:5"
@@ -79,8 +81,6 @@ L10N_LOCALES=( ar be bg ca cs da de el en en_AU en_GB eo es eu fi fr gl he hi_IN
 inherit l10n-r1
 
 pkg_setup() {
-	xdg_pkg_setup
-
 	declare -g -r -a MULTIBUILD_VARIANTS=( $(usev gui) $(usev webui) )
 }
 
@@ -91,7 +91,7 @@ src_prepare-locales() {
 
 	l10n_get_locales locales app $(usex nls off all)
 	for l in ${locales} ; do
-		rm -vf "${loc_dir}/${loc_pre}${l}${loc_post}" || die
+		erm "${loc_dir}/${loc_pre}${l}${loc_post}"
 		sed -e "/qbittorrent_${l}.qm/d" -i -- src/lang.qrc || die
 	done
 }
@@ -115,7 +115,7 @@ src_prepare() {
 	multibuild_copy_sources
 }
 
-multibuild_src_configure() {
+my_multi_src_configure() {
 	# workaround build issue with older boost
 	# https://github.com/qbittorrent/qBittorrent/issues/4112
 	if has_version '<dev-libs/boost-1.58' ; then
@@ -125,16 +125,16 @@ multibuild_src_configure() {
 	local econf_args=(
 		--with-qjson=system
 		--with-qtsingleapplication=system
-		--disable-systemd # we have a service of our own
+		--disable-systemd # we have a services of our own
 
 		$(use_enable dbus qt-dbus) # introduced for macOS
 		$(use_enable debug)
 		$(use_with !qt5 qt4)
 	)
 
-	if [[ "${MULTIBUILD_VARIANT}" == gui ]] ; then
+	if [[ "${MULTIBUILD_VARIANT}" == 'gui' ]] ; then
 		econf_args+=( --enable-gui --disable-webui )
-	elif [[ "${MULTIBUILD_VARIANT}" == webui ]] ; then
+	elif [[ "${MULTIBUILD_VARIANT}" == 'webui' ]] ; then
 		econf_args+=( --disable-gui --enable-webui )
 	else
 		die
@@ -147,7 +147,7 @@ multibuild_src_configure() {
 
 src_configure() {
 	multibuild_foreach_variant run_in_build_dir \
-		multibuild_src_configure
+		my_multi_src_configure
 }
 
 src_compile() {
@@ -155,13 +155,14 @@ src_compile() {
 		default_src_compile
 }
 
-multibuild_src_install() {
-	emake INSTALL_ROOT="${D}" install
-}
-
 src_install() {
+	my_multi_src_install() {
+		emake INSTALL_ROOT="${D}" install
+	}
 	multibuild_foreach_variant run_in_build_dir \
-		multibuild_src_install
+		my_multi_src_install
+
+	einstalldocs
 
 	EXPAND_BINDIR="${EPREFIX}/usr/bin"
 	if use webui ; then
@@ -175,6 +176,4 @@ src_install() {
 		rindeal:expand_vars "${FILESDIR}/qbittorrent.user-service.in" "${T}/qbittorrent.service"
 		systemd_douserunit "${T}/qbittorrent.service"
 	fi
-
-	einstalldocs
 }
