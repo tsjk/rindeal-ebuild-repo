@@ -53,6 +53,7 @@ CDEPEND_A=(
 		"dev-qt/qtcore:5"
 		"dev-qt/qtnetwork:5[ssl]"
 		"dev-qt/qtxml:5"
+		"dev-qt/qtsingleapplication[qt5]"
 		"gui? ("
 			"dev-qt/qtgui:5"
 			"dev-qt/qtwidgets:5"
