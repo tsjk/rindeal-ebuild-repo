@@ -15,7 +15,11 @@ IUSE="+python system-cmake system-gdb system-lldb"
 RDEPEND="
 	system-cmake? ( >=dev-util/cmake-3.2 )
 	system-gdb? ( >=sys-devel/gdb-7.8 )
-	system-lldb? ( sys-devel/llvm[lldb] )"
+	system-lldb? ( || (
+		<sys-devel/llvm-3.9[lldb]
+		dev-util/lldb
+	) )
+"
 
 src_unpack() {
 	local JBIJ_TAR_EXCLUDE=()
