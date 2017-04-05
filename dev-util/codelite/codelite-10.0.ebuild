@@ -31,7 +31,10 @@ CDEPEND_A=(
 	"x11-libs/wxGTK:3.0"
 	"clang? ( sys-devel/clang:0 )"
 	"flex? ( sys-devel/flex )"
-	"lldb? ( sys-devel/llvm[lldb] )"
+	"lldb? ( || ("
+		"<sys-devel/llvm-3.9[lldb]"
+		"dev-util/lldb"
+	") )"
 	"mysql? ( virtual/mysql )"
 	"sftp? ( net-libs/libssh )"
 )
