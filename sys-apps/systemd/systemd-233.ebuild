@@ -292,7 +292,12 @@ src_prepare() {
 	eapply "${FILESDIR}/232-dcce98a4bdc302a5efeb3a5c35b6cbf6d16a3efc.patch"	# Avoid strict DM interface version dependencies (#5519)
 	eapply "${FILESDIR}/233-6f94e420e8355421fc31713a0df760d6b20473ac.patch"	# journal: prevent integer overflow while validating header (#5569)
 	eapply "${FILESDIR}/233-d74dc4f2d00644c04ad9dc900ef43050fcadaa8b.patch"	# coredump: fix handling of premature-eof data for --backtrace
-	eapply "${FILESDIR}/233-60705040152c9953a200eea16fffb5fef894c613.patch"		# systemctl: fix broken vertical lines in list-dependencies --all (#5608)
+	eapply "${FILESDIR}/233-60705040152c9953a200eea16fffb5fef894c613.patch"	# systemctl: fix broken vertical lines in list-dependencies --all (#5608)
+	eapply "${FILESDIR}/233-b6a20306fa5dbb8129dd09e07efeacfcfc57363f.patch"	# journal: fix up syslog facility when forwarding native messages (#5667)
+	eapply "${FILESDIR}/233-0b180d754cd9b171f38e39554495841f666060f7.patch"	# networkd: fix route_new_static assert when IPv4LLRoute=true (#5676)
+	eapply "${FILESDIR}/233-6554550f35a7976f9110aff94743d3576d5f02dd.patch"	# networkd: RFC compliant autonomous prefix handling (#5636)
+	eapply "${FILESDIR}/233-7ed1565a9d94c505839fa83b8f90cdddaff0c8f1.patch"	# resolved: add a DNSStubListener property to Manager
+	eapply "${FILESDIR}/233-7357272ed1c2c7a139c9ecbc8f3b8f63f71dd0b0.patch"	# nspawn: check if the DNS stub is listening for requests
 	eapply_user
 
 	# 'uucp' group is prefered for this purpose in Gentoo (gentoo#463376)
