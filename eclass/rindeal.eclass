@@ -78,8 +78,8 @@ epopd() {
 	popd "$@" >/dev/null || die
 }
 
-erm() {
-	rm $(_verbose) --interactive=never --preserve-root --one-file-system "$@" || die
+emkdir() {
+	mkdir $(_verbose) -p "${@}" || die
 }
 
 ecp() {
@@ -90,8 +90,12 @@ emv() {
 	mv $(_verbose) "${@}" || die
 }
 
-emkdir() {
-	mkdir $(_verbose) -p "${@}" || die
+echmod() {
+	chmod $(_verbose) "${@}" || die
+}
+
+erm() {
+	rm $(_verbose) --interactive=never --preserve-root --one-file-system "$@" || die
 }
 
 
