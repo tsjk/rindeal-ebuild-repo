@@ -90,7 +90,7 @@ src_prepare() {
 	eapply_user
 
 	# bloat
-	RM_V=0 erm -r snapcraft
+	NO_V=1 erm -r snapcraft
 
 	# fix docdir
 	sed -e "s@'share/doc/nikola', \[@'share/doc/${PF}', \[@" -i -- setup.py || die
