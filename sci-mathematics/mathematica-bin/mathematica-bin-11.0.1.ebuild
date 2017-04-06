@@ -103,7 +103,7 @@ src_install() {
 
 	if ! use doc ; then
 		einfo "Deleting documentation ..."
-		RM_V=0 erm -r Documentation
+		NO_V=1 erm -r Documentation
 	fi
 
 	einfo "Deleting 32-bit files ..."
