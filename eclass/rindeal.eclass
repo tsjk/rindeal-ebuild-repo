@@ -64,6 +64,12 @@ inherit() {
 fi
 
 
+_verbose() {
+	local verbose='--verbose'
+	(( NO_V )) && verbose=''
+	echo "${verbose}"
+}
+
 epushd() {
 	pushd "$@" >/dev/null || die
 }
@@ -72,31 +78,20 @@ epopd() {
 	popd "$@" >/dev/null || die
 }
 
-
 erm() {
-	debug-print-function "${FUNCNAME}" "$@"
-	local verbose="-v"
-	if [[ -n "${RM_V}" && \
-		( ! (( RM_V )) || "${RM_V}" == 'false' || "${RM_V}" == 'no' ) \
-		]]
-	then
-		verbose=
-	fi
-
-	rm ${verbose} --interactive=never --preserve-root --one-file-system "$@" || die
+	rm $(_verbose) --interactive=never --preserve-root --one-file-system "$@" || die
 }
 
-
 ecp() {
-	cp -v "${@}" || die
+	cp $(_verbose) "${@}" || die
 }
 
 emv() {
-	mv -v "${@}" || die
+	mv $(_verbose) "${@}" || die
 }
 
 emkdir() {
-	mkdir -p -v "${@}" || die
+	mkdir $(_verbose) -p "${@}" || die
 }
 
 
