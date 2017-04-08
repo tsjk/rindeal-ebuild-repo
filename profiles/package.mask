@@ -4,3 +4,5 @@ dev-util/datagrip
 dev-util/phpstorm
 # moved to `dev-cpp/clion`
 dev-util/clion
+# buggy, `systemd daemon-reload` hangs, journald crashes
+=sys-apps/systemd-233
