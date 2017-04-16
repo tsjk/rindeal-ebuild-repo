@@ -21,7 +21,7 @@ KEYWORDS="~amd64 ~arm ~arm64"
 IUSE_A=(
 	debug +readline +dbus
 
-	gui qt4 qt5
+	gui qt5
 
 	+openssl gnutls tls1_1 +tls1_2 smartcard
 
@@ -49,16 +49,18 @@ CDEPEND_A=(
 	"dev-libs/libnl:3"
 	"net-wireless/crda"
 
-	"qt4? ("
-		"dev-qt/qtcore:4"
-		"dev-qt/qtgui:4"
-		"dev-qt/qtsvg:4"
-	")"
-	"qt5? ("
-		"dev-qt/qtcore:5"
-		"dev-qt/qtgui:5"
-		"dev-qt/qtwidgets:5"
-		"dev-qt/qtsvg:5"
+	"gui? ("
+		"!qt5? ("
+			"dev-qt/qtcore:4"
+			"dev-qt/qtgui:4"
+			"dev-qt/qtsvg:4"
+		")"
+		"qt5? ("
+			"dev-qt/qtcore:5"
+			"dev-qt/qtgui:5"
+			"dev-qt/qtwidgets:5"
+			"dev-qt/qtsvg:5"
+		")"
 	")"
 	"readline? ("
 		"sys-libs/ncurses:0="
@@ -83,7 +85,6 @@ RDEPEND_A=( "${CDEPEND_A[@]}" )
 REQUIRED_USE_A=(
 	"eap-fast? ( !gnutls !openssl )"
 	"smartcard? ( openssl )"
-	"gui? ( || ( qt5 qt4 ) )"
 	"driver_nl80211_qca? ( driver_nl80211 )"
 	"eap-sim? ( pcsc )"
 	"eap-aka? ( pcsc )"
