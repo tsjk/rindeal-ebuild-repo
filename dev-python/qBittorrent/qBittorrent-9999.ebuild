@@ -4,7 +4,7 @@
 EAPI=6
 inherit rindeal
 
-GH_URI="github/v1k45/python-qBittorrent"
+GH_RN="github:v1k45:python-qBittorrent"
 PYTHON_COMPAT=( python2_7 )
 
 # EXPORT_FUNCTIONS: src_unpack

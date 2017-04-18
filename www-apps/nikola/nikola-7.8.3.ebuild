@@ -5,7 +5,7 @@
 EAPI=6
 inherit rindeal
 
-GH_URI="github/getnikola"
+GH_RN="github:getnikola"
 GH_REF="v${PV}"
 
 # nikola support python3_6, but it's deps do not

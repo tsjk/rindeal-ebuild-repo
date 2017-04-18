@@ -5,7 +5,7 @@
 EAPI=6
 inherit rindeal
 
-GH_URI="github/Xfennec"
+GH_RN="github:Xfennec"
 GH_REF="v${PV}"
 
 # EXPORT_FUNCTIONS: src_unpack

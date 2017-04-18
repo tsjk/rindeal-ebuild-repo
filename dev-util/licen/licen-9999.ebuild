@@ -7,7 +7,7 @@ PYTHON_COMPAT=( python{2_7,3_{3,4,5}} )
 
 DISTUTILS_SINGLE_IMPL=true
 
-GH_URI='github/lord63'
+GH_RN='github:lord63'
 
 inherit git-hosting distutils-r1
 

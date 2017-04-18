@@ -6,7 +6,7 @@ EAPI=6
 inherit rindeal
 
 # git-hosting.eclass
-GH_URI='github/alexkay'
+GH_RN='github:alexkay'
 [[ "${PV}" == *9999* ]] || GH_REF="v${PV}"
 # wxwidgets.eclass
 WX_GTK_VER="3.0"

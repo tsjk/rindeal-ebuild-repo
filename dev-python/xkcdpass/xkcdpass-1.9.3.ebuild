@@ -4,7 +4,7 @@
 EAPI=6
 inherit rindeal
 
-GH_URI="github/redacted/XKCD-password-generator"
+GH_RN="github:redacted:XKCD-password-generator"
 GH_REF="${PN}-${PV}"
 
 PYTHON_COMPAT=( python{2_7,3_3,3_4,3_5} )

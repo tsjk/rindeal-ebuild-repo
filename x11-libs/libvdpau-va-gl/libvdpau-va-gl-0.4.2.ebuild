@@ -5,7 +5,7 @@
 EAPI=6
 inherit rindeal
 
-GH_URI="github/i-rinat"
+GH_RN="github:i-rinat"
 GH_REF="v${PV}"
 
 inherit cmake-utils git-hosting

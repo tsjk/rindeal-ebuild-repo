@@ -4,7 +4,7 @@
 EAPI=6
 inherit rindeal
 
-GH_URI="github/Alexey-Yakovenko"
+GH_RN="github:Alexey-Yakovenko"
 
 # EXPORT_FUNCTIONS: src_unpack
 inherit git-hosting

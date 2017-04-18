@@ -4,7 +4,7 @@
 EAPI=6
 inherit rindeal
 
-GH_URI="github/lxde"
+GH_RN="github:lxde"
 
 inherit git-hosting
 inherit cmake-utils

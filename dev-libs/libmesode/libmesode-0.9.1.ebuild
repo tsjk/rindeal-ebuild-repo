@@ -4,7 +4,7 @@
 EAPI=6
 inherit rindeal
 
-GH_URI="github/boothj5"
+GH_RN="github:boothj5"
 
 inherit git-hosting
 # functions: eautoreconf

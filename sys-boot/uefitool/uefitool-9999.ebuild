@@ -4,7 +4,7 @@
 EAPI=6
 inherit rindeal
 
-GH_URI="github/LongSoft/UEFITool"
+GH_RN="github:LongSoft:UEFITool"
 
 inherit git-hosting
 # functions: eqmake5

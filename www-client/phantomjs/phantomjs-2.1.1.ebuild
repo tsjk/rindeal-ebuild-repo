@@ -5,7 +5,7 @@ EAPI=6
 
 PYTHON_COMPAT=( python2_7 )
 
-GH_URI='github/ariya'
+GH_RN='github:ariya'
 
 inherit python-any-r1 multiprocessing pax-utils qmake-utils virtualx git-hosting
 

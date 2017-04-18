@@ -5,7 +5,7 @@
 EAPI=6
 inherit rindeal
 
-GH_URI="github/tibonihoo"
+GH_RN="github:tibonihoo"
 GH_REF="release_${PN^}-${PV}"
 
 PYTHON_COMPAT=( python2_7 python3_{4,5} )

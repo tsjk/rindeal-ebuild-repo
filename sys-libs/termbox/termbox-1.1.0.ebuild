@@ -5,7 +5,7 @@ EAPI=6
 inherit rindeal
 
 ## git-hosting.eclass
-GH_URI="github/nsf"
+GH_RN="github:nsf"
 GH_REF="v${PV}"
 ## python-*.eclass
 PYTHON_COMPAT=( python{2_7,3_4} )

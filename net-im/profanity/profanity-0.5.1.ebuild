@@ -5,7 +5,7 @@ EAPI=6
 inherit rindeal
 
 # git-hosting.eclass
-GH_URI="github/boothj5"
+GH_RN="github:boothj5"
 # python-*.eclass
 PYTHON_COMPAT=( python2_7 )
 

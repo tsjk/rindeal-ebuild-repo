@@ -4,7 +4,7 @@
 EAPI=6
 inherit rindeal
 
-GH_URI="github/shundhammer"
+GH_RN="github:shundhammer"
 
 inherit git-hosting
 inherit qmake-utils

@@ -6,7 +6,7 @@ inherit rindeal
 
 PYTHON_COMPAT=( python2_7 python3_{3,4} )
 
-GH_URI='github/gpocentek/python-gitlab'
+GH_RN='github:gpocentek:python-gitlab'
 
 inherit distutils-r1
 inherit git-hosting

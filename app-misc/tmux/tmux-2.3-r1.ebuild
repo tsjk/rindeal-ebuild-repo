@@ -5,7 +5,7 @@
 EAPI=6
 inherit rindeal
 
-GH_URI="github"
+GH_RN="github"
 
 inherit autotools
 inherit git-hosting

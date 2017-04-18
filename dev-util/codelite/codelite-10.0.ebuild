@@ -7,7 +7,7 @@ inherit rindeal
 # wxwidgets.eclass
 WX_GTK_VER="3.0"
 # git-hosting.eclass
-GH_URI='github/eranif'
+GH_RN='github:eranif'
 
 inherit git-hosting
 # functions: setup-wxwidgets

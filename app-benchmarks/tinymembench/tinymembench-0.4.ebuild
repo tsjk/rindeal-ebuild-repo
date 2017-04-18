@@ -4,7 +4,7 @@
 EAPI=6
 inherit rindeal
 
-GH_URI='github/ssvb'
+GH_RN='github:ssvb'
 GH_REF="v${PV}"
 
 inherit flag-o-matic

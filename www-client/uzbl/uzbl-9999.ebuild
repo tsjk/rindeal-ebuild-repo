@@ -5,7 +5,7 @@ EAPI=6
 inherit rindeal
 
 ## git-hosting.eclass
-GH_URI="github"
+GH_RN="github"
 ## git-r3.eclass
 EGIT_BRANCH="next"
 ## python-*.eclass

@@ -5,7 +5,7 @@
 EAPI=6
 inherit rindeal
 
-GH_URI="github/raspberrypi/firmware"
+GH_RN="github:raspberrypi:firmware"
 
 inherit git-hosting
 

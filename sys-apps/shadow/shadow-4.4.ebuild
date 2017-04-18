@@ -5,7 +5,7 @@
 EAPI=6
 inherit rindeal
 
-GH_URI="github/shadow-maint"
+GH_RN="github:shadow-maint"
 
 inherit git-hosting
 inherit eutils

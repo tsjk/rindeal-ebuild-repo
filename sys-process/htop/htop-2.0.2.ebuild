@@ -5,7 +5,7 @@
 EAPI=6
 inherit rindeal
 
-GH_URI="github/hishamhm"
+GH_RN="github:hishamhm"
 
 inherit autotools
 # EXPORT_FUNCTIONS: pkg_setup

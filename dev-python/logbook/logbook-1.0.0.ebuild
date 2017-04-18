@@ -7,7 +7,7 @@
 EAPI=6
 inherit rindeal
 
-GH_URI="github/getlogbook/logbook"
+GH_RN="github:getlogbook:logbook"
 
 PYTHON_COMPAT=( python2_7 python3_{4,5} pypy )
 

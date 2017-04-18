@@ -3,7 +3,7 @@
 
 EAPI=6
 
-GH_URI="github/adsr"
+GH_RN="github:adsr"
 
 inherit git-hosting
 

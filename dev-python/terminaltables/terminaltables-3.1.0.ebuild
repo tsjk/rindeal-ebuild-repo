@@ -6,7 +6,7 @@ inherit rindeal
 
 PYTHON_COMPAT=( python{2_7,3_{3,4,5}} )
 
-GH_URI='github/Robpol86'
+GH_RN='github:Robpol86'
 GH_REF="v${PV}"
 
 inherit git-hosting

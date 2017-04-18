@@ -3,7 +3,7 @@
 
 EAPI=6
 
-GH_URI='github/supercrabtree'
+GH_RN='github:supercrabtree'
 
 inherit git-hosting
 

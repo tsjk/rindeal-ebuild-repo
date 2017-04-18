@@ -3,7 +3,7 @@
 
 EAPI=6
 
-GH_URI="github/rindeal/Amalgamate"
+GH_RN="github:rindeal:Amalgamate"
 
 inherit git-hosting
 

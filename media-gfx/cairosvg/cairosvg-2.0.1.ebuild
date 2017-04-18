@@ -5,7 +5,7 @@
 EAPI=6
 inherit rindeal
 
-GH_URI="github/Kozea/CairoSVG"
+GH_RN="github:Kozea:CairoSVG"
 
 PYTHON_COMPAT=( python3_{4,5} )
 

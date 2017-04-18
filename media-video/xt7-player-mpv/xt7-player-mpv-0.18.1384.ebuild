@@ -3,7 +3,7 @@
 
 EAPI=6
 
-GH_URI='github/kokoko3k'
+GH_RN='github:kokoko3k'
 GH_REF="${PV}"
 
 inherit git-hosting eutils xdg

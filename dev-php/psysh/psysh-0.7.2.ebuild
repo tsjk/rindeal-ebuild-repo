@@ -3,7 +3,7 @@
 
 EAPI=6
 
-GH_URI='github/bobthecow'
+GH_RN='github:bobthecow'
 GH_REF="v${PV}"
 
 inherit git-hosting composer

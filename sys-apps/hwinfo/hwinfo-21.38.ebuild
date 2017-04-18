@@ -3,7 +3,7 @@
 
 EAPI=6
 
-GH_URI='github/openSUSE'
+GH_RN='github:openSUSE'
 
 inherit git-hosting multilib toolchain-funcs
 

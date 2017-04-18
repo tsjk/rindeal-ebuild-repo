@@ -4,7 +4,7 @@
 EAPI=6
 inherit rindeal
 
-GH_URI="github/strophe"
+GH_RN="github:strophe"
 
 inherit git-hosting
 # functions: eautoreconf

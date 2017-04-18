@@ -7,7 +7,7 @@ inherit rindeal
 PYTHON_COMPAT=( python{2_7,3_{3,4,5}} )
 DISTUTILS_SINGLE_IMPL=true
 
-GH_URI='github/pixelb'
+GH_RN='github:pixelb'
 GH_REF="v${PV}"
 
 inherit git-hosting

@@ -4,7 +4,7 @@
 EAPI=6
 inherit rindeal
 
-GH_URI="github/Aseman-Land/libqtelegram-aseman-edition"
+GH_RN="github:Aseman-Land:libqtelegram-aseman-edition"
 # GH_REF="v${PV}-stable" # use only stable versions
 EGIT_SUBMODULES=()
 

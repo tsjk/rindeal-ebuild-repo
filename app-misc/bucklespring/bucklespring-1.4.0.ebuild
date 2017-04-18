@@ -4,7 +4,7 @@
 EAPI=6
 inherit rindeal
 
-GH_URI="github/zevv"
+GH_RN="github:zevv"
 
 inherit git-hosting
 # functions: tc-getCC

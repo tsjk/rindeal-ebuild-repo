@@ -4,7 +4,7 @@
 EAPI=6
 inherit rindeal
 
-GH_URI='github/telegramdesktop/tdesktop'
+GH_RN='github:telegramdesktop:tdesktop'
 GH_REF="v${PV}"
 if [ -n "${TELEGRAM_DEBUG}" ] ; then
 	GH_FETCH_TYPE=live

@@ -4,7 +4,7 @@
 EAPI=6
 inherit rindeal
 
-GH_URI="github/google"
+GH_RN="github:google"
 GH_REF="v${PV}"
 
 # EXPORT_FUNCTIONS: src_unpack

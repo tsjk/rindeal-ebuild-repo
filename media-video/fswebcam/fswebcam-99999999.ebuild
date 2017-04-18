@@ -3,7 +3,7 @@
 
 EAPI=6
 
-GH_URI="github/fsphil"
+GH_RN="github:fsphil"
 
 inherit git-hosting autotools
 

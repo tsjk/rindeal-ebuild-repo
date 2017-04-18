@@ -5,7 +5,7 @@
 EAPI=6
 inherit rindeal
 
-GH_URI="github/pydoit"
+GH_RN="github:pydoit"
 
 PYTHON_COMPAT=( python3_{4,5} )
 

@@ -4,7 +4,7 @@
 EAPI=6
 inherit rindeal
 
-GH_URI="github/Aseman-Land"
+GH_RN="github:Aseman-Land"
 # GH_REF="v${PV}-stable" # use only stable versions
 
 inherit git-hosting

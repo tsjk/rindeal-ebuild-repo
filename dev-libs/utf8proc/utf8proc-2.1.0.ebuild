@@ -5,7 +5,7 @@
 EAPI=6
 inherit rindeal
 
-GH_URI="github/JuliaLang"
+GH_RN="github:JuliaLang"
 GH_REF="v${PV}"
 
 inherit git-hosting

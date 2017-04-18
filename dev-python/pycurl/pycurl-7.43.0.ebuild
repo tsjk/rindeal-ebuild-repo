@@ -5,7 +5,7 @@
 EAPI=6
 inherit rindeal
 
-GH_URI="github"
+GH_RN="github"
 GH_REF="REL_${PV//./_}"
 
 # The selftests fail with pypy, and urlgrabber segfaults for me.

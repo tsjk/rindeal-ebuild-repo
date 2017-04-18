@@ -7,7 +7,7 @@
 EAPI=6
 inherit rindeal
 
-GH_URI="github/cmdrkotori"
+GH_RN="github:cmdrkotori"
 
 inherit git-hosting
 # functions: eqmake5

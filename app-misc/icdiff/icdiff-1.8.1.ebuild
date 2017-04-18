@@ -6,7 +6,7 @@ inherit rindeal
 
 PYTHON_COMPAT=( python{2_7,3_4,3_5} )
 
-GH_URI="github/jeffkaufman"
+GH_RN="github:jeffkaufman"
 GH_REF="release-${PV}"
 
 inherit python-single-r1

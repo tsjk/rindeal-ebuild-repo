@@ -4,7 +4,7 @@
 EAPI=6
 inherit rindeal
 
-GH_URI="github/Aseman-Land/Berry"
+GH_RN="github:Aseman-Land:Berry"
 
 inherit git-hosting
 inherit qmake-utils

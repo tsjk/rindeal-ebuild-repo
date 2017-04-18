@@ -5,7 +5,7 @@
 EAPI=6
 inherit rindeal
 
-GH_URI='github/alexkay'
+GH_RN='github:alexkay'
 GH_REF="v${PV}"
 # wxwidgets.eclass
 WX_GTK_VER="3.0"

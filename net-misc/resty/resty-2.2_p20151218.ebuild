@@ -4,7 +4,7 @@
 EAPI=6
 inherit rindeal
 
-GH_URI='github/micha'
+GH_RN='github:micha'
 [[ "${PV}" == *9999* ]] || \
 	GH_REF="82d9cbd2776acd3f4c103d5fe00c74232648fee3"
 

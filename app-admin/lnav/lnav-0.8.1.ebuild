@@ -5,7 +5,7 @@
 EAPI=6
 inherit rindeal
 
-GH_URI="github/tstack"
+GH_RN="github:tstack"
 GH_REF="v${PV}"
 PYTHON_COMPAT=( python2_7 )
 

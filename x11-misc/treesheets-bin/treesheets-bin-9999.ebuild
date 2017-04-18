@@ -4,7 +4,7 @@
 EAPI=6
 inherit rindeal
 
-GH_URI="github/aardappel"
+GH_RN="github:aardappel"
 GH_FETCH_TYPE=manual
 
 inherit git-hosting

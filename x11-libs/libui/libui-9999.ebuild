@@ -4,7 +4,7 @@
 EAPI=6
 inherit rindeal
 
-GH_URI="github/andlabs"
+GH_RN="github:andlabs"
 
 # EXPORT_FUNCTIONS: src_unpack
 inherit git-hosting

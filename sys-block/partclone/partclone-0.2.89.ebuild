@@ -3,7 +3,7 @@
 
 EAPI=6
 
-GH_URI="github/Thomas-Tsai"
+GH_RN="github:Thomas-Tsai"
 
 inherit git-hosting autotools
 

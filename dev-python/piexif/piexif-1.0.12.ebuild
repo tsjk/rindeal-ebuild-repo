@@ -4,7 +4,7 @@
 EAPI=6
 inherit rindeal
 
-GH_URI="github/hMatoba/Piexif"
+GH_RN="github:hMatoba:Piexif"
 
 PYTHON_COMPAT=( python2_7 python3_{4,5,6} )
 

@@ -4,7 +4,7 @@
 EAPI=6
 inherit rindeal
 
-GH_URI="github/qbittorrent/qBittorrent"
+GH_RN="github:qbittorrent:qBittorrent"
 GH_REF="release-${PV}"
 
 # functions: append-cppflags

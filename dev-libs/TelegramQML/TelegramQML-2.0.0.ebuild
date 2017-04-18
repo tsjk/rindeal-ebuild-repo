@@ -5,7 +5,7 @@
 EAPI=6
 inherit rindeal
 
-GH_URI="github/Aseman-Land"
+GH_RN="github:Aseman-Land"
 GH_REF="v${PV}"
 
 inherit git-hosting

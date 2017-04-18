@@ -5,7 +5,7 @@
 EAPI=6
 inherit rindeal
 
-GH_URI="github/Beep6581/RawTherapee"
+GH_RN="github:Beep6581:RawTherapee"
 # check http://rawtherapee.com/downloads for a new commit number
 GH_REF="50114c1a3658cb08dec16f4a3e33c1611e08aa98"
 

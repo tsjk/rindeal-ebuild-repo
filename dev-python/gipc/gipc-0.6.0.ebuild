@@ -4,7 +4,7 @@
 EAPI=6
 inherit rindeal
 
-GH_URI="bitbucket/jgehrcke"
+GH_RN="bitbucket:jgehrcke"
 
 PYTHON_COMPAT=( python2_7 python3_{3,4,5} )
 

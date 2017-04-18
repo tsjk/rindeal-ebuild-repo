@@ -4,7 +4,7 @@
 EAPI=6
 inherit rindeal
 
-GH_URI="github/dsoprea"
+GH_RN="github:dsoprea"
 
 PYTHON_COMPAT=( python2_7 )
 

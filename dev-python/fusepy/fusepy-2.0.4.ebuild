@@ -4,7 +4,7 @@
 EAPI=6
 inherit rindeal
 
-GH_URI="github/terencehonles"
+GH_RN="github:terencehonles"
 GH_REF="v${PV}"
 
 PYTHON_COMPAT=( python2_7 python3_{3,4,5} )

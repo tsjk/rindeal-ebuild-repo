@@ -5,7 +5,7 @@
 EAPI=6
 inherit rindeal
 
-GH_URI="gitlab/rindeal"
+GH_RN="gitlab:rindeal"
 EGIT_CLONE_TYPE="shallow"
 EGIT_BRANCH="master"
 

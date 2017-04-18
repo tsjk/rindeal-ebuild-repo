@@ -5,7 +5,7 @@
 EAPI=6
 inherit rindeal
 
-GH_URI="bitbucket/jeromerobert/k4dirstat"
+GH_RN="bitbucket:jeromerobert:k4dirstat"
 GH_REF="k4dirstat-${PV}"
 KDE_HANDBOOK="forceoptional"
 

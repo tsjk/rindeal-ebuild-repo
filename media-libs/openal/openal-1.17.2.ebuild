@@ -5,7 +5,7 @@
 EAPI=6
 inherit rindeal
 
-GH_URI="github/kcat/openal-soft"
+GH_RN="github:kcat:openal-soft"
 GH_REF="openal-soft-${PV}"
 
 inherit cmake-utils

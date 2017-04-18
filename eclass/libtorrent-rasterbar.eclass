@@ -21,7 +21,7 @@ inherit rindeal
 [[ -z "${DISTUTILS_IN_SOURCE_BUILD}" ]] && \
 	DISTUTILS_IN_SOURCE_BUILD=true
 
-GH_URI='github/arvidn/libtorrent'
+GH_RN='github:arvidn:libtorrent'
 GH_FETCH_TYPE='manual'
 
 

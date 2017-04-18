@@ -6,7 +6,7 @@ inherit rindeal
 
 PYTHON_COMPAT=( python2_7 python3_{3,4,5} )
 
-GH_URI="github/rockdaboot"
+GH_RN="github:rockdaboot"
 GH_REF="${PN}-${PV}"
 
 inherit git-hosting
@@ -28,9 +28,9 @@ list_commit="41a519ad34cf86ff4470b967d9e4755d72b63a6c"
 list_uri=""
 list_ext=""
 list_distfile="${PN}-list-${list_commit}"
-git-hosting_gen_snapshot_uri "github/publicsuffix/list" "${list_commit}" list_uri list_ext
+git-hosting_gen_snapshot_url "github:publicsuffix:list" "${list_commit}" list_url list_ext
 SRC_URI+="
-	${list_uri} -> ${list_distfile}${list_ext}
+	${list_url} -> ${list_distfile}${list_ext}
 "
 
 KEYWORDS="~amd64 ~arm ~arm64"

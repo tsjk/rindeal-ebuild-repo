@@ -4,7 +4,7 @@
 EAPI=6
 inherit rindeal
 
-GH_URI="github/cboxdoerfer/ddb_waveform_seekbar"
+GH_RN="github:cboxdoerfer:ddb_waveform_seekbar"
 
 # EXPORT_FUNCTIONS: src_unpack
 inherit git-hosting

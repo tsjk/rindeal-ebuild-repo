@@ -5,7 +5,7 @@
 EAPI=6
 inherit rindeal
 
-GH_URI="github/coleifer"
+GH_RN="github:coleifer"
 
 PYTHON_COMPAT=( python2_7 python3_{4,5} )
 

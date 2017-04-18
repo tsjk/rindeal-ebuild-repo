@@ -4,7 +4,7 @@
 EAPI=6
 inherit rindeal
 
-GH_URI='github/fcambus'
+GH_RN='github:fcambus'
 
 inherit git-hosting
 inherit cmake-utils

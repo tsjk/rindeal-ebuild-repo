@@ -4,7 +4,7 @@
 EAPI=6
 inherit rindeal
 
-GH_URI="github/Aseman-Land/libqtelegram-code-generator"
+GH_RN="github:Aseman-Land:libqtelegram-code-generator"
 GH_REF="29462b49f094e88d2d65efeb6b98254d814294fc"
 
 inherit git-hosting

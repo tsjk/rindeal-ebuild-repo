@@ -5,7 +5,7 @@
 EAPI=6
 inherit rindeal
 
-GH_URI="github/Lawouach/WebSocket-for-Python"
+GH_RN="github:Lawouach:WebSocket-for-Python"
 # 2017-01-05; v0.3.5 is not tagged yet, present only on pypi
 GH_REF="36da4a09e91ddd08917455fb8066d22a9617e087"
 

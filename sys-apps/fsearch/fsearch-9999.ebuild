@@ -3,7 +3,7 @@
 
 EAPI=6
 
-GH_URI="github/cboxdoerfer"
+GH_RN="github:cboxdoerfer"
 
 inherit rindeal git-hosting autotools xdg
 

@@ -5,7 +5,7 @@
 EAPI=6
 inherit rindeal
 
-GH_URI="github/the-${PN}-group"
+GH_RN="github:the-${PN}-group"
 GH_REF="${PN}-${PV}"
 
 inherit flag-o-matic

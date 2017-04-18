@@ -5,7 +5,7 @@
 EAPI=6
 inherit rindeal
 
-GH_URI="bitbucket/heldercorreia"
+GH_RN="bitbucket:heldercorreia"
 GH_REF="release-${PV}"
 
 inherit git-hosting

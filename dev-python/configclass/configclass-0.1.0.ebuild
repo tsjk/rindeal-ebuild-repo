@@ -5,7 +5,7 @@
 EAPI=6
 inherit rindeal
 
-GH_URI="github/schettino72"
+GH_RN="github:schettino72"
 
 PYTHON_COMPAT=( python2_7 python3_{4,5} pypy )
 

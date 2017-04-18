@@ -5,7 +5,7 @@
 EAPI=6
 inherit rindeal
 
-GH_URI="github"
+GH_RN="github"
 
 inherit cmake-utils
 inherit xdg
@@ -17,9 +17,9 @@ LICENSE="GPL-3+"
 
 plugins_commit="fd199cf231257bd91fc9fd9aabc36d91d4a28ccd" # 2016-07-22
 SLOT="0"
-git-hosting_gen_snapshot_uri "github/${PN}/${PN}-plugins" "${plugins_commit}" plugins_snapshot_uri plugins_snapshot_ext
+git-hosting_gen_snapshot_url "github:${PN}:${PN}-plugins" "${plugins_commit}" plugins_snap_url plugins_snap_ext
 SRC_URI+="
-	plugins? ( ${plugins_snapshot_uri} -> ${PN}-plugins-${PV}${plugins_snapshot_ext} )"
+	plugins? ( ${plugins_snap_url} -> ${PN}-plugins-${PV}${plugins_snap_ext} )"
 
 KEYWORDS="~amd64"
 IUSE_A=( debug opencv +plugins raw tiff zip )
