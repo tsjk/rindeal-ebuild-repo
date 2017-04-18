@@ -6,7 +6,7 @@ import os
 import traceback
 import glob
 from terminaltables import AsciiTable
-from multiprocessing import Process, Lock
+from multiprocessing import Pool, Process, Lock
 import subprocess
 
 
@@ -115,7 +115,6 @@ def run_cmd(cmd):
     err = os.system(cmd)
     if err:
         print("{}/{}: command '{}' failed with code {}".format(cat, pn, cmd, err))
-        return 1
     return err
 
 
@@ -131,25 +130,27 @@ def update_pkg(cat, pn, slot, from_v, to_v):
         run_cmd('git mv -v {0}-{1}*.ebuild {0}-{2}.ebuild'.format(pn, from_v, to_v))
     LOCK.release()
 
-    run_cmd('repoman manifest')
+    if run_cmd('repoman manifest') != 0:
+        LOCK.acquire()
+        run_cmd('git checkout -- .')
+        LOCK.release()
+        return 1
 
     LOCK.acquire()
-    run_cmd('git add .')
+    run_cmd('git add {0}-{2}.ebuild')
     if slot == "latest":
         run_cmd("git commit -m '{}/{}: new version v{}' .".format(cat, pn, to_v))
     else: # bump inside a slot
         run_cmd("git commit -m '{}/{}: bump to v{}' .".format(cat, pn, to_v))
     LOCK.release()
 
-processes = []
 # only one git command may run concurrently
 LOCK = Lock()
 
-for x in table[1:]:
-    cat_pn = "{}/{}".format(x[0], x[1])
-    processes.append(Process(target=update_pkg, args=(x[0], x[1], x[2], x[3], x[4])))
+pool = Pool(4)
 
-for p in processes:
-    p.start()
-for p in processes:
-    p.join()
+for x in table[1:]:
+    pool.apply_async(func=update_pkg, args=(x[0], x[1], x[2], x[3], x[4]))
+
+pool.close()
+pool.join()
