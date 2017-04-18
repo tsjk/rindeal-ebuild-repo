@@ -18,7 +18,7 @@ SLOT="0"
 KEYWORDS="~amd64 ~arm ~arm64"
 
 CDEPEND_A=(
-	"media-libs/libpng"
+	"media-libs/libpng:0"
 )
 DEPEND_A=( "${CDEPEND_A[@]}" )
 RDEPEND_A=( "${CDEPEND_A[@]}" )
