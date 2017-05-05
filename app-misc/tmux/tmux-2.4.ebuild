@@ -36,10 +36,9 @@ RDEPEND="${CDEPEND}
 "
 
 src_prepare() {
-	eapply 	"${FILESDIR}"/${PN}-2.3-flags.patch
-	# usptream fixes (can be removed with next version bump)
-	eapply "${FILESDIR}"/${P}-screen_write_copy-fix.patch
 	eapply_user
+
+	sed -r -e '/^(AM_)?CFLAGS/ s, -(O2|g),,g' -i Makefile.am || die
 
 	eautoreconf
 }
