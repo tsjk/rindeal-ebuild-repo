@@ -57,6 +57,8 @@ pkg_setup() {
 
 src_prepare() {
 	eapply "${FILESDIR}"/2.0.2-ncurses-tinfo.patch
+	eapply "${FILESDIR}"/2.0.2-bb8dec15829bb90ef2e637312e45e90b8ab4c64b.patch # [PATCH] Cap battery at 100%.
+	eapply "${FILESDIR}"/2.0.2-parseBatInfo-check-for-null-string.patch # https://github.com/hishamhm/htop/pull/620
 	xdg_src_prepare
 
 	# improve .desktop file (https://github.com/hishamhm/htop/pull/609)
