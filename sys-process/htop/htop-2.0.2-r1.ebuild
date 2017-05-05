@@ -50,8 +50,7 @@ pkg_setup() {
 	fi
 
 	CONFIG_CHECK="
-		$(usex taskstats '~TASKSTATS' '')
-		$(usex cgroup '~CGROUPS' '')"
+		$(usex taskstats '~TASKSTATS' '')"
 	linux-info_pkg_setup
 }
 
