@@ -15,7 +15,7 @@ DESCRIPTION="Qt-based image viewer"
 HOMEPAGE="https://www.nomacs.org/ ${GH_HOMEPAGE}"
 LICENSE="GPL-3+"
 
-plugins_commit="fd199cf231257bd91fc9fd9aabc36d91d4a28ccd" # 2016-07-22
+plugins_commit="be5886fab002d84963daab7820bd04f703e74b59" # 2017-03-23
 SLOT="0"
 git-hosting_gen_snapshot_url "github:${PN}:${PN}-plugins" "${plugins_commit}" plugins_snap_url plugins_snap_ext
 SRC_URI+="
@@ -36,8 +36,8 @@ CDEPEND_A=(
 
 	">=media-gfx/exiv2-0.25:="
 
-	"opencv? ( >=media-libs/opencv-2.1.0:=[qt5] )"
-	"raw? ( >=media-libs/libraw-0.12.0:= )"
+	"opencv? ( >=media-libs/opencv-2.4.6:=[qt5] )"
+	"raw? ( >=media-libs/libraw-0.17.0:= )"
 	"tiff? ( media-libs/tiff:0 )"
 	"zip? ( dev-libs/quazip[qt5] )"
 )
@@ -81,20 +81,18 @@ src_prepare-locales() {
 
 src_prepare() {
 	# prevent these from interfering with the build
-	rm -r "${S_OLD}"/{LibRaw-*,exiv2-*,expat,herqq,installer,zlib-*} || die
+	rm -r "${S_OLD}"/{LibRaw-*,exiv2-*,expat,installer,zlib-*} || die
 	rm -r "${S}"/3rdparty/quazip-* || die
 
-	sed -e "s|@EPREFIX@|${EPREFIX}|g" \
-		-e "s|@libdir@|$(get_libdir)|g" \
-		-- "${FILESDIR}"/3.4-fix_plugins_dir.patch.in \
-		> "${T}"/3.4-fix_plugins_dir.patch || die
+
+	sed -e 's|QStringList libPaths = QCoreApplication::libraryPaths();|QStringList libPaths;|' \
+		-e "s|libPaths.append(QCoreApplication::applicationDirPath() + \"/plugins\");|libPaths.append(\"${EPREFIX}/usr/$(get_libdir)/nomacs-plugins\");|" \
+		-i -- src/DkCore/DkPluginManager.cpp || die
 
 	if use plugins ; then
 		sed -e "s|DESTINATION lib/nomacs-plugins|DESTINATION $(get_libdir)/nomacs-plugins|" \
 			-i -- plugins/cmake/Utils.cmake || die
 	fi
-
-	eapply "${T}"/3.4-fix_plugins_dir.patch
 
 	xdg_src_prepare
 	cmake-utils_src_prepare
