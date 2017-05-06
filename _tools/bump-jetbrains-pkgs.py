@@ -137,7 +137,7 @@ def update_pkg(cat, pn, slot, from_v, to_v):
         return 1
 
     LOCK.acquire()
-    run_cmd('git add {0}-{2}.ebuild')
+    run_cmd('git add {}-{}.ebuild'.format(pn, to_v))
     if slot == "latest":
         run_cmd("git commit -m '{}/{}: new version v{}' .".format(cat, pn, to_v))
     else: # bump inside a slot
