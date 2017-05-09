@@ -16,8 +16,10 @@ esac
 inherit rindeal
 
 
-# functions: make_desktop_entry, newicon, eshopts_push
+# functions: make_desktop_entry, newicon
 inherit eutils
+# functions: eshopts_push, eshopts_pop
+inherit estack
 # functions: get_version_component_range, get_major_version
 inherit versionator
 # EXPORT_FUNCTIONS: src_prepare, pkg_preinst, pkg_postinst, pkg_postrm
@@ -205,10 +207,14 @@ _jetbrains-intellij_src_install-fix() {
 	echmod a+x bin/${JBIJ_STARTUP_SCRIPT_NAME}
 	echmod a+x bin/fsnotifier*
 
-	local jre_bin_dir=jre/jre/bin
-	# https://github.com/rindeal/gentoo-overlay/issues/160
-	(( $(get_major_version) >= 2017 )) && jre_bin_dir=jre/bin
-	use system-jre || echmod a+x ${jre_bin_dir}/*
+	if ! use system-jre ; then
+		# upstream renames/moves this dir very often
+		# https://github.com/rindeal/gentoo-overlay/issues/160
+		# https://github.com/rindeal/gentoo-overlay/issues/165
+		eshopts_push -s globstar
+		chmod a+x **/jre*/**/bin/* || die
+		eshopts_pop
+	fi
 }
 
 _jetbrains-intellij_src_install-post() {
