@@ -212,7 +212,7 @@ _jetbrains-intellij_src_install-fix() {
 		# https://github.com/rindeal/gentoo-overlay/issues/160
 		# https://github.com/rindeal/gentoo-overlay/issues/165
 		eshopts_push -s globstar
-		chmod a+x **/jre*/**/bin/* || die
+		echmod a+x **/jre*/**/bin/*
 		eshopts_pop
 	fi
 }
