@@ -6,6 +6,10 @@
     <name>Jan Chren (rindeal)</name>
   </maintainer>
   <use>
-    <flag name="android">Enables Android plugin</flag>
+    <flag name="android">Enable Android plugin</flag>
+    <flag name="kotlin">Enable Kotlin plugin</flag>
+    <flag name="spy-js">Enable Spy.js plugin</flag>
+    <flag name="svn">Enable svn4idea plugin</flag>
+    <flag name="groovy">Enable Groovy plugin</flag>
   </use>
 </pkgmetadata>
