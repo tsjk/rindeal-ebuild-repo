@@ -8,7 +8,7 @@ JBIJ_URI="idea/ideaIU-${PV}"
 
 inherit jetbrains-intellij
 
-DESCRIPTION="IntelliJ IDEA is a capable and ergonomic Java IDE"
+DESCRIPTION="${JBIJ_PN_PRETTY} is a capable and ergonomic Java IDE"
 
 IUSE="android"
 
