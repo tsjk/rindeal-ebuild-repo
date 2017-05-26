@@ -47,7 +47,7 @@ LICENSE='BSD'
 [[ -z "${LT_SONAME}" ]] && die "LT_SONAME not defined or empty"
 SLOT="0/${LT_SONAME}"
 # prepared tarball saves eautoreconf() call. Repo snapshot is not needed for now.
-SRC_URI="${GH_BASE_URI}/releases/download/libtorrent-${PV//./_}/${P}.tar.gz"
+SRC_URI="${GH_REPO_URL}/releases/download/libtorrent-${PV//./_}/${P}.tar.gz"
 
 
 [[ "${PV}" != *9999* ]] && [[ -z "${KEYWORDS}" ]] && \
@@ -69,7 +69,7 @@ DEPEND="${RDEPEND}
 	sys-devel/libtool"
 
 REQUIRED_USE="python? ( ${PYTHON_REQUIRED_USE} )"
-RESTRICT+=" test"
+RESTRICT+=" mirror test"
 
 
 EXPORT_FUNCTIONS src_unpack src_prepare src_configure src_compile src_install
