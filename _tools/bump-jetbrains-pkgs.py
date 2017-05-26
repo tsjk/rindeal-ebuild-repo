@@ -150,46 +150,67 @@ def run_cmd(cmd):
     pn = os.path.basename(os.getcwd())
     print("> \033[94m{}\033[0m: `\033[93m{}\033[0m`".format(pn, cmd))
     err = os.system(cmd)
-    #err = 0
     if err:
         print("{}: command '{}' failed with code {}".format(pn, cmd, err))
     return err
 
 
 def update_pkg(cat, pn, loc_slot, loc_ver, rem_slot, rem_ver):
-    global LOCK
+    global GIT_LOCK
 
-    os.chdir("{}/{}/{}".format(PORTDIR_OVERLAY, cat, pn))
+    cat_pn = "{}/{}".format(cat, pn)
+
+    os.chdir("{}/{}".format(PORTDIR_OVERLAY, cat_pn))
+
+    PKG_LOCKS[cat_pn].acquire()
 
     new_slot = 0 if loc_slot == rem_slot else 1
 
-    LOCK.acquire()
+    GIT_LOCK.acquire()
     if new_slot: # bump into a new slot
         run_cmd('cp -v {0}-{1}*.ebuild {0}-{2}.ebuild'.format(pn, loc_slot, rem_ver))
     else: # bump inside a slot
         run_cmd('git mv -v {0}-{1}*.ebuild {0}-{2}.ebuild'.format(pn, loc_ver, rem_ver))
-    LOCK.release()
+    GIT_LOCK.release()
 
     if run_cmd('repoman manifest') != 0:
-        LOCK.acquire()
+        GIT_LOCK.acquire()
+        run_cmd('git reset -- .')
         run_cmd('git checkout -- .')
-        LOCK.release()
+        GIT_LOCK.release()
+
+        PKG_LOCKS[cat_pn].release()
+
         return 1
 
-    LOCK.acquire()
-    run_cmd('git add {}-{}.ebuild'.format(pn, rem_ver))
+    GIT_LOCK.acquire()
+    run_cmd('git add {0}-{1}.ebuild'.format(pn, rem_ver))
     if new_slot:
-        run_cmd("git commit -m '{}/{}: new version v{}' .".format(cat, pn, rem_ver))
+        run_cmd("git commit -m '{0}/{1}: new version v{2}' .".format(cat, pn, rem_ver))
     else: # bump inside a slot
-        run_cmd("git commit -m '{}/{}: bump to v{}' .".format(cat, pn, rem_ver))
-    LOCK.release()
+        run_cmd("git commit -m '{0}/{1}: bump to v{2}' .".format(cat, pn, rem_ver))
+    GIT_LOCK.release()
+
+    PKG_LOCKS[cat_pn].release()
 
 # only one git command may run concurrently
-LOCK = Lock()
+GIT_LOCK = Lock()
+PKG_LOCKS = {}
 
+# https://stackoverflow.com/a/25558333/2566213
+def pool_init(l):
+    global PKG_LOCKS
+    PKG_LOCKS = l
+
+for update in update_table:
+    cat_pn = "{}/{}".format(update['cat'], update['pn'])
+    if not cat_pn in PKG_LOCKS:
+        PKG_LOCKS[cat_pn] = Lock()
+
+# DEBUG
 #update_pkg(update_table[0])
 
-pool = Pool(4)
+pool = Pool(processes=8, initializer=pool_init, initargs=(PKG_LOCKS, ))
 
 for update in update_table:
     pool.apply_async(func=update_pkg, kwds=update)
