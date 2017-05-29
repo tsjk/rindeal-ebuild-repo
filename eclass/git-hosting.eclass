@@ -156,7 +156,7 @@ git-hosting_gen_live_url() {
 	_gh_gen_repo_url "${provider}" "${user}" "${repo}" repo_url
 	readonly repo_url
 
-	live_url_nref="${base_uri%'.git'}.git"
+	live_url_nref="${repo_url%'.git'}.git"
 }
 
 ##
