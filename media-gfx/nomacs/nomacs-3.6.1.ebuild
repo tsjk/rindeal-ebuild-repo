@@ -84,7 +84,6 @@ src_prepare() {
 	rm -r "${S_OLD}"/{LibRaw-*,exiv2-*,expat,installer,zlib-*} || die
 	rm -r "${S}"/3rdparty/quazip-* || die
 
-
 	sed -e 's|QStringList libPaths = QCoreApplication::libraryPaths();|QStringList libPaths;|' \
 		-e "s|libPaths.append(QCoreApplication::applicationDirPath() + \"/plugins\");|libPaths.append(\"${EPREFIX}/usr/$(get_libdir)/nomacs-plugins\");|" \
 		-i -- src/DkCore/DkPluginManager.cpp || die
