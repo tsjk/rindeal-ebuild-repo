@@ -41,7 +41,7 @@ src_configure() {
 src_install() {
 	dobin mpc-qt
 
-	newicon -s scalable "image-sources/logo.svg" "${PN}.svg"
+	newicon -s scalable "images/icon/logo.svg" "${PN}.svg"
 
 	einstalldocs
 
