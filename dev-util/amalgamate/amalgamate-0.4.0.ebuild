@@ -4,7 +4,7 @@
 EAPI=6
 inherit rindeal
 
-GH_RN="github:rindeal:Amalgamate"
+GH_RN="gitlab:rindeal:Amalgamate"
 
 inherit git-hosting
 
