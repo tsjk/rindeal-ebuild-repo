@@ -1,5 +1,5 @@
 # Copyright 1999-2016 Gentoo Foundation
-# Copyright 2016 Jan Chren (rindeal)
+# Copyright 2016-2017 Jan Chren (rindeal)
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
@@ -29,7 +29,7 @@ IUSE="libav qt4 qt5"
 CDEPEND_A=(
 	"dev-libs/expat"
 	"sys-libs/glibc"
-	"dev-libs/openssl:0"
+	"dev-libs/openssl:0[-bindist(-)]"
 	"sys-libs/zlib"
 
 	## prefer qt5 when both qt4 and qt5 are enabled
@@ -72,33 +72,32 @@ declare -A L10N_LOCALES_MAP=(
 	['es']='spa'
 	['sv']='swe'
 )
-L10N_LOCALES=( ${!L10N_LOCALES_MAP[@]} )
+L10N_LOCALES=( "${!L10N_LOCALES_MAP[@]}" )
 inherit l10n-r1
 
 S="${WORKDIR}/${MY_P_OSS}"
 
 src_prepare() {
-	eapply "${FILESDIR}"/${PN}-{makefile,path,sysmacros}.patch
-
-	# Qt5 always trumps Qt4 if it is available. There are no configure
-	# options or variables to control this and there is no publicly
-	# available configure.ac either.
-	if use qt4 ; then
-		eapply "${FILESDIR}"/${PN}-qt4.patch
-	elif use qt5 ; then
-		eapply "${FILESDIR}"/${PN}-qt5.patch
-	# else cli only
-	fi
+	eapply "${FILESDIR}"/path.patch
+	eapply "${FILESDIR}"/1.10.5-wget.patch
 
 	xdg_src_prepare
 
 	# make these vars global as they're used in src_install()
-	declare -g LOC_DIR="${WORKDIR}/${MY_P_BIN}"/src/share LOC_PRE='makemkv_' LOC_POST='.mo.gz'
+	declare -g -r -- \
+        LOC_DIR="${WORKDIR}/${MY_P_BIN}"/src/share \
+        LOC_PRE='makemkv_' \
+        LOC_POST='.mo.gz'
 	l10n_find_changes_in_dir "${LOC_DIR}" "${LOC_PRE}" "${LOC_POST}"
 }
 
 src_configure() {
-	local econf_args=()
+	local econf_args=(
+		--enable-debug # do not strip symbols -- this will be done by portage itself
+		--disable-noec # use openssl instead of custom crypto
+		$(use_enable qt4)
+		$(use_enable qt5)
+	)
 
 	if use qt4 || use qt5 ; then
 		econf_args+=( --enable-gui )
@@ -151,12 +150,12 @@ my_install_key_updater() {
 		fi
 
 		echo "app_Key = \"\${new_key}\"" >>"\${f}" || echo "Error appending to the config file"
-		echo "Ok"
+		echo "OK"
 		_EOF_
 	) update-beta-key.sh
 }
 
-src_install() {
+src_install-oss() {
 	### Install OSS components
 	cd "${WORKDIR}/${MY_P_OSS}" || die
 
@@ -191,9 +190,9 @@ src_install() {
 	## example config file
 	insinto "/usr/share/MakeMKV"
 	doins "${FILESDIR}/settings.conf.example"
+}
 
-	# ---
-
+src_install-bin() {
 	### Install binary/pre-compiled/pre-generated components
 	cd "${WORKDIR}/${MY_P_BIN}" || die
 
@@ -220,6 +219,11 @@ src_install() {
 	## END
 }
 
+src_install() {
+	src_install-oss
+	src_install-bin
+}
+
 QA_PREBUILT="usr/bin/makemkvcon usr/bin/mmdtsdec"
 
 pkg_postinst() {
@@ -231,10 +235,13 @@ pkg_postinst() {
 	elog "See this forum thread for more information, including the key:"
 	elog "  http://www.makemkv.com/forum2/viewtopic.php?f=5&t=1053"
 	elog "Note that beta license has an expiration date and you will"
-	elog "need to check for newer licenses/releases."
+	elog "need to check for newer licenses/releases. But you can do so"
+	elog "automatically by using '/usr/libexec/makemkv/update-beta-key.sh'"
+	elog "script."
 	elog ""
 	elog "MakeMKV can also act as a drop-in replacement for libaacs and"
 	elog "libbdplus, allowing transparent decryption of a wider range of"
 	elog "titles under players like VLC and mplayer."
+	elog "See '/etc/env.d/20-makemkv-libmmbd'."
 	elog ""
 }
