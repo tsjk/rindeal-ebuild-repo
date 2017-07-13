@@ -12,7 +12,7 @@ inherit git-hosting
 inherit eutils
 inherit xdg
 
-DESCRIPTION="Example package"
+DESCRIPTION="Free Form Data Organizer"
 HOMEPAGE="http://strlen.com/treesheets/ ${GH_HOMEPAGE}"
 LICENSE="ZLIB"
 
