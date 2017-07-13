@@ -136,6 +136,8 @@
     <flag name="findfs">findfs(8) - find a filesystem by label or UUID</flag>
     <flag name="wipefs">wipefs(8) - wipe a signature from a device</flag>
     <flag name="findmnt">findmnt(8) - find a filesystem</flag>
+    <flag name="blkzone">blkzone(8) - run zone command on a device</flag>
+    <flag name="uuidparse">uuidparse(1) - utility to parse unique identifiers</flag>
 
     <flag name="mkfs">mkfs(8) - build a Linux filesystem</flag>
     <flag name="isosize">isosize(8) - output the length of an iso9660 filesystem</flag>
@@ -181,7 +183,7 @@
     <flag name="column">column(1) - columnate lists</flag>
     <flag name="hexdump">hexdump(1) - display file contents in hexadecimal, decimal, octal, or ascii</flag>
     <flag name="rev">rev(1) - reverse lines characterwise</flag>
-    <flag name="tailf">tailf(1) - follow the growth of a log file; obsolete</flag>
+    <flag name="fincore">fincore(1) - count pages of file contents in core</flag>
 
     <flag name="ionice">ionice(1) - set or get process I/O scheduling class and priority</flag>
     <flag name="taskset">taskset(1) - set or retrieve a process's CPU affinity</flag>

@@ -122,13 +122,13 @@ IUSE_A=(
 
 	# extras:
 	+fdisk +sfdisk +cfdisk
-	+uuidgen +blkid +findfs +wipefs +findmnt
+	+uuidgen +blkid +findfs +wipefs +findmnt blkzone uuidparse
 	+mkfs isosize +fstrim +swapon +lsblk +lscpu
 	chcpu
 	swaplabel +mkswap
 	look mcookie +namei +whereis +getopt +blockdev +prlimit +lslocks
 	+flock ipcmk
-	lsipc +lsns +renice +setsid readprofile +dmesg ctrlaltdel +fsfreeze +blkdiscard ldattach rtcwake setarch +script +scriptreplay col colcrt colrm +column +hexdump rev tailf
+	lsipc +lsns +renice +setsid readprofile +dmesg ctrlaltdel +fsfreeze +blkdiscard ldattach rtcwake setarch +script +scriptreplay col colcrt colrm +column +hexdump rev fincore
 	+ionice +taskset +chrt
 )
 
@@ -220,12 +220,16 @@ REQUIRED_USE_A=(
 	"uuidd? ( libuuid )"
 	# `UL_REQUIRES_BUILD([uuidgen], [libuuid])`
 	"uuidgen? ( libuuid )"
+	# `UL_REQUIRES_BUILD([uuidparse], [libuuid])`
+	# `UL_REQUIRES_BUILD([uuidparse], [libsmartcols])`
+	"uuidparse? ( libuuid libsmartcols )"
 	# `UL_REQUIRES_BUILD([blkid], [libblkid])`
 	"blkid? ( libblkid )"
 	# `UL_REQUIRES_BUILD([findfs], [libblkid])`
 	"findfs? ( libblkid )"
 	# `UL_REQUIRES_BUILD([wipefs], [libblkid])`
-	"wipefs? ( libblkid )"
+	# `UL_REQUIRES_BUILD([wipefs], [libsmartcols])`
+	"wipefs? ( libblkid libsmartcols )"
 	# `UL_REQUIRES_BUILD([findmnt], [libmount])`
 	# `UL_REQUIRES_BUILD([findmnt], [libblkid])`
 	# `UL_REQUIRES_BUILD([findmnt], [libsmartcols])`
@@ -265,6 +269,10 @@ REQUIRED_USE_A=(
 	"lsipc? ( libsmartcols )"
 	# `UL_REQUIRES_BUILD([lsns], [libsmartcols])`
 	"lsns? ( libsmartcols )"
+	# `UL_REQUIRES_BUILD([fincore], [libsmartcols])`
+	"fincore? ( libsmartcols )"
+	# `UL_REQUIRES_BUILD([column], [libsmartcols])`
+	"column? ( libsmartcols )"
 	# `UL_REQUIRES_HAVE([chfn_chsh], [security_pam_appl_h], [PAM header file])`
 	"$(rindeal:dsf:eval 'chfn-chsh-password|user' 'pam')"
 	# `UL_REQUIRES_HAVE([login], [security_pam_appl_h], [PAM header file])`
@@ -303,7 +311,7 @@ pkg_setup() {
 
 my_use_build_init() {
 	local flag="${1}" option="${2:-"${1}"}"
-	egrep -q "UL_BUILD_INIT.*\[${option}\]" configure.ac || die
+	grep -F -q "UL_BUILD_INIT([${option}]" configure.ac || die
 	sed -r -e "s@^(UL_BUILD_INIT *\( *\[${option}\])(, *\[[a-z]{2,}\])?@\1, [$(usex ${flag})]@" \
 		-i -- configure.ac || die
 }
@@ -337,6 +345,8 @@ src_prepare() {
 	my_use_build_init findfs
 	my_use_build_init wipefs
 	my_use_build_init findmnt
+	my_use_build_init blkzone
+# 	my_use_build_init uuidparse # TODO: enable in v2.31
 
 	my_use_build_init mkfs
 	my_use_build_init isosize
@@ -364,6 +374,7 @@ src_prepare() {
 
 	my_use_build_init lsipc
 	my_use_build_init lsns
+	my_use_build_init fincore
 	my_use_build_init renice
 	my_use_build_init setsid
 	my_use_build_init readprofile
@@ -382,7 +393,6 @@ src_prepare() {
 	my_use_build_init column
 	my_use_build_init hexdump
 	my_use_build_init rev
-	my_use_build_init tailf
 
 	my_use_build_init ionice
 	my_use_build_init taskset
