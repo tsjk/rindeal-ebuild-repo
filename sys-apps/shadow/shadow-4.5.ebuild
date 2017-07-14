@@ -26,7 +26,7 @@ KEYWORDS="~amd64 ~arm ~arm64"
 IUSE_A=(
 	nls rpath +man +largefile
 	audit selinux
-	acl libcrack pam skey xattr +account-tools-setuid subordinate-ids utmpx shadowgrp +sha-crypt +nscd
+	acl libcrack pam skey xattr account-tools-setuid subordinate-ids utmpx shadowgrp +sha-crypt +nscd
 )
 
 # Taken from the man/Makefile.am file.
@@ -63,8 +63,6 @@ inherit arrays
 
 src_prepare() {
 	eapply "${FILESDIR}"/4.1.3-dots-in-usernames.patch
-	eapply "${FILESDIR}"/4.4-prototypes.patch
-	eapply "${FILESDIR}"/4.4-load_defaults.patch
 	eapply_user
 
 	# TODO: L10N
@@ -80,7 +78,7 @@ src_prepare() {
 src_configure() {
 	local my_econf_args=(
 		--enable-shared=yes
-		--enable-static=yes
+		--enable-static=no
 
 		--without-tcb # unsupported by upstream and actually by everything
 		# HP-UX 10 limits to 16 characters, so 64 should be pretty safe, unlimited is too dangerous
@@ -110,19 +108,17 @@ src_configure() {
 }
 
 set_login_opt() {
-	local comment="" opt=$1 val=$2
-	if [[ -z ${val} ]]; then
+	local comment="" opt="$1" val="$2"
+	if [[ -z ${val} ]] ; then
 		comment="#"
-		sed -i \
-			-e "/^${opt}\>/s:^:#:" \
-			"${ED}"/etc/login.defs || die
+		sed -e "/^${opt}\>/ s|^|#|" \
+			-i -- "${ED}"/etc/login.defs || die
 	else
-		sed -i -r \
-			-e "/^#?${opt}\>/s:.*:${opt} ${val}:" \
-			"${ED}"/etc/login.defs
+		sed -r -e "/^#?${opt}\>/ s|.*|${opt} ${val}|" \
+			-i -- "${ED}"/etc/login.defs || die
 	fi
-	local res=$(grep "^${comment}${opt}\>" "${ED}"/etc/login.defs)
-	einfo "${res:-Unable to find ${opt} in /etc/login.defs}"
+	local res="$(grep "^${comment}${opt}\>" "${ED}"/etc/login.defs)"
+	einfo "${res:-"Unable to find ${opt} in /etc/login.defs"}"
 }
 
 src_install() {
@@ -200,8 +196,8 @@ src_install() {
 		if use man ; then
 			# remove manpages that pam will install for us
 			# and/or don't apply when using pam
-			erm -f "${ED}"/usr/share/man/man5/suauth.5
-			erm -f "${ED}"/usr/share/man/man5/limits.5
+			erm "${ED}"/usr/share/man/man5/suauth.5
+			use pam || erm "${ED}"/usr/share/man/man5/limits.5
 		fi
 
 		# Remove pam.d files provided by sys-auth/pambase
@@ -211,8 +207,8 @@ src_install() {
 	if use man ; then
 		# Remove manpages that are handled by other packages (sys-apps/coreutils sys-apps/man-pages)
 		erm -f "${ED}"/usr/share/man/man1/id.1
-		erm -f "${ED}"/usr/share/man/man5/passwd.5
-		erm -f "${ED}"/usr/share/man/man3/getspnam.3
+		erm "${ED}"/usr/share/man/man5/passwd.5
+		erm "${ED}"/usr/share/man/man3/getspnam.3
 	fi
 
 	dodoc ChangeLog NEWS TODO doc/{HOWTO,README*,WISHLIST,*.txt}
@@ -220,8 +216,8 @@ src_install() {
 }
 
 pkg_preinst() {
-	erm "${EROOT}"/etc/pam.d/system-auth.new \
-		"${EROOT}/etc/login.defs.new"
+	erm -f "${EROOT}"etc/pam.d/system-auth.new \
+		"${EROOT}"etc/login.defs.new
 }
 
 pkg_postinst() {
@@ -230,7 +226,7 @@ pkg_postinst() {
 		if grpck -r -R "${EROOT}" 2>/dev/null ; then
 			grpconv -R "${EROOT}"
 		else
-			ewarn "Running 'grpck' returned errors.  Please run it by hand, and then"
+			ewarn "Running 'grpck' returned errors. Please run it by hand, and then"
 			ewarn "run 'grpconv' afterwards!"
 		fi
 	fi
