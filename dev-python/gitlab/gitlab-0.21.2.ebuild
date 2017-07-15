@@ -18,10 +18,10 @@ LICENSE="LGPL-3"
 SLOT="0"
 
 KEYWORDS="~amd64 ~arm ~arm64"
-IUSE="docs test"
+IUSE="man test"
 
 DEPEND_A=(
-	"docs? ( dev-python/sphinx )"
+	"man? ( dev-python/sphinx )"
 	"test? ("
 		"dev-python/coverage"
 		"dev-python/testrepository"
@@ -43,11 +43,13 @@ inherit arrays
 src_prepare() {
 	default
 
-	use test || erm -r 'gitlab/tests'
+	use test || \
+		erm -r 'gitlab/tests'
 }
 
 python_compile_all() {
-	use docs && emake -C docs man
+	use man && \
+		emake -C docs man
 }
 
 python_test() {
@@ -57,5 +59,6 @@ python_test() {
 python_install_all() {
 	distutils-r1_python_install_all
 
-	use docs && doman 'docs/_build/man/python-gitlab.1'
+	use man && \
+		doman 'docs/_build/man/python-gitlab.1'
 }
