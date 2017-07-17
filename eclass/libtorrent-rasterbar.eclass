@@ -12,7 +12,7 @@ inherit rindeal
 
 
 [[ -z "${PYTHON_COMPAT}" ]] && \
-	PYTHON_COMPAT=( python{2_7,3_{4,5}} )
+	PYTHON_COMPAT=( python2_7 python3_{4,5,6} )
 [[ -z "${PYTHON_REQ_USE}" ]] && \
 	PYTHON_REQ_USE="threads"
 
@@ -52,24 +52,28 @@ SRC_URI="${GH_REPO_URL}/releases/download/libtorrent-${PV//./_}/${P}.tar.gz"
 
 [[ "${PV}" != *9999* ]] && [[ -z "${KEYWORDS}" ]] && \
 	KEYWORDS='~amd64 ~arm ~arm64'
-IUSE='+crypt debug +dht doc examples python static-libs test'
+IUSE_A=( +crypt debug +dht doc examples python static-libs test )
 
 
-RDEPEND="
-	!!net-libs/rb_libtorrent
-	dev-libs/boost:=[threads]
-	virtual/libiconv
+CDEPEND_A=(
+	"!!net-libs/rb_libtorrent"
+	"dev-libs/boost:=[threads]"
+	"virtual/libiconv"
 
-	crypt? ( dev-libs/openssl:0= )
-	examples? ( !net-p2p/mldonkey )
-	python? ( ${PYTHON_DEPS}
-		dev-libs/boost:=[python,${PYTHON_USEDEP}]
-	)"
-DEPEND="${RDEPEND}
-	sys-devel/libtool"
+	"crypt? ( dev-libs/openssl:0= )"
+	"examples? ( !net-p2p/mldonkey )"
+	"python? ( ${PYTHON_DEPS}"
+		"dev-libs/boost:=[python,${PYTHON_USEDEP}]"
+	")"
+)
+DEPEND_A=( "${CDEPEND_A[@]}"
+	"sys-devel/libtool"
+)
 
-REQUIRED_USE="python? ( ${PYTHON_REQUIRED_USE} )"
+REQUIRED_USE_A=( "python? ( ${PYTHON_REQUIRED_USE} )" )
 RESTRICT+=" mirror test"
+
+inherit arrays
 
 
 EXPORT_FUNCTIONS src_unpack src_prepare src_configure src_compile src_install
@@ -113,7 +117,7 @@ import distutils.ccompiler
 distutils.ccompiler.CCompiler.compile=parallelCCompile
 _EOF_
 	gawk -i inplace -vmonkey_patch="${build_py_monkey_patch}" \
-		'/^setup\(/ { print monkey_patch ; print ; next }1' \
+		'/^setup *\(/ { print monkey_patch ; print ; next }1' \
 		bindings/python/setup.py || die
 
 	use python && distutils-r1_src_prepare
@@ -136,7 +140,7 @@ libtorrent-rasterbar_src_configure() {
 		$(use_enable test tests)
 	)
 
-	if (( $(version_compare "${PV}" 1.1.0 ) = 1 )) ; then
+	if (( $(version_compare "${PV}" 1.1.0 ) == 1 )) ; then
 		my_econf_args+=( $(use_enable debug statistics) )
 	fi
 
