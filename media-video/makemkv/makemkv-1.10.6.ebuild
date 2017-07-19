@@ -19,9 +19,10 @@ LICENSE="LGPL-2.1 MPL-1.1 MakeMKV-EULA openssl"
 SLOT="0"
 MY_P_OSS="${PN}-oss-${PV}"
 MY_P_BIN="${PN}-bin-${PV}"
-SRC_URI="
-	https://www.makemkv.com/download/${MY_P_OSS}.tar.gz
-	https://www.makemkv.com/download/${MY_P_BIN}.tar.gz"
+SRC_URI_A=(
+	https://www.makemkv.com/download{,/old}/${MY_P_OSS}.tar.gz
+	https://www.makemkv.com/download{,/old}/${MY_P_BIN}.tar.gz
+)
 
 KEYWORDS="-* ~amd64"
 IUSE="libav qt4 qt5"
