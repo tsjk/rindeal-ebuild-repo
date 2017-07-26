@@ -1,4 +1,4 @@
-Rindeal's [_Gentoo™_](https://www.gentoo.org/) Overlay <img src="./assets/logo_96.png" title="Sir Benjamin the Bull" alt="logo" align="right">
+Rindeal's Ebuild Repository <img src="./assets/logo_96.png" title="Sir Benjamin the Bull" alt="logo" align="right">
 =================================================================================================
 
 _Packages done right™_
