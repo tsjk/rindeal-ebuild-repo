@@ -4,7 +4,7 @@
 EAPI=6
 inherit rindeal
 
-PYTHON_COMPAT=( python{2_7,3_{3,4,5}} )
+PYTHON_COMPAT=( python2_7 python3_{4,5,6} )
 
 GH_RN='github:Robpol86'
 GH_REF="v${PV}"
