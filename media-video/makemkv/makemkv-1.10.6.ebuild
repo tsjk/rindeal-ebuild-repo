@@ -160,17 +160,29 @@ src_install-oss() {
 	### Install OSS components
 	cd "${WORKDIR}/${MY_P_OSS}" || die
 
-	dolib.so "out/libdriveio.so.0"
-	dolib.so "out/libmakemkv.so.1"
-	dolib.so "out/libmmbd.so.0"
-	## these symlinks are not installed by upstream
-	## TODO: are they still necessary?
-	dosym "libdriveio.so.0"	"/usr/$(get_libdir)/libdriveio.so.0.${PV}"
-	dosym "libdriveio.so.0"	"/usr/$(get_libdir)/libdriveio.so"
-	dosym "libmakemkv.so.1"	"/usr/$(get_libdir)/libmakemkv.so.1.${PV}"
-	dosym "libmakemkv.so.1"	"/usr/$(get_libdir)/libmakemkv.so"
-	dosym "libmmbd.so.0"	"/usr/$(get_libdir)/libmmbd.so"
-	dosym "libmmbd.so.0"	"/usr/$(get_libdir)/libmmbd.so.0.${PV}"
+	for lib in libdriveio libmakemkv libmmbd ; do
+		path="$(echo "out/${lib}.so."?)"
+		name="${path##"out/"}"
+		dolib.so "${path}"
+		## these symlinks are not installed by upstream
+		## TODO: are they still necessary?
+		dosym "${name}"	"/usr/$(get_libdir)/${name}.${PV}"
+		dosym "${name}"	"/usr/$(get_libdir)/${lib}.so"
+	done
+
+	find -type d -name "inc" | \
+	while read -r dir ; do
+		insdir="/usr/include/makemkv"
+		libdirname="$( basename "$( dirname "${dir}" )" )"
+
+		insinto "${insdir}/${libdirname}"
+		doins -r "${dir}"
+
+		instincdir="${ED}/${insdir}/${libdirname}/inc"
+		mv "${instincdir}"/* "${instincdir%%"/inc"}" || die
+		rmdir "${instincdir}" || die
+	done
+	assert
 
 	if use qt4 || use qt5 ; then
 		dobin "out/${PN}"
