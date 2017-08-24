@@ -1,5 +1,5 @@
 # Copyright 1999-2015 Gentoo Foundation
-# Copyright 2016 Jan Chren (rindeal)
+# Copyright 2016-2017 Jan Chren (rindeal)
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
@@ -17,6 +17,10 @@ HOMEPAGE="https://wiki.ubuntu.com/Kernel/Reference/fwts"
 LICENSE="GPL-2"
 
 SLOT="0"
+# get newest release:
+# 
+#     wget -q -O - "http://archive.ubuntu.com/ubuntu/pool/universe/f/fwts/?C=M;O=D" | grep orig.tar | head -n 1 | grep -P -o '(?<=">)[^<>]+(?=</a)'
+#
 SRC_URI="https://launchpad.net/ubuntu/+archive/primary/+files/${PN}_${PV}.orig.tar.gz"
 
 KEYWORDS="~amd64"
