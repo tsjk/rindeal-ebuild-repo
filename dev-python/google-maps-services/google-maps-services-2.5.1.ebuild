@@ -5,7 +5,7 @@ EAPI=6
 inherit rindeal
 
 GH_RN="github:googlemaps:${PN}-python"
-PYTHON_COMPAT=( python{2_7,3_4} )
+PYTHON_COMPAT=( python2_7 python3_{4,5,6} )
 
 inherit distutils-r1
 inherit git-hosting
