@@ -9,7 +9,7 @@ GH_RN="github"
 GH_REF="REL_${PV//./_}"
 
 # The selftests fail with pypy, and urlgrabber segfaults for me.
-PYTHON_COMPAT=( python2_7 python3_{4,5} )
+PYTHON_COMPAT=( python2_7 python3_{4,5,6} )
 
 # Needed for individual runs of testsuite by python impls.
 DISTUTILS_IN_SOURCE_BUILD=1
