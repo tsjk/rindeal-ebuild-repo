@@ -30,7 +30,7 @@ declare -g -a -- _GH_AVAILABLE_PROVIDERS=(
 
 _gh_provider_bitbucket:base_url()	{ printf '%s\n'	'bitbucket.org' ; }
 _gh_provider_bitbucket:snap_ext()	{ printf '%s\n'	'.tar.bz2' ; }
-_gh_provider_bitbucket:snap_url() {
+_gh_provider_bitbucket:snap_url_tail() {
 	(( $# != 1 )) && die
 	local -r -- ref="${1}" snap_ext="$(_gh_provider_bitbucket:snap_ext)"
 								printf '%s\n' 	"get/${ref}${snap_ext}"
