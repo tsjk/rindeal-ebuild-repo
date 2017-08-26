@@ -1,5 +1,5 @@
 # Copyright 1999-2016 Gentoo Foundation
-# Copyright 2016 Jan Chren (rindeal)
+# Copyright 2016-2017 Jan Chren (rindeal)
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
@@ -14,7 +14,7 @@ LICENSE="GPL-2"
 
 SLOT="0"
 
-KEYWORDS="~amd64 ~arm"
+KEYWORDS="~amd64 ~arm ~arm64"
 IUSE="acl cron selinux systemd"
 
 CDEPEND="
@@ -42,12 +42,8 @@ src_prepare() {
 
 	sed -e '/CFLAGS =/ s|-Werror||' -i -- Makefile.am || die
 
-	# https://bugs.gentoo.org/show_bug.cgi?id=357275
-	sed -e "s|/var/lib/logrotate.status|${STATEFILE}|" \
-		-i -- ${PN}.8.in config.h || die
-
 	# prevent these from installing
-	rm -v -f README.{HPUX,Solaris} || die
+	erm README.{HPUX,Solaris}
 
 	eautoreconf
 }
@@ -56,6 +52,12 @@ src_configure() {
 	local econf_args=(
 		$(use_with acl)
 		$(use_with selinux)
+		# --with-compress-command=
+		# --with-uncompress-command=
+		# --with-compress-extension=
+		# --with-default-mail-command
+		# https://bugs.gentoo.org/show_bug.cgi?id=357275
+		--with-state-file-path="${STATEFILE}"
 	)
 	econf "${econf_args[@]}"
 }
