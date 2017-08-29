@@ -40,13 +40,13 @@ IUSE_A=( doc man static-libs nls +rpath
 )
 
 CDEPEND_A=(
-	"$(rindeal:dsf \
+	"$(rindeal:dsf:eval \
 		'(builtin & builtin_libicu) | (runtime & runtime_libicu)' \
 			"dev-libs/icu[static-libs?]" )"
-	"$(rindeal:dsf \
+	"$(rindeal:dsf:eval \
 		'(builtin & builtin_libidn) | (runtime & runtime_libidn)' \
 			"net-dns/libidn[static-libs?]" )"
-	"$(rindeal:dsf \
+	"$(rindeal:dsf:eval \
 		'(builtin & builtin_libidn2) | (runtime & runtime_libidn2)' \
 			"net-dns/libidn2[static-libs?]" )"
 
