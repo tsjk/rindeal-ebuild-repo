@@ -58,9 +58,6 @@ How to install this overlay
 [rindeal]
 ## set this to any location you want
 location = /var/cache/portage/repos/rindeal
-## prefer gentoo-mirror which includes metadata cache, but introduces a delay (<6hours) for hotfixes
-sync-uri =  https://github.com/gentoo-mirror/rindeal.git
-## otherwise use the one and only original source
 #sync-uri = https://github.com/rindeal/gentoo-overlay.git
 sync-type = git
 auto-sync = yes
