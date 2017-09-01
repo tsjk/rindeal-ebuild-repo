@@ -14,7 +14,7 @@ inherit git-hosting
 inherit autotools
 # EXPORT_FUNCTIONS: pkg_setup
 inherit python-any-r1
-# functions: rindeal:dsf
+# functions: rindeal:dsf:eval
 inherit rindeal-utils
 # functions: prune_libtool_files
 inherit eutils

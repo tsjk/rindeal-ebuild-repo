@@ -13,7 +13,7 @@ inherit xdg
 inherit autotools
 # functions: prune_libtool_files
 inherit eutils
-# functions: rindeal:dsf, rindeal:dsf:prefix_flags
+# functions: rindeal:dsf:eval, rindeal:dsf:prefix_flags
 inherit rindeal-utils
 
 DESCRIPTION="Music player for *nix-like systems"

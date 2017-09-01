@@ -9,7 +9,7 @@ GH_RN="github"
 GH_REF="curl-${PV//./_}"
 
 inherit git-hosting
-# functions: rindeal:dsf, rindeal:dsf:prefix_flags
+# functions: rindeal:dsf:eval, rindeal:dsf:prefix_flags
 inherit rindeal-utils
 # functions: eautoreconf
 inherit autotools
@@ -55,7 +55,7 @@ RESTRICT+=" test"
 CDEPEND_A=(
 	"protocol_ldap? ( net-nds/openldap )"
 	"ssl? ("
-		"$(rindeal:dsf \
+		"$(rindeal:dsf:eval \
 			"ssl_openssl|ssl_libressl|ssl_gnutls|ssl_polarssl" \
 				"app-misc/ca-certificates")"
 
