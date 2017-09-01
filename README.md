@@ -81,8 +81,6 @@ emerge --sync
 
 ```sh
 layman -o 'https://github.com/rindeal/gentoo-overlay/raw/master/repositories.xml' -a rindeal
-# or more simply
-layman -a rindeal
 ```
 
 ---
