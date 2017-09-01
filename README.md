@@ -9,7 +9,7 @@ Every package here has been carefully crafted to the highest level of perfection
 
 Features that the vast majority of my ebuilds has in common:
 
- - code in ebuilds is **correct, clean, documented**, thus making packages maintainable and easily updatable
+ - code in ebuilds is **clean and documented**, thus making packages maintainable and easily updatable
  - **USE flags** are provided for almost any configurable option
      - instead of packing multitude of options under a single feature as _Gentoo™_ devs do
  - full **_systemd_** integration (services, templates, timers, ...), no _OpenRC_/_cron_ support
