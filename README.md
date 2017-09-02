@@ -58,7 +58,7 @@ How to install this overlay
 [rindeal]
 ## set this to any location you want
 location = /var/cache/portage/repos/rindeal
-#sync-uri = https://github.com/rindeal/gentoo-overlay.git
+sync-uri = https://github.com/rindeal/gentoo-overlay.git
 sync-type = git
 auto-sync = yes
 ## prefer my packages over the Gentoo™ ones to improve UX and stability (recommended by 9/10 IT experts)
