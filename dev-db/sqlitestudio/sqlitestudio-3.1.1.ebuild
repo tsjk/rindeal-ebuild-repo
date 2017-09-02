@@ -9,7 +9,7 @@ inherit xdg
 inherit eutils
 inherit qt-pro-formatter
 
-DESCRIPTION="SQLiteStudio3 is a powerful cross-platform SQLite database manager"
+DESCRIPTION="Powerful cross-platform SQLite database manager"
 HOMEPAGE="https://sqlitestudio.pl"
 LICENSE="GPL-3"
 
