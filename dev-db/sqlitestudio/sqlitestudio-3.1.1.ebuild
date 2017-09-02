@@ -40,23 +40,31 @@ inherit arrays
 
 # this dir structure resembles upstream guide
 S="${WORKDIR}"
-MY_CORE_SRC_DIR="${S}/SQLiteStudio3"
-MY_PLUGINS_SRC_DIR="${S}/Plugins"
-MY_CORE_BUILD_DIR="${S}/output/build"
-MY_PLUGINS_BUILD_DIR="${MY_CORE_BUILD_DIR}/Plugins"
 
 pkg_setup() {
+	declare -r -g -- \
+		MY_CORE_SRC_DIR="${S}/SQLiteStudio3"
+	declare -r -g -- \
+		MY_PLUGINS_SRC_DIR="${S}/Plugins"
+	declare -r -g -- \
+		MY_CORE_BUILD_DIR="${S}/output/build"
+	declare -r -g -- \
+		MY_PLUGINS_BUILD_DIR="${MY_CORE_BUILD_DIR}/Plugins"
+
 	# NOTE: SQLITESTUDIO_*_DIRS dirs can also be specified at runtime
-	# NOTE: as `SQLITESTUDIO_{PLUGINS,ICONS,FORMS}` env vars, which
-	# NOTE: also accept multiple values as `:` separated list.
+	#       as `SQLITESTUDIO_{PLUGINS,ICONS,FORMS}` env vars, which
+	#       also accept multiple values as `:` separated list.
 
 	# Additional directory to look up for plugins.
 	# NOTE: this dir is the same as for core plugins
-	SQLITESTUDIO_PLUGINS_DIR="/usr/$(get_libdir)/${PN}"
+	declare -r -g -- \
+		SQLITESTUDIO_PLUGINS_DIR="/usr/$(get_libdir)/${PN}"
 	# Additional directory to look up for icons.
-	SQLITESTUDIO_ICONS_DIR="/usr/share/${PN}/icons"
+	declare -r -g -- \
+		SQLITESTUDIO_ICONS_DIR="/usr/share/${PN}/icons"
 	# Additional directory to look up for *.ui files (forms used by plugins).
-	SQLITESTUDIO_FORMS_DIR="/usr/share/${PN}/forms"
+	declare -r -g -- \
+		SQLITESTUDIO_FORMS_DIR="/usr/share/${PN}/forms"
 }
 
 src_prepare() {
@@ -69,7 +77,7 @@ src_prepare() {
 
 	# fix wrong portable conditional
 	# it should be: `portable { ... ; linux { ... } ; }`
-	sed -e 's@linux|portable@portable@' \
+	sed -e 's#linux|portable#portable#' \
 		-i -- "${MY_CORE_SRC_DIR}"/sqlitestudio/sqlitestudio.pro || die
 
 	if ! use nls ; then
@@ -85,8 +93,8 @@ src_prepare() {
 
 	disable_modules() {
 		debug-print-function "${FUNCTION}" "${@}"
-		local file="$1"; shift
-		local modules=( "${@}" )
+		local -r file="$1"; shift
+		local -r modules=( "${@}" )
 
 		# skip if no modules specified
 		(( ${#modules[@]} )) || return 0
@@ -94,7 +102,7 @@ src_prepare() {
 		# build regex simply looking like this: `module1(\|$)|module2(\|$)`
 		local m regex=""
 		for m in "${modules[@]}" ; do
-			regex+="\b${m}\b[ \t]*(\\\\|\r?\$)|"
+			regex+="\b${m}\b[[:space:]]*(\\\\|\r?\$)|"
 		done
 		regex="${regex%"|"}"
 
