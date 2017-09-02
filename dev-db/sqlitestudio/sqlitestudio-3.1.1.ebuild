@@ -72,19 +72,6 @@ src_prepare() {
 	sed -e 's@linux|portable@portable@' \
 		-i -- "${MY_CORE_SRC_DIR}"/sqlitestudio/sqlitestudio.pro || die
 
-	# fix path that points to an upstream dev dir
-	sed -e 's|../../../sqlitestudio/|../../|' \
-		-i -- "${MY_PLUGINS_SRC_DIR}"/DbAndroid/DbAndroid.pro || die
-
-	# fix path to `tclConfig.sh`
-	# idk whether is this a bug in tcl ebuild or upstream
-	sed -e 's|$$TCL_CONFIG_DIR/tclConfig.sh|$$TCL_CONFIG_DIR/../tclConfig.sh|' \
-		-i -- "${MY_PLUGINS_SRC_DIR}"/ScriptingTcl/ScriptingTcl.pro || die
-
-	# fix missing INCLUDEPATH
-	echo "INCLUDEPATH+=../../SQLiteStudio3/coreSQLiteStudio" \
-		>> "${MY_PLUGINS_SRC_DIR}"/DbSqliteCipher/DbSqliteCipher.pro || die
-
 	if ! use nls ; then
 		# delete all files with translations
 		find -type f \( -name "*.ts" -o -name "*.qm" \) -delete || die
