@@ -88,8 +88,8 @@ layman -o 'https://ebuilds.janchren.eu/repos/rindeal/repositories.xml' -a rindea
 
 [protected branches]: https://help.github.com/articles/about-protected-branches/
 [LISTING]: ./LISTING.md
-[New issue]: https://github.com/rindeal/gentoo-overlay/issues/new
-[ci-master-badge]: https://img.shields.io/travis/rindeal/gentoo-overlay/master.svg?style=flat-square&label=master%20build
-[ci-master]: https://travis-ci.org/rindeal/gentoo-overlay
-[ci-dev-badge]: https://img.shields.io/travis/rindeal/gentoo-overlay/dev.svg?style=flat-square&label=dev%20build
-[ci-dev]: https://travis-ci.org/rindeal/gentoo-overlay
+[New issue]: https://github.com/rindeal/rindeal-ebuild-repo/issues/new
+[ci-master-badge]: https://img.shields.io/travis/rindeal/rindeal-ebuild-repo/master.svg?style=flat-square&label=master%20build
+[ci-master]: https://travis-ci.org/rindeal/rindeal-ebuild-repo
+[ci-dev-badge]: https://img.shields.io/travis/rindeal/rindeal-ebuild-repo/dev.svg?style=flat-square&label=dev%20build
+[ci-dev]: https://travis-ci.org/rindeal/rindeal-ebuild-repo
