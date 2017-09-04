@@ -4,14 +4,12 @@
   <repo quality="stable" status="unofficial">
     <name>rindeal</name>
     <description lang="en">Rindeal's collection of solid ebuilds and whatnot</description>
-    <homepage>https://github.com/rindeal/gentoo-overlay</homepage>
+    <homepage>https://ebuilds.janchren.eu/repos/rindeal</homepage>
     <owner type="person">
       <name>Jan Chren (rindeal)</name>
-      <email>dev.rindeal+gentoo-overlay@gmail.com</email>
+      <email>dev.rindeal+rindeal-ebuild-repo@gmail.com</email>
     </owner>
-    <source type="git">https://github.com/rindeal/gentoo-overlay.git</source>
-    <source type="git">git://git@github.com:rindeal/gentoo-overlay.git</source>
-    <source type="git">git+ssh://git@github.com:rindeal/gentoo-overlay.git</source>
-    <feed>https://github.com/rindeal/gentoo-overlay/commits/master.atom</feed>
+    <source type="git">https://ebuilds.janchren.eu/repos/rindeal/.git</source>
+    <feed>https://ebuilds.janchren.eu/repos/rindeal/repositories.xml</feed>
   </repo>
 </repositories>

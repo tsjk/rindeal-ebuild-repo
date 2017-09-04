@@ -58,7 +58,7 @@ How to install this overlay
 [rindeal]
 ## set this to any location you want
 location = /var/cache/portage/repos/rindeal
-sync-uri = https://github.com/rindeal/gentoo-overlay.git
+sync-uri = https://ebuilds.janchren.eu/repos/rindeal/.git
 sync-type = git
 auto-sync = yes
 ## prefer my packages over the Gentoo™ ones to improve UX and stability (recommended by 9/10 IT experts)
@@ -77,7 +77,7 @@ emerge --sync
 ### Automatically with Layman
 
 ```sh
-layman -o 'https://github.com/rindeal/gentoo-overlay/raw/master/repositories.xml' -a rindeal
+layman -o 'https://ebuilds.janchren.eu/repos/rindeal/repositories.xml' -a rindeal
 ```
 
 ---
