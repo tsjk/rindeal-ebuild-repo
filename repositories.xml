@@ -10,6 +10,6 @@
       <email>dev.rindeal+rindeal-ebuild-repo@gmail.com</email>
     </owner>
     <source type="git">https://ebuilds.janchren.eu/repos/rindeal/.git</source>
-    <feed>https://ebuilds.janchren.eu/repos/rindeal/repositories.xml</feed>
+    <feed>https://ebuilds.janchren.eu/repos/rindeal/feed</feed>
   </repo>
 </repositories>
